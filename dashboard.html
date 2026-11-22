@@ -2,688 +2,837 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arrow Trade | Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arrow Trade | Trading Terminal</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
- --bg:#F8F8F6;
- --white:#FFFFFF;
- --navy:#14243B;
- --gold:#B99A58;
- --gold-light:#D8C18B;
- --text:#17263B;
- --muted:#858B94;
- --border:#E8E5DC;
- --soft:#F2F0EA;
+--bg:#F7F8FA;
+--white:#fff;
+--navy:#14243B;
+--gold:#B99A58;
+--text:#17263B;
+--muted:#8993A1;
+--border:#E7EAF0;
+--green:#15966A;
+--red:#DC4C55;
+--softgreen:#E8F7F0;
+--softred:#FCEDEF;
 }
 
-*{box-sizing:border-box}
-
-body{
- margin:0;
- background:var(--bg);
- color:var(--text);
- font-family:'DM Sans',sans-serif;
-}
-
-button{font-family:inherit;cursor:pointer}
-
-.layout{min-height:100vh}
-
-/* SIDEBAR */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+button{cursor:pointer}
 
 .sidebar{
- width:245px;
- background:var(--navy);
- position:fixed;
- left:0;
- top:0;
- bottom:0;
- padding:30px 18px;
- color:white;
- z-index:10;
+position:fixed;left:0;top:0;bottom:0;width:235px;
+background:var(--navy);color:white;padding:25px 16px;z-index:20;
+overflow-y:auto;
 }
 
 .logo{
- font-size:25px;
- font-weight:700;
- letter-spacing:2px;
- padding:0 12px;
+font-family:'Playfair Display',serif;font-size:26px;
+color:#D8C18B;padding:8px 12px 30px;
 }
+.logo small{display:block;font:10px 'DM Sans';letter-spacing:4px;color:#AAB5C3;margin-top:5px}
 
-.logo span{color:var(--gold-light)}
-
-.brandline{
- font-size:10px;
- letter-spacing:3px;
- color:#AEB9C7;
- margin:8px 12px 45px;
+.nav-label{font-size:10px;letter-spacing:2px;color:#8796A8;padding:13px}
+.nav-btn{
+width:100%;border:0;background:transparent;color:#D5DCE5;
+padding:13px 14px;text-align:left;border-radius:8px;
+margin-bottom:4px;font-size:12px;
 }
+.nav-btn:hover,.nav-btn.active{background:#FFFFFF17;color:#E4C98F}
 
-.nav-title{
- color:#AAB4C1;
- font-size:10px;
- letter-spacing:2px;
- margin:28px 12px 12px;
-}
-
-.nav{
- width:100%;
- border:0;
- background:transparent;
- color:#D4DCE5;
- padding:14px;
- text-align:left;
- border-radius:7px;
- margin:4px 0;
- font-size:14px;
- transition:.2s;
-}
-
-.nav:hover,.nav.active{
- background:rgba(185,154,88,.19);
- color:var(--gold-light);
-}
-
-/* MAIN */
-
-.main{
- margin-left:245px;
- padding:30px 38px;
- max-width:1600px;
-}
+.main{margin-left:235px;padding:25px 30px;min-height:100vh}
 
 .topbar{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin-bottom:35px;
- gap:15px;
+display:flex;align-items:center;justify-content:space-between;
+gap:12px;margin-bottom:22px;
 }
 
-.welcome h1{
- margin:0 0 8px;
- font-size:27px;
- font-weight:600;
- color:var(--navy);
+.heading h1{font:26px 'Playfair Display',serif}
+.heading p{font-size:11px;color:var(--muted);margin-top:5px}
+
+.top-actions{display:flex;align-items:center;gap:10px}
+
+.account-tag{
+background:#E8F7F0;color:var(--green);
+padding:8px 12px;border-radius:20px;font-size:10px;font-weight:800;
 }
-
-.welcome h1 span{color:var(--gold)}
-
-.welcome p{
- margin:0;
- color:var(--muted);
- font-size:13px;
-}
-
-/* PROFILE */
-
-.profile-wrap{position:relative}
 
 .profile-btn{
- display:flex;
- align-items:center;
- gap:11px;
- padding:9px 15px;
- background:white;
- border:1px solid var(--border);
- border-radius:40px;
- color:var(--navy);
+border:1px solid var(--border);background:white;padding:9px 13px;
+border-radius:9px;display:flex;align-items:center;gap:9px;
 }
 
 .avatar{
- width:36px;
- height:36px;
- border-radius:50%;
- display:grid;
- place-items:center;
- background:#F1EADB;
- color:#9A783C;
- font-weight:700;
+width:32px;height:32px;background:var(--navy);color:#D8C18B;
+border-radius:50%;display:grid;place-items:center;font-weight:800;
 }
 
-.dropdown{
- display:none;
- position:absolute;
- right:0;
- top:55px;
- width:235px;
- background:white;
- border:1px solid var(--border);
- border-radius:12px;
- padding:18px;
- z-index:30;
- box-shadow:0 12px 35px rgba(20,36,59,.12);
+.profile-menu{
+display:none;position:absolute;right:0;top:55px;
+background:white;border:1px solid var(--border);border-radius:10px;
+padding:12px;width:220px;z-index:30;box-shadow:0 10px 30px #0001;
+}
+.profile-menu.show{display:block}
+.profile-menu p{font-size:11px;color:var(--muted);padding:8px;overflow-wrap:anywhere}
+.profile-menu button{width:100%;border:0;background:#F0F2F5;padding:10px;border-radius:7px}
+
+.profile-wrap{position:relative}
+
+.stats{
+display:grid;grid-template-columns:repeat(4,1fr);
+gap:14px;margin-bottom:20px;
 }
 
-.dropdown.show{display:block}
-
-.dropdown strong{
- display:block;
- color:var(--navy);
- margin-bottom:7px;
+.stat{
+background:white;border:1px solid var(--border);
+border-radius:11px;padding:19px;min-width:0;
 }
 
-.dropdown small{
- color:var(--muted);
- word-break:break-all;
+.stat label{font-size:11px;color:var(--muted)}
+.stat h2{font-size:23px;margin-top:12px;font-weight:800;overflow-wrap:anywhere}
+.stat small{font-size:10px;color:var(--muted)}
+
+.green{color:var(--green)!important}
+.red{color:var(--red)!important}
+.grey{color:var(--muted)!important}
+
+.panel{
+background:white;border:1px solid var(--border);
+border-radius:12px;padding:20px;margin-bottom:18px;
 }
 
-.dropdown button{
- width:100%;
- margin-top:17px;
- padding:12px;
- border:0;
- border-radius:7px;
- background:var(--navy);
- color:white;
+.panel-head{
+display:flex;justify-content:space-between;align-items:center;
+gap:10px;margin-bottom:18px;
+}
+.panel-head h3{font-size:14px}
+.panel-head span{font-size:10px;color:var(--muted)}
+
+.trading-grid{
+display:grid;grid-template-columns:minmax(0,1.6fr) minmax(270px,.8fr);
+gap:17px;
 }
 
-/* CARDS */
-
-.section-title{
- font-size:19px;
- color:var(--navy);
- margin:32px 0 17px;
- font-weight:600;
+.market-top{
+display:flex;justify-content:space-between;align-items:center;
+gap:10px;flex-wrap:wrap;margin-bottom:18px;
 }
 
-.grid{
- display:grid;
- grid-template-columns:repeat(3,1fr);
- gap:17px;
+.market-name{font-size:17px;font-weight:800}
+.market-price{font-size:23px;font-weight:800;margin-top:6px}
+.market-change{font-size:11px;margin-top:5px}
+
+.chart-area{height:270px;position:relative}
+
+.watch-item{
+display:flex;justify-content:space-between;align-items:center;
+padding:13px 0;border-bottom:1px solid var(--border);
+cursor:pointer;
+}
+.watch-item:last-child{border:0}
+.watch-item strong{font-size:12px}
+.watch-item small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.watch-item b{font-size:12px}
+
+.trade-tabs{display:flex;gap:8px;margin-bottom:15px}
+.trade-tabs button{
+flex:1;padding:12px;border:1px solid var(--border);
+background:#F6F7F9;border-radius:8px;font-weight:800;
+}
+.trade-tabs .buy-active{background:var(--softgreen);color:var(--green);border-color:var(--green)}
+.trade-tabs .sell-active{background:var(--softred);color:var(--red);border-color:var(--red)}
+
+.form-label{font-size:11px;color:var(--muted);display:block;margin:13px 0 7px}
+.field{
+border:1px solid var(--border);background:white;
+padding:11px;border-radius:8px;outline:none;width:100%;
 }
 
-.card{
- background:white;
- border:1px solid var(--border);
- border-radius:13px;
- padding:23px;
- box-shadow:0 4px 16px rgba(20,36,59,.025);
+.trade-btn{
+width:100%;border:0;padding:13px;border-radius:8px;
+color:white;font-weight:800;margin-top:16px;
+}
+.buy-btn{background:var(--green)}
+.sell-btn{background:var(--red)}
+.disabled-btn{background:#9AA3AD;cursor:not-allowed}
+
+.section{display:none}
+.section.active{display:block}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:570px}
+th,td{padding:13px 11px;text-align:left;border-bottom:1px solid var(--border);font-size:11px}
+th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}
+
+.badge{
+display:inline-block;padding:5px 9px;border-radius:20px;
+background:#F1F3F5;color:#697586;font-size:10px;font-weight:700;
+}
+.badge-green{background:var(--softgreen);color:var(--green)}
+.badge-red{background:var(--softred);color:var(--red)}
+
+.notice{
+padding:13px;border-radius:9px;background:#F8F4E9;
+color:#806B3F;font-size:11px;line-height:1.6;margin-top:15px;
 }
 
-.card-label{
- font-size:12px;
- color:var(--muted);
- letter-spacing:.5px;
+.empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}
+
+.mobile-menu{display:none}
+.balance-loading{font-size:15px!important;color:var(--muted)}
+
+@media(max-width:1050px){
+.stats{grid-template-columns:repeat(2,1fr)}
+.trading-grid{grid-template-columns:1fr}
 }
 
-.card-value{
- font-size:28px;
- font-weight:700;
- color:var(--navy);
- margin:15px 0 8px;
-}
-
-.gold{color:var(--gold)}
-
-.card-note{
- color:var(--muted);
- font-size:12px;
-}
-
-/* ACTION BUTTONS */
-
-.actions{
- display:flex;
- gap:13px;
- margin-top:22px;
-}
-
-.action{
- padding:14px 25px;
- border-radius:7px;
- border:1px solid var(--navy);
- background:var(--navy);
- color:white;
- font-weight:600;
-}
-
-.action.secondary{
- background:white;
- color:var(--navy);
-}
-
-.action:hover{opacity:.88}
-
-/* CONTENT */
-
-.content-grid{
- display:grid;
- grid-template-columns:1.5fr 1fr;
- gap:18px;
-}
-
-.chart-box{
- height:260px;
- margin-top:20px;
-}
-
-.transaction{
- display:flex;
- justify-content:space-between;
- align-items:center;
- padding:15px 0;
- border-bottom:1px solid var(--border);
- font-size:13px;
- gap:10px;
-}
-
-.transaction:last-child{border:0}
-
-.status{
- color:var(--gold);
- font-size:11px;
- text-transform:capitalize;
-}
-
-.empty{
- color:var(--muted);
- font-size:13px;
- padding:20px 0;
- line-height:1.7;
-}
-
-section{animation:fade .25s ease}
-
-@keyframes fade{
- from{opacity:0;transform:translateY(5px)}
- to{opacity:1;transform:translateY(0)}
-}
-
-@media(max-width:950px){
- .sidebar{width:200px}
- .main{margin-left:200px;padding:24px}
- .grid{grid-template-columns:1fr 1fr}
- .content-grid{grid-template-columns:1fr}
-}
-
-@media(max-width:600px){
- .sidebar{display:none}
- .main{margin:0;padding:22px 16px}
- .topbar{align-items:flex-start}
- .welcome h1{font-size:20px}
- .welcome p{font-size:12px}
- .profile-btn{padding:7px}
- .profile-btn>span:last-child{font-size:12px}
- .grid{grid-template-columns:1fr 1fr;gap:10px}
- .card{padding:15px}
- .card-value{font-size:21px}
- .card-label{font-size:10px}
- .card-note{font-size:11px}
- .actions{gap:9px}
- .action{flex:1;padding:13px 8px;font-size:13px}
- .section-title{font-size:18px}
- .content-grid{grid-template-columns:1fr}
+@media(max-width:700px){
+.sidebar{width:250px;transform:translateX(-100%);transition:.25s}
+.sidebar.open{transform:translateX(0)}
+.main{margin-left:0;padding:18px 13px}
+.mobile-menu{display:block;border:0;background:var(--navy);color:white;border-radius:8px;padding:10px 13px;margin-bottom:16px}
+.topbar{align-items:flex-start}
+.heading h1{font-size:21px}
+.stats{gap:9px}
+.stat{padding:14px}
+.stat h2{font-size:18px}
+.profile-btn{padding:7px}
+.profile-btn .profile-text{display:none}
 }
 </style>
 </head>
 
 <body>
 
-<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="logo">ARROW TRADE<small>TRADING TERMINAL</small></div>
 
-<aside class="sidebar">
- <div class="logo">ARROW <span>TRADE</span></div>
- <div class="brandline">TRADING PLATFORM</div>
+<div class="nav-label">TRADING</div>
+<button class="nav-btn active" onclick="showSection('overview',this)">▦ &nbsp; Dashboard</button>
+<button class="nav-btn" onclick="showSection('markets',this)">◈ &nbsp; Markets</button>
+<button class="nav-btn" onclick="showSection('positions',this)">▤ &nbsp; Open Positions</button>
+<button class="nav-btn" onclick="showSection('orders',this)">↔ &nbsp; Order History</button>
 
- <div class="nav-title">MAIN MENU</div>
- <button class="nav active" onclick="showSection('overview',this)">◈ &nbsp; Overview</button>
- <button class="nav" onclick="showSection('portfolio',this)">▦ &nbsp; Portfolio</button>
- <button class="nav" onclick="showSection('transactions',this)">⇄ &nbsp; Transactions</button>
+<div class="nav-label">WALLET</div>
+<button class="nav-btn" onclick="showSection('wallet',this)">₹ &nbsp; My Wallet</button>
+<button class="nav-btn" onclick="location.href='deposit.html'">＋ &nbsp; Deposit</button>
+<button class="nav-btn" onclick="location.href='withdraw.html'">− &nbsp; Withdraw</button>
 
- <div class="nav-title">ACCOUNT</div>
- <button class="nav" onclick="showSection('deposit',this)">＋ &nbsp; Deposit</button>
- <button class="nav" onclick="showSection('withdraw',this)">↗ &nbsp; Withdraw</button>
- <button class="nav" onclick="showSection('profile',this)">◎ &nbsp; My Profile</button>
+<div class="nav-label">ACCOUNT</div>
+<button class="nav-btn" onclick="showSection('profile',this)">◎ &nbsp; My Profile</button>
 </aside>
 
 <main class="main">
 
+<button class="mobile-menu" onclick="toggleSidebar()">☰ Menu</button>
+
 <header class="topbar">
- <div class="welcome">
-  <h1>Welcome back, <span id="welcomeName">User</span></h1>
-  <p>Your financial overview at a glance.</p>
- </div>
-
- <div class="profile-wrap">
-  <button class="profile-btn" onclick="toggleProfile()">
-   <span class="avatar" id="avatar">U</span>
-   <span>My Account ▾</span>
-  </button>
-
-  <div class="dropdown" id="profileDropdown">
-   <strong id="profileName">User</strong>
-   <small id="profileEmail">Loading...</small>
-   <button onclick="logout()">Logout ↗</button>
-  </div>
- </div>
-</header>
-
-<section id="overview">
-
- <div class="grid">
-
-  <div class="card">
-   <div class="card-label">AVAILABLE BALANCE</div>
-   <div class="card-value gold" id="balance">₹0.00</div>
-   <div class="card-note">Your available wallet balance</div>
-  </div>
-
-  <div class="card">
-   <div class="card-label">TOTAL INVESTMENT</div>
-   <div class="card-value" id="investment">₹0.00</div>
-   <div class="card-note">Portfolio investment value</div>
-  </div>
-
-  <div class="card">
-   <div class="card-label">ACCOUNT STATUS</div>
-   <div class="card-value gold" style="font-size:21px" id="accountStatus">Loading</div>
-   <div class="card-note">Account information</div>
-  </div>
-
- </div>
-
- <div class="actions">
-  <button class="action" onclick="showSection('deposit')">＋ Deposit</button>
-  <button class="action secondary" onclick="showSection('withdraw')">↗ Withdraw</button>
- </div>
-
- <h2 class="section-title">Portfolio Overview</h2>
-
- <div class="content-grid">
-
-  <div class="card">
-   <div class="card-label">PORTFOLIO PERFORMANCE</div>
-   <div class="chart-box">
-    <canvas id="portfolioChart"></canvas>
-   </div>
-   <div class="empty">
-    Performance history will appear when portfolio data is available.
-   </div>
-  </div>
-
-  <div class="card">
-   <div class="card-label">RECENT TRANSACTIONS</div>
-   <div id="recentTransactions" class="empty">Loading transactions...</div>
-  </div>
-
- </div>
-
- <h2 class="section-title">Market Overview</h2>
-
- <div class="card">
-  <div class="empty">
-   Live market data is not connected yet. Verified market data will appear here once a provider is configured.
-  </div>
- </div>
-
-</section>
-
-<section id="portfolio" style="display:none">
- <h2 class="section-title">My Portfolio</h2>
- <div class="card">
-  <div class="card-label">TOTAL INVESTMENT</div>
-  <div class="card-value gold" id="portfolioValue">₹0.00</div>
-  <div class="empty">Your portfolio records will appear here.</div>
- </div>
-</section>
-
-<section id="transactions" style="display:none">
- <h2 class="section-title">Transaction History</h2>
- <div class="card" id="allTransactions">Loading...</div>
-</section>
-
-<section id="deposit" style="display:none">
- <h2 class="section-title">Deposit Funds</h2>
- <div class="card">
-  <p>Submit a deposit request through the approved payment process.</p>
-  <div class="empty">Deposit page will be connected separately.</div>
- </div>
-</section>
-
-<section id="withdraw" style="display:none">
- <h2 class="section-title">Withdraw Funds</h2>
- <div class="card">
-  <p>Manage your withdrawal requests.</p>
-  <div class="empty">Withdrawal page will be connected separately.</div>
- </div>
-</section>
-
-<section id="profile" style="display:none">
- <h2 class="section-title">My Profile</h2>
- <div class="card">
-  <p class="card-label">FULL NAME</p>
-  <strong id="fullName">Loading...</strong>
-
-  <p class="card-label">EMAIL ADDRESS</p>
-  <strong id="emailAddress">Loading...</strong>
-
-  <p class="card-label">ACCOUNT ID</p>
-  <strong id="accountId">Loading...</strong>
- </div>
-</section>
-
-</main>
+<div class="heading">
+<h1>Welcome, <span id="userName">Loading...</span></h1>
+<p>Your trading account overview</p>
 </div>
 
-<script>
-const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+<div class="top-actions">
+<span class="account-tag">REAL ACCOUNT</span>
+<div class="profile-wrap">
+<button class="profile-btn" onclick="toggleProfile()">
+<div class="avatar" id="avatar">A</div>
+<div class="profile-text">
+<strong id="profileName">Loading...</strong>
+</div>
+</button>
+<div class="profile-menu" id="profileMenu">
+<p id="profileEmail">Loading...</p>
+<button onclick="logout()">Logout</button>
+</div>
+</div>
+</div>
+</header>
+ <section id="overview" class="section active">
 
-const db = window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY,
- {
-  auth:{
-   persistSession:true,
-   autoRefreshToken:true,
-   detectSessionInUrl:true
-  }
- }
+<div class="stats">
+<div class="stat">
+<label>Available Balance</label>
+<h2 id="balance" class="balance-loading">Loading...</h2>
+<small>Actual wallet balance</small>
+</div>
+
+<div class="stat">
+<label>Total Investment</label>
+<h2 id="investment">Loading...</h2>
+<small>Recorded investments</small>
+</div>
+
+<div class="stat">
+<label>Total Profit / Loss</label>
+<h2 id="totalPL" class="balance-loading">Loading...</h2>
+<small>Verified records only</small>
+</div>
+
+<div class="stat">
+<label>Today's P&L</label>
+<h2 id="todayPL" class="balance-loading">Loading...</h2>
+<small>Verified daily records</small>
+</div>
+</div>
+
+<div class="trading-grid">
+
+<div class="panel">
+<div class="panel-head">
+<h3>Market Overview</h3>
+<span id="marketConnection">Market feed not connected</span>
+</div>
+
+<div class="market-top">
+<div>
+<div class="market-name" id="selectedSymbol">Market data unavailable</div>
+<div class="market-price" id="marketPrice">—</div>
+<div class="market-change grey" id="marketChange">Waiting for authorized market feed</div>
+</div>
+
+<select id="marketSelect" onchange="selectMarket()">
+<option value="">Select Market</option>
+<option value="EURUSD">EUR/USD</option>
+<option value="GBPUSD">GBP/USD</option>
+<option value="USDJPY">USD/JPY</option>
+<option value="XAUUSD">GOLD</option>
+<option value="BTCUSD">BTC/USD</option>
+</select>
+</div>
+
+<div class="chart-area">
+<canvas id="marketChart"></canvas>
+</div>
+
+<div class="notice">
+Market prices will appear after connecting a genuine market-data provider. No simulated quotes are displayed.
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-head">
+<h3>Market Watch</h3>
+<span>Live feed required</span>
+</div>
+
+<div class="watch-item"><div><strong>EUR/USD</strong><small>Forex</small></div><b class="grey">—</b></div>
+<div class="watch-item"><div><strong>GBP/USD</strong><small>Forex</small></div><b class="grey">—</b></div>
+<div class="watch-item"><div><strong>USD/JPY</strong><small>Forex</small></div><b class="grey">—</b></div>
+<div class="watch-item"><div><strong>GOLD</strong><small>Commodity</small></div><b class="grey">—</b></div>
+<div class="watch-item"><div><strong>BTC/USD</strong><small>Crypto</small></div><b class="grey">—</b></div>
+</div>
+
+</div>
+
+<div class="panel">
+<div class="panel-head"><h3>Recent Account Activity</h3></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+<tbody id="recentActivity"><tr><td colspan="4" class="empty">Loading records...</td></tr></tbody>
+</table>
+</div>
+</div>
+
+</section>
+
+<section id="markets" class="section">
+
+<div class="panel">
+<div class="panel-head"><h3>Markets</h3><span>Authorized feed required</span></div>
+<div class="notice">Live quotes are not configured yet. Prices will not be fabricated.</div>
+</div>
+
+<div class="panel">
+<h3>Trading Order</h3>
+
+<div class="trade-tabs">
+<button id="buyTab" class="buy-active" onclick="setSide('buy')">BUY</button>
+<button id="sellTab" onclick="setSide('sell')">SELL</button>
+</div>
+
+<label class="form-label">Trading Instrument</label>
+<select class="field" id="tradeSymbol">
+<option value="">Select Instrument</option>
+<option value="EURUSD">EUR/USD</option>
+<option value="GBPUSD">GBP/USD</option>
+<option value="USDJPY">USD/JPY</option>
+<option value="XAUUSD">GOLD</option>
+<option value="BTCUSD">BTC/USD</option>
+</select>
+
+<label class="form-label">Order Type</label>
+<select class="field" id="orderType">
+<option value="market">Market Order</option>
+<option value="limit">Limit Order</option>
+</select>
+
+<label class="form-label">Quantity / Units</label>
+<input class="field" id="tradeQuantity" type="number" min="0.01" step="0.01" placeholder="Enter quantity">
+
+<label class="form-label">Stop Loss (Optional)</label>
+<input class="field" id="stopLoss" type="number" min="0" step="any" placeholder="Stop loss price">
+
+<label class="form-label">Take Profit (Optional)</label>
+<input class="field" id="takeProfit" type="number" min="0" step="any" placeholder="Take profit price">
+
+<button class="trade-btn disabled-btn" id="placeOrder" disabled>
+Broker Connection Required
+</button>
+
+<div class="notice">
+Order execution is disabled until an authorized broker API is connected and tested. No order will be falsely marked as executed.
+</div>
+</div>
+</section>
+
+<section id="positions" class="section">
+<div class="panel">
+<div class="panel-head"><h3>Open Positions</h3></div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Instrument</th>
+<th>Side</th>
+<th>Quantity</th>
+<th>Entry</th>
+<th>Current</th>
+<th>P&L</th>
+</tr>
+</thead>
+<tbody id="positionsTable">
+<tr><td colspan="6" class="empty">No verified position records available.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="orders" class="section">
+<div class="panel">
+<div class="panel-head"><h3>Order History</h3></div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Order ID</th>
+<th>Instrument</th>
+<th>Side</th>
+<th>Quantity</th>
+<th>Status</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="ordersTable">
+<tr><td colspan="6" class="empty">No order records available.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="wallet" class="section">
+<div class="panel">
+<div class="panel-head"><h3>My Wallet</h3></div>
+<label class="form-label">Actual Available Balance</label>
+<h2 id="walletBalance">Loading...</h2>
+<div class="notice">
+Balance is retrieved from your existing Supabase wallet. No demo balance is used.
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-head"><h3>Wallet Transactions</h3></div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+</thead>
+<tbody id="walletTransactions">
+<tr><td colspan="4" class="empty">Loading...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="profile" class="section">
+<div class="panel">
+<h3>My Profile</h3>
+
+<label class="form-label">Full Name</label>
+<p id="detailName">—</p>
+
+<label class="form-label">Email</label>
+<p id="detailEmail">—</p>
+
+<label class="form-label">Account ID</label>
+<p id="detailAccount">—</p>
+
+<label class="form-label">Account Status</label>
+<p id="detailStatus">—</p>
+</div>
+</section>
+ </main>
+
+<script>
+const SUPABASE_URL="https://sofargknzehbqkdlyywx.supabase.co";
+
+const SUPABASE_KEY="sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+
+const db=window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY,
+{
+auth:{
+persistSession:true,
+autoRefreshToken:true,
+detectSessionInUrl:true
+}
+}
 );
 
 let currentUser=null;
+let profile=null;
+let wallet=null;
+let side="buy";
 
 function money(value){
- return "₹"+Number(value||0).toLocaleString("en-IN",{
-  minimumFractionDigits:2,
-  maximumFractionDigits:2
- });
+return "₹"+Number(value||0).toLocaleString("en-IN",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
 }
 
-async function initDashboard(){
-
- const {data,error}=await db.auth.getSession();
-
- if(error||!data.session){
-  window.location.replace("login.html");
-  return;
- }
-
- currentUser=data.session.user;
- await loadUserData();
+function safe(value){
+return String(value??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+})[c]);
 }
 
-async function loadUserData(){
-
- const user=currentUser;
-
- const {data:profile,error}=await db
-  .from("profiles")
-  .select("id,account_id,full_name,status,role,account_suspended")
-  .eq("id",user.id)
-  .maybeSingle();
-
- if(error){
-  console.error("Profile error:",error);
- }
-
- if(profile?.account_suspended===true){
-  alert("Your account is suspended. Please contact support.");
-  await db.auth.signOut();
-  window.location.replace("login.html");
-  return;
- }
-
- const name=profile?.full_name||user.user_metadata?.full_name||"User";
-
- document.getElementById("welcomeName").textContent=name;
- document.getElementById("profileName").textContent=name;
- document.getElementById("profileEmail").textContent=user.email||"";
- document.getElementById("avatar").textContent=name.charAt(0).toUpperCase();
-
- document.getElementById("fullName").textContent=name;
- document.getElementById("emailAddress").textContent=user.email||"";
- document.getElementById("accountId").textContent=profile?.account_id||"Not assigned";
- document.getElementById("accountStatus").textContent=profile?.status||"Active";
-
- await loadWallet(user.id);
- await loadTransactions(user.id);
- await loadPortfolio(user.id);
+function date(value){
+return value?new Date(value).toLocaleString("en-IN"):"—";
 }
 
-async function loadWallet(userId){
+function showSection(id,button){
+document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+document.getElementById(id).classList.add("active");
 
- const {data,error}=await db
-  .from("wallets")
-  .select("available_balance")
-  .eq("user_id",userId)
-  .maybeSingle();
+document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
 
- if(error){
-  console.error("Wallet error:",error);
-  document.getElementById("balance").textContent="Unavailable";
-  return;
- }
+if(button)button.classList.add("active");
 
- document.getElementById("balance").textContent=money(data?.available_balance||0);
+document.getElementById("sidebar").classList.remove("open");
 }
 
-async function loadTransactions(userId){
-
- const container=document.getElementById("recentTransactions");
- const all=document.getElementById("allTransactions");
-
- const {data,error}=await db
-  .from("deposits")
-  .select("*")
-  .eq("user_id",userId)
-  .order("created_at",{ascending:false})
-  .limit(10);
-
- if(error){
-  console.error("Transaction error:",error);
-  container.textContent="Transaction data unavailable.";
-  all.textContent="Unable to load transaction history.";
-  return;
- }
-
- if(!data||data.length===0){
-  container.textContent="No transactions yet.";
-  all.textContent="No transactions yet.";
-  return;
- }
-
- let html="";
-
- data.forEach(item=>{
-  html+=`
-   <div class="transaction">
-    <div>
-     <strong>Deposit</strong><br>
-     <span class="card-note">${new Date(item.created_at).toLocaleDateString()}</span>
-    </div>
-    <div style="text-align:right">
-     <strong class="gold">${money(item.amount)}</strong><br>
-     <span class="status">${item.status||"Pending"}</span>
-    </div>
-   </div>`;
- });
-
- container.innerHTML=html;
- all.innerHTML=html;
-}
-
-async function loadPortfolio(userId){
-
- const {data,error}=await db
-  .from("portfolios")
-  .select("*")
-  .eq("user_id",userId);
-
- if(error){
-  console.error("Portfolio error:",error);
-  return;
- }
-
- let total=0;
-
- if(data){
-  data.forEach(item=>{
-   total+=Number(item.amount||item.investment_amount||0);
-  });
- }
-
- document.getElementById("investment").textContent=money(total);
- document.getElementById("portfolioValue").textContent=money(total);
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("open");
 }
 
 function toggleProfile(){
- document.getElementById("profileDropdown").classList.toggle("show");
-}
-
-document.addEventListener("click",function(e){
- if(!e.target.closest(".profile-wrap")){
-  document.getElementById("profileDropdown").classList.remove("show");
- }
-});
-
-function showSection(id,button=null){
-
- document.querySelectorAll("main section").forEach(section=>{
-  section.style.display="none";
- });
-
- const selected=document.getElementById(id);
-
- if(selected) selected.style.display="block";
-
- document.querySelectorAll(".nav").forEach(nav=>{
-  nav.classList.remove("active");
- });
-
- if(button) button.classList.add("active");
+document.getElementById("profileMenu").classList.toggle("show");
 }
 
 async function logout(){
-
- if(!confirm("Are you sure you want to logout?")) return;
-
- const {error}=await db.auth.signOut();
-
- if(error){
-  alert("Logout failed: "+error.message);
-  return;
- }
-
- window.location.replace("login.html");
+await db.auth.signOut();
+location.href="login.html";
 }
 
-db.auth.onAuthStateChange((event,session)=>{
- if(event==="SIGNED_OUT"){
-  window.location.replace("login.html");
- }
+function setSide(value){
+side=value;
+
+document.getElementById("buyTab").className=
+value==="buy"?"buy-active":"";
+
+document.getElementById("sellTab").className=
+value==="sell"?"sell-active":"";
+}
+
+function setPL(id,value){
+
+const el=document.getElementById(id);
+
+if(value===null||value===undefined||!Number.isFinite(Number(value))){
+el.textContent="Unavailable";
+el.className="grey";
+return;
+}
+
+const n=Number(value);
+
+el.textContent=(n>0?"+":"")+money(n);
+
+el.className=n>0?"green":n<0?"red":"grey";
+}
+
+async function init(){
+
+const {data,error}=await db.auth.getSession();
+
+if(error||!data.session){
+location.href="login.html";
+return;
+}
+
+currentUser=data.session.user;
+
+await loadProfile();
+await loadWallet();
+await loadInvestments();
+await loadDeposits();
+}
+
+async function loadProfile(){
+
+const {data,error}=await db.from("profiles")
+.select("id,account_id,full_name,status,role,account_suspended")
+.eq("id",currentUser.id)
+.maybeSingle();
+
+if(error){
+console.error("Profile error:",error);
+document.getElementById("userName").textContent="Account";
+return;
+}
+
+if(!data){
+alert("Profile not found.");
+return;
+}
+
+if(data.account_suspended){
+await db.auth.signOut();
+alert("Account suspended.");
+location.href="login.html";
+return;
+}
+
+profile=data;
+
+const name=data.full_name||"Customer";
+const email=currentUser.email||"";
+
+document.getElementById("userName").textContent=name;
+document.getElementById("profileName").textContent=name;
+document.getElementById("profileEmail").textContent=email;
+document.getElementById("avatar").textContent=name.charAt(0).toUpperCase();
+
+document.getElementById("detailName").textContent=name;
+document.getElementById("detailEmail").textContent=email;
+document.getElementById("detailAccount").textContent=data.account_id||"—";
+document.getElementById("detailStatus").textContent=data.status||"Active";
+}
+
+async function loadWallet(){
+
+const {data,error}=await db.from("wallets")
+.select("available_balance")
+.eq("user_id",currentUser.id)
+.maybeSingle();
+
+if(error){
+console.error("Wallet error:",error);
+showUnavailable();
+return;
+}
+
+if(!data){
+wallet=null;
+showUnavailable();
+return;
+}
+
+wallet=Number(data.available_balance);
+
+if(!Number.isFinite(wallet)){
+showUnavailable();
+return;
+}
+
+document.getElementById("balance").textContent=money(wallet);
+document.getElementById("walletBalance").textContent=money(wallet);
+}
+
+function showUnavailable(){
+
+document.getElementById("balance").textContent="Unavailable";
+document.getElementById("walletBalance").textContent="Unavailable";
+
+document.getElementById("balance").className="red";
+}
+
+async function loadInvestments(){
+
+const {data,error}=await db.from("portfolios")
+.select("*")
+.eq("user_id",currentUser.id);
+
+if(error){
+console.error("Portfolio error:",error);
+
+document.getElementById("investment").textContent="Unavailable";
+
+setPL("totalPL",null);
+setPL("todayPL",null);
+
+return;
+}
+
+const rows=data||[];
+
+let total=0;
+let totalProfit=0;
+let todayProfit=0;
+
+const today=new Date().toLocaleDateString("en-CA");
+
+rows.forEach(item=>{
+
+total+=Number(item.amount||item.investment_amount||0);
+
+const p=Number(item.verified_profit||0);
+
+totalProfit+=p;
+
+if(item.created_at&&
+new Date(item.created_at).toLocaleDateString("en-CA")===today){
+todayProfit+=p;
+}
+
 });
 
-initDashboard();
+document.getElementById("investment").textContent=money(total);
+
+setPL("totalPL",totalProfit);
+setPL("todayPL",todayProfit);
+
+renderPositions(rows);
+}
+
+function renderPositions(rows){
+
+const tbody=document.getElementById("positionsTable");
+
+const active=rows.filter(x=>
+["open","active","executed"].includes(
+String(x.status||"").toLowerCase()
+)
+);
+
+if(!active.length){
+tbody.innerHTML='<tr><td colspan="6" class="empty">No open position records found.</td></tr>';
+return;
+}
+
+tbody.innerHTML=active.map(x=>{
+
+const pl=Number(x.verified_profit||0);
+
+return `<tr>
+<td>${safe(x.symbol||x.instrument||"—")}</td>
+<td>${safe(x.side||"—")}</td>
+<td>${safe(x.quantity||"—")}</td>
+<td>${safe(x.entry_price||"—")}</td>
+<td>${safe(x.current_price||"—")}</td>
+<td class="${pl>0?"green":pl<0?"red":"grey"}">
+${pl>0?"+":""}${money(pl)}
+</td>
+</tr>`;
+
+}).join("");
+}
+
+async function loadDeposits(){
+
+const {data,error}=await db.from("deposits")
+.select("*")
+.eq("user_id",currentUser.id)
+.order("created_at",{ascending:false})
+.limit(50);
+
+if(error){
+console.error("Deposits error:",error);
+return;
+}
+
+const rows=data||[];
+
+renderTransactions(rows,"recentActivity");
+renderTransactions(rows,"walletTransactions");
+}
+
+function renderTransactions(rows,id){
+
+const tbody=document.getElementById(id);
+
+if(!rows.length){
+tbody.innerHTML='<tr><td colspan="4" class="empty">No transaction records found.</td></tr>';
+return;
+}
+
+tbody.innerHTML=rows.map(x=>{
+
+const status=String(x.status||"Pending");
+
+const approved=
+status.toLowerCase()==="approved"||
+status.toLowerCase()==="completed";
+
+return `<tr>
+<td>Deposit</td>
+<td>${money(x.amount)}</td>
+<td><span class="badge ${approved?"badge-green":""}">
+${safe(status)}
+</span></td>
+<td>${date(x.created_at)}</td>
+</tr>`;
+
+}).join("");
+}
+
+function selectMarket(){
+
+const symbol=document.getElementById("marketSelect").value;
+
+document.getElementById("selectedSymbol").textContent=
+symbol||"Market data unavailable";
+
+document.getElementById("marketPrice").textContent="—";
+
+document.getElementById("marketChange").textContent=
+"Live market feed not connected";
+
+document.getElementById("marketChange").className=
+"market-change grey";
+}
+
+db.auth.onAuthStateChange(event=>{
+
+if(event==="SIGNED_OUT"){
+location.href="login.html";
+}
+
+});
+
+init();
 </script>
 
 </body>
 </html>
+ 
