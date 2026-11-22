@@ -409,7 +409,7 @@ type==="login"?"Create an account":"Already have an account? Log in";
 document.getElementById("authMessage").textContent=
 db?"Secure authentication is ready.":"Supabase configuration is missing.";
 }
-
+window.authPage = authPage;
 document.getElementById("switchAuth").onclick=()=>{
 authPage(mode==="login"?"signup":"login");
 };
