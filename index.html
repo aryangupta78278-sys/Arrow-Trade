@@ -318,62 +318,142 @@ document.querySelectorAll("[data-tab]").forEach(button=>{
  };
 });
 
-function showTab(tab){
- const titles={
-  overview:"Overview",deposit:"Add Funds",withdraw:"Withdraw",
-  portfolio:"Portfolio",history:"Transaction History",
-  notifications:"Notifications",profile:"My Profile"
- };
- document.getElementById("pageTitle").textContent=titles[tab];
- const panel=document.getElementById("panel");
+async function showTab(tab) {
+  const titles = {
+    overview: "Overview",
+    deposit: "Add Funds",
+    withdraw: "Withdraw",
+    portfolio: "Portfolio",
+    history: "Transaction History",
+    notifications: "Notifications",
+    profile: "My Profile"
+  };
 
- if(tab==="overview"){
-  panel.innerHTML=`
-   <div class="cards">
-    <div class="box"><small>Wallet Balance</small><strong>₹0.00</strong></div>
-    <div class="box"><small>Total Deposits</small><strong>₹0.00</strong></div>
-    <div class="box"><small>Invested Amount</small><strong>₹0.00</strong></div>
-    <div class="box"><small>Portfolio Value</small><strong>₹0.00</strong></div>
-   </div>
-   <div class="two">
-    <div class="box"><h3>Portfolio Overview</h3><div class="empty">No verified portfolio records available.</div></div>
-    <div class="box"><h3>Quick Actions</h3>
-     <button class="action" onclick="showTab('deposit')">＋ Add Funds</button>
-     <button class="action" onclick="showTab('withdraw')">↗ Withdraw</button>
-     <button class="action" onclick="showTab('history')">◷ History</button>
+  document.getElementById("pageTitle").textContent = titles[tab];
+
+  const panel = document.getElementById("panel");
+
+  panel.innerHTML = `
+    <div class="box">
+      <p class="muted">Loading your account information...</p>
     </div>
-   </div>
-   <div class="box" style="margin-top:15px"><h3>Account Information</h3><p class="muted" style="margin-top:12px">Account ID and verification status will appear after profile records are connected.</p></div>`;
- }
- else if(tab==="deposit"||tab==="withdraw"){
-  panel.innerHTML=`
-   <div class="box" style="max-width:650px">
-    <h3>${tab==="deposit"?"Deposit Request":"Withdrawal Request"}</h3>
-    <p class="muted" style="margin:12px 0">Submit a request for review. This interface does not process or release real funds.</p>
-    <div class="field"><label>AMOUNT (INR)</label><input id="amount" type="number" min="1" placeholder="Enter amount"></div>
-    ${tab==="deposit"?'<div class="field"><label>UTR / PAYMENT REFERENCE</label><input id="utr" placeholder="Enter UTR"></div>':'<div class="field"><label>WITHDRAWAL DESTINATION</label><input id="destination" placeholder="Bank / UPI details"></div>'}
-    <button class="formbtn" onclick="alert('Secure backend approval workflow must be connected before real requests can be submitted.')">Submit Request</button>
-   </div>`;
- }
- else if(tab==="portfolio"){
-  panel.innerHTML='<div class="box"><h3>My Portfolio</h3><div class="empty">No portfolio records available.</div></div>';
- }
- else if(tab==="history"){
-  panel.innerHTML='<div class="box"><h3>Transaction History</h3><div class="empty">No transaction records available.</div></div>';
- }
- else if(tab==="notifications"){
-  panel.innerHTML='<div class="box"><h3>Notifications</h3><div class="empty">You are all caught up.</div></div>';
- }
- else{
-  panel.innerHTML='<div class="box"><h3>My Profile</h3><p class="muted" style="margin-top:12px">'+document.getElementById("clientEmail").textContent+'</p></div>';
- }
-}
+  `;
 
-if(db){
- db.auth.getSession().then(({data})=>{
-  if(data.session)openClient(data.session.user.email);
- });
+  if (!db) {
+    panel.innerHTML = `
+      <div class="box">Supabase connection unavailable.</div>
+    `;
+    return;
+  }
+
+  const { data: userData, error: userError } =
+    await db.auth.getUser();
+
+  if (userError || !userData.user) {
+    panel.innerHTML = `
+      <div class="box">Please log in again.</div>
+    `;
+    return;
+  }
+
+  const user = userData.user;
+
+  const { data: profile, error: profileError } =
+    await db.from("profiles")
+      .select("account_id, full_name, status")
+      .eq("id", user.id)
+      .maybeSingle();
+
+  const { data: wallet, error: walletError } =
+    await db.from("wallets")
+      .select("available_balance")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+  if (profileError || walletError) {
+    panel.innerHTML = `
+      <div class="box">
+        Database error: ${
+          profileError?.message || walletError?.message
+        }
+      </div>
+    `;
+    return;
+  }
+
+  const balance = Number(wallet?.available_balance || 0);
+
+  if (tab === "overview") {
+    panel.innerHTML = `
+      <div class="cards">
+        <div class="box">
+          <small>Wallet Balance</small>
+          <strong>₹${balance.toFixed(2)}</strong>
+        </div>
+
+        <div class="box">
+          <small>Total Deposits</small>
+          <strong>₹0.00</strong>
+        </div>
+
+        <div class="box">
+          <small>Invested Amount</small>
+          <strong>₹0.00</strong>
+        </div>
+
+        <div class="box">
+          <small>Portfolio Value</small>
+          <strong>₹0.00</strong>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Account Information</h3>
+        <p style="margin-top:15px">
+          Account ID: ${profile?.account_id || "Not available"}
+        </p>
+        <p style="margin-top:12px">
+          Name: ${profile?.full_name || "Not available"}
+        </p>
+        <p style="margin-top:12px">
+          Status: ${profile?.status || "Pending"}
+        </p>
+      </div>
+    `;
+  }
+
+  else if (tab === "profile") {
+    panel.innerHTML = `
+      <div class="box">
+        <h3>My Profile</h3>
+        <p style="margin-top:15px">Name: ${profile?.full_name || "—"}</p>
+        <p style="margin-top:12px">Email: ${user.email || "—"}</p>
+        <p style="margin-top:12px">Account ID: ${profile?.account_id || "—"}</p>
+        <p style="margin-top:12px">Status: ${profile?.status || "Pending"}</p>
+      </div>
+    `;
+  }
+
+  else if (tab === "deposit" || tab === "withdraw") {
+    panel.innerHTML = `
+      <div class="box">
+        <h3>${titles[tab]}</h3>
+        <p class="muted" style="margin-top:12px">
+          Wallet Balance: ₹${balance.toFixed(2)}
+        </p>
+        <p class="muted" style="margin-top:12px">
+          Secure request processing will be connected next.
+        </p>
+      </div>
+    `;
+  }
+
+  else {
+    panel.innerHTML = `
+      <div class="box">
+        <h3>${titles[tab]}</h3>
+        <div class="empty">No records available yet.</div>
+      </div>
+    `;
+  }
 }
-</script>
-</body>
-</html>
