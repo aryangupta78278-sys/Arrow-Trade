@@ -4,121 +4,193 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Arrow Trade Admin</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090d14;color:white;font-family:Arial}
-header{padding:20px;background:#151c29;border-bottom:1px solid #30394a}
+body{
+ margin:0;background:#090d14;color:white;
+ font-family:Arial,sans-serif
+}
+header{
+ padding:22px;background:#151c29;
+ border-bottom:1px solid #30394a
+}
 header h2{color:#ffda00;margin:0}
-.container{display:flex;min-height:90vh}
-.sidebar{width:220px;background:#111824;padding:15px}
-.sidebar button{display:block;width:100%;text-align:left;padding:15px;margin:5px 0;background:transparent;color:white;border:0;border-radius:8px;font-size:15px}
-.sidebar button.active,.sidebar button:hover{background:#293447;color:#ffda00}
+#loginBox{
+ max-width:420px;margin:45px auto;
+ padding:25px;background:#151e2c;
+ border-radius:12px
+}
+input{
+ width:100%;padding:14px;margin:10px 0;
+ background:#090d14;color:white;
+ border:1px solid #39465a;border-radius:7px
+}
+button{cursor:pointer}
+.action{
+ padding:12px 18px;background:#ffda00;
+ color:#111;border:0;border-radius:7px;
+ font-weight:bold;margin:8px 0
+}
+.container{display:flex;min-height:85vh}
+.sidebar{
+ width:230px;background:#111824;padding:15px;
+ flex-shrink:0
+}
+.sidebar button{
+ display:block;width:100%;text-align:left;
+ padding:15px;margin:5px 0;
+ background:transparent;color:white;
+ border:0;border-radius:8px;font-size:15px
+}
+.sidebar button.active,
+.sidebar button:hover{
+ background:#293447;color:#ffda00
+}
 main{flex:1;padding:25px;min-width:0}
-.card{background:#151e2c;padding:20px;border-radius:12px;margin-bottom:18px;border:1px solid #293447}
-h3{color:#ffda00;margin-top:0}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px}
-.stat{background:#202c3e;padding:20px;border-radius:10px}
-.stat strong{display:block;font-size:27px;margin-top:12px}
-input{padding:12px;width:100%;margin:8px 0;background:#0b111b;border:1px solid #39465a;color:white;border-radius:7px}
-.action{padding:12px 18px;background:#ffda00;color:#111;border:0;border-radius:7px;font-weight:bold}
 .page{display:none}
 .page.active{display:block}
-#dashboardApp{display:none}
-#loginBox{max-width:400px;margin:60px auto}
-.muted{color:#aab5c5;font-size:14px;line-height:1.6}
+.card{
+ background:#151e2c;padding:20px;
+ border-radius:12px;margin-bottom:18px;
+ border:1px solid #293447
+}
+h3{color:#ffda00}
+.stats{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+ gap:15px
+}
+.stat{
+ background:#202c3e;padding:20px;border-radius:10px
+}
+.stat strong{
+ display:block;font-size:28px;margin-top:12px
+}
+.data{
+ white-space:pre-wrap;overflow-wrap:anywhere;
+ background:#0b111b;padding:15px;
+ border-radius:8px;color:#dce5f2;
+ font-size:13px;max-height:500px;overflow:auto
+}
+.muted{color:#aab5c5;font-size:14px}
+#app{display:none}
 @media(max-width:650px){
-.container{display:block}
-.sidebar{width:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
-.sidebar button{font-size:13px;padding:12px}
-main{padding:15px}
+ .container{display:block}
+ .sidebar{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:5px
+ }
+ .sidebar button{font-size:13px;padding:13px}
+ main{padding:15px}
 }
 </style>
 </head>
 
 <body>
 
-<header><h2>ARROW TRADE — ADMIN</h2></header>
+<header>
+<h2>ARROW TRADE — ADMIN</h2>
+</header>
 
-<div id="loginBox" class="card">
+<div id="loginBox">
 <h3>Admin Login</h3>
-<input id="email" type="email" placeholder="Admin email">
+<input id="email" type="email" placeholder="Admin Email">
 <input id="password" type="password" placeholder="Password">
-<button class="action" onclick="adminLogin()">Login</button>
+<button class="action" id="loginBtn">Login</button>
 <p id="message" class="muted"></p>
 </div>
 
-<div id="dashboardApp">
+<div id="app">
+
 <div class="container">
 
 <nav class="sidebar">
-<button class="active" onclick="openPage('dashboard',this)">Dashboard</button>
-<button onclick="openPage('users',this)">User Management</button>
-<button onclick="openPage('deposits',this)">Deposits</button>
-<button onclick="openPage('withdrawals',this)">Withdrawals</button>
-<button onclick="openPage('wallet',this)">Wallet Management</button>
-<button onclick="openPage('payments',this)">Payment Settings</button>
-<button onclick="openPage('notifications',this)">Notifications</button>
-<button onclick="logout()">Logout</button>
+<button class="active" data-page="dashboard">Dashboard</button>
+<button data-page="users">User Management</button>
+<button data-page="deposits">Deposits</button>
+<button data-page="withdrawals">Withdrawals</button>
+<button data-page="wallet">Wallet Management</button>
+<button data-page="payments">Payment Settings</button>
+<button data-page="notifications">Notifications</button>
+<button id="logoutBtn">Logout</button>
 </nav>
 
 <main>
 
-<section id="dashboard" class="page active">
+<section id="page-dashboard" class="page active">
 <h2>Dashboard Overview</h2>
+
 <div class="stats">
-<div class="stat">Total Users<strong id="users">—</strong></div>
-<div class="stat">Pending Deposits<strong id="deposits">—</strong></div>
-<div class="stat">Pending Withdrawals<strong id="withdrawals">—</strong></div>
+<div class="stat">
+Total Users
+<strong id="stat-users">—</strong>
 </div>
+
+<div class="stat">
+Pending Deposits
+<strong id="stat-deposits">—</strong>
+</div>
+
+<div class="stat">
+Pending Withdrawals
+<strong id="stat-withdrawals">—</strong>
+</div>
+</div>
+
+<button class="action" onclick="loadStats()">Refresh Dashboard</button>
+<p id="statsMessage" class="muted"></p>
 </section>
 
-<section id="users" class="page">
+<section id="page-users" class="page">
 <div class="card">
 <h3>User Management</h3>
-<p class="muted">Registered user records aur account status yahan manage honge.</p>
 <button class="action" onclick="loadUsers()">Refresh Users</button>
-<div id="userList" class="muted"></div>
+<pre id="userData" class="data">Click Refresh Users.</pre>
 </div>
 </section>
 
-<section id="deposits" class="page">
+<section id="page-deposits" class="page">
 <div class="card">
 <h3>Deposit Management</h3>
-<p class="muted">Deposit requests, UTR aur payment proofs yahan dekhe ja sakenge.</p>
-<p id="depositInfo">Deposit records load karne ke liye Refresh dabayein.</p>
 <button class="action" onclick="loadDeposits()">Refresh Deposits</button>
+<pre id="depositData" class="data">Click Refresh Deposits.</pre>
 </div>
 </section>
 
-<section id="withdrawals" class="page">
+<section id="page-withdrawals" class="page">
 <div class="card">
 <h3>Withdrawal Management</h3>
-<p class="muted">Withdrawal requests aur unke status yahan dekhe ja sakenge.</p>
-<p id="withdrawalInfo">Withdrawal records load karne ke liye Refresh dabayein.</p>
 <button class="action" onclick="loadWithdrawals()">Refresh Withdrawals</button>
+<pre id="withdrawalData" class="data">Click Refresh Withdrawals.</pre>
 </div>
 </section>
 
-<section id="wallet" class="page">
+<section id="page-wallet" class="page">
 <div class="card">
 <h3>Wallet Management</h3>
-<p class="muted">Wallet records aur verified transactions ka management yahan hoga.</p>
+<button class="action" onclick="loadWallets()">Refresh Wallets</button>
+<pre id="walletData" class="data">Click Refresh Wallets.</pre>
 </div>
 </section>
 
-<section id="payments" class="page">
+<section id="page-payments" class="page">
 <div class="card">
 <h3>Payment Settings</h3>
-<p class="muted">Admin UPI ID aur QR settings yahan configure hongi.</p>
+<button class="action" onclick="loadPayments()">Refresh Settings</button>
+<pre id="paymentData" class="data">Click Refresh Settings.</pre>
 </div>
 </section>
 
-<section id="notifications" class="page">
+<section id="page-notifications" class="page">
 <div class="card">
 <h3>Notifications</h3>
-<p class="muted">Customer notifications ka management yahan configure hoga.</p>
+<button class="action" onclick="loadNotifications()">Refresh Notifications</button>
+<pre id="notificationData" class="data">Click Refresh Notifications.</pre>
 </div>
 </section>
 
@@ -127,85 +199,168 @@ main{padding:15px}
 </div>
 
 <script>
-const SUPABASE_URL="https://sofargknzehbqkdlyywx.supabase.co";
-const SUPABASE_KEY="sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SUPABASE_URL =
+"https://sofargknzehbqkdlyywx.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+
+const db = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+function showData(id,data,error){
+ const box=document.getElementById(id);
+
+ if(error){
+  box.textContent="ERROR: "+error.message;
+  return;
+ }
+
+ box.textContent=data && data.length
+  ? JSON.stringify(data,null,2)
+  : "No records found.";
+}
+
+function openPage(name){
+ document.querySelectorAll(".page").forEach(page=>{
+  page.classList.remove("active");
+ });
+
+ document.getElementById("page-"+name).classList.add("active");
+
+ document.querySelectorAll(".sidebar button[data-page]").forEach(btn=>{
+  btn.classList.toggle("active",btn.dataset.page===name);
+ });
+}
+
+document.querySelectorAll(".sidebar button[data-page]").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+  openPage(btn.dataset.page);
+ });
+});
+
+async function checkAdmin(){
+ const {data:{user}}=await db.auth.getUser();
+
+ if(!user){
+  showLogin();
+  return;
+ }
+
+ const {data,error}=await db
+  .from("profiles")
+  .select("role")
+  .eq("id",user.id)
+  .single();
+
+ if(error || data?.role!=="admin"){
+  await db.auth.signOut();
+  document.getElementById("message").textContent=
+   "Admin access denied.";
+  showLogin();
+  return;
+ }
+
+ document.getElementById("loginBox").style.display="none";
+ document.getElementById("app").style.display="block";
+
+ await loadStats();
+}
 
 async function adminLogin(){
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
- const msg=document.getElementById("message");
- msg.textContent="Checking...";
 
- const {error}=await db.auth.signInWithPassword({email,password});
- if(error){msg.textContent=error.message;return}
+ document.getElementById("message").textContent="Checking login...";
+
+ const {error}=await db.auth.signInWithPassword({
+  email,password
+ });
+
+ if(error){
+  document.getElementById("message").textContent=error.message;
+  return;
+ }
+
  await checkAdmin();
 }
 
-async function checkAdmin(){
- const {data:{user}}=await db.auth.getUser();
- if(!user){showLogin();return}
-
- const {data,error}=await db.from("profiles")
- .select("role").eq("id",user.id).single();
-
- if(error||data?.role!=="admin"){
- await db.auth.signOut();
- document.getElementById("message").textContent="Admin access denied";
- showLogin();return;
- }
-
- document.getElementById("loginBox").style.display="none";
- document.getElementById("dashboardApp").style.display="block";
- await loadStats();
-}
-
 async function loadStats(){
- const a=await db.from("profiles").select("*",{count:"exact",head:true});
- const b=await db.from("deposits").select("*",{count:"exact",head:true}).eq("status","pending");
- const c=await db.from("withdrawals").select("*",{count:"exact",head:true}).eq("status","pending");
+ const [u,d,w]=await Promise.all([
+  db.from("profiles").select("*",{count:"exact",head:true}),
+  db.from("deposits").select("*",{count:"exact",head:true}).eq("status","pending"),
+  db.from("withdrawals").select("*",{count:"exact",head:true}).eq("status","pending")
+ ]);
 
- document.getElementById("users").textContent=a.count??"—";
- document.getElementById("deposits").textContent=b.error?"—":b.count;
- document.getElementById("withdrawals").textContent=c.error?"—":c.count;
-}
+ document.getElementById("stat-users").textContent=
+  u.error?"Error":u.count??0;
 
-function openPage(id,button){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- document.getElementById(id).classList.add("active");
- document.querySelectorAll(".sidebar button").forEach(b=>b.classList.remove("active"));
- button.classList.add("active");
+ document.getElementById("stat-deposits").textContent=
+  d.error?"Error":d.count??0;
+
+ document.getElementById("stat-withdrawals").textContent=
+  w.error?"Error":w.count??0;
+
+ document.getElementById("statsMessage").textContent=
+  [u,d,w].filter(x=>x.error).map(x=>x.error.message).join(" | ");
 }
 
 async function loadUsers(){
- const box=document.getElementById("userList");
- box.textContent="Loading...";
- const {data,error}=await db.from("profiles").select("account_id,full_name,status,role");
- if(error){box.textContent="Could not load users: "+error.message;return}
- box.innerHTML=data.map(u=>`<p>${u.full_name||"User"} | ${u.account_id||""} | ${u.status||"—"} | ${u.role||"user"}</p>`).join("")||"No users found";
+ const {data,error}=await db
+  .from("profiles").select("*").limit(100);
+
+ showData("userData",data,error);
 }
 
 async function loadDeposits(){
- const box=document.getElementById("depositInfo");
- const {data,error}=await db.from("deposits").select("*").order("created_at",{ascending:false}).limit(50);
- box.textContent=error?"Could not load deposits: "+error.message:JSON.stringify(data,null,2);
+ const {data,error}=await db
+  .from("deposits").select("*").limit(100);
+
+ showData("depositData",data,error);
 }
 
 async function loadWithdrawals(){
- const box=document.getElementById("withdrawalInfo");
- const {data,error}=await db.from("withdrawals").select("*").order("created_at",{ascending:false}).limit(50);
- box.textContent=error?"Could not load withdrawals: "+error.message:JSON.stringify(data,null,2);
+ const {data,error}=await db
+  .from("withdrawals").select("*").limit(100);
+
+ showData("withdrawalData",data,error);
+}
+
+async function loadWallets(){
+ const {data,error}=await db
+  .from("wallets").select("*").limit(100);
+
+ showData("walletData",data,error);
+}
+
+async function loadPayments(){
+ const {data,error}=await db
+  .from("payment_settings").select("*").limit(20);
+
+ showData("paymentData",data,error);
+}
+
+async function loadNotifications(){
+ const {data,error}=await db
+  .from("notifications").select("*").limit(100);
+
+ showData("notificationData",data,error);
 }
 
 function showLogin(){
  document.getElementById("loginBox").style.display="block";
- document.getElementById("dashboardApp").style.display="none";
+ document.getElementById("app").style.display="none";
 }
 
 async function logout(){
  await db.auth.signOut();
  showLogin();
 }
+
+document.getElementById("loginBtn").addEventListener("click",adminLogin);
+document.getElementById("logoutBtn").addEventListener("click",logout);
 
 db.auth.getSession().then(({data})=>{
  if(data.session)checkAdmin();
