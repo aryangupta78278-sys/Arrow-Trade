@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrow Trade | Admin Panel</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#090b10;color:#fff;font-family:Arial,sans-serif}
+header{padding:22px;background:#121722;border-bottom:1px solid #292f3b}
+header h2{color:#ffd500}
+.container{max-width:1100px;margin:30px auto;padding:15px}
+.card{background:#141a25;border:1px solid #293141;border-radius:14px;padding:22px;margin-bottom:20px}
+h3{margin-bottom:15px;color:#ffd500}
+input{width:100%;padding:14px;margin:10px 0;background:#090d14;border:1px solid #343d4c;border-radius:8px;color:white}
+button{padding:12px 20px;background:#ffda00;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+#dashboard{display:none}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
+.stat{background:#202938;padding:20px;border-radius:10px}
+.stat strong{display:block;font-size:25px;margin-top:10px}
+.muted{color:#aab3c2;font-size:13px;margin-top:12px}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>ARROW TRADE — ADMIN</h2>
+</header>
+
+<div class="container">
+
+<div class="card" id="loginBox">
+<h3>Admin Login</h3>
+<input id="email" type="email" placeholder="Admin Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="adminLogin()">Login</button>
+<p id="message" class="muted"></p>
+</div>
+
+<div id="dashboard">
+<div class="card">
+<h3>Welcome to Admin Dashboard</h3>
+<p id="adminEmail"></p>
+</div>
+
+<div class="stats">
+<div class="stat">Total Users<strong id="users">—</strong></div>
+<div class="stat">Pending Deposits<strong id="deposits">—</strong></div>
+<div class="stat">Pending Withdrawals<strong id="withdrawals">—</strong></div>
+</div>
+
+<div class="card">
+<h3>Admin Access</h3>
+<p class="muted">Admin authentication successful.</p>
+</div>
+
+<button onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+async function adminLogin(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ const message=document.getElementById("message");
+
+ message.textContent="Checking admin access...";
+
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+
+ if(error){
+  message.textContent=error.message;
+  return;
+ }
+
+ await checkAdmin();
+}
+
+async function checkAdmin(){
+ const {data:{user}}=await db.auth.getUser();
+
+ if(!user){
+  showLogin();
+  return;
+ }
+
+ const {data,error}=await db
+ .from("profiles")
+ .select("role")
+ .eq("id",user.id)
+ .single();
+
+ if(error || data?.role!=="admin"){
+  await db.auth.signOut();
+  document.getElementById("message").textContent="Access denied. Admin only.";
+  showLogin();
+  return;
+ }
+
+ document.getElementById("loginBox").style.display="none";
+ document.getElementById("dashboard").style.display="block";
+ document.getElementById("adminEmail").textContent=user.email;
+
+ await loadStats();
+}
+
+async function loadStats(){
+ const {count:users}=await db.from("profiles").select("*",{count:"exact",head:true});
+ const {count:deposits}=await db.from("deposits").select("*",{count:"exact",head:true}).eq("status","pending");
+ const {count:withdrawals}=await db.from("withdrawals").select("*",{count:"exact",head:true}).eq("status","pending");
+
+ document.getElementById("users").textContent=users??"—";
+ document.getElementById("deposits").textContent=deposits??"—";
+ document.getElementById("withdrawals").textContent=withdrawals??"—";
+}
+
+function showLogin(){
+ document.getElementById("loginBox").style.display="block";
+ document.getElementById("dashboard").style.display="none";
+}
+
+async function logout(){
+ await db.auth.signOut();
+ showLogin();
+}
+
+db.auth.getSession().then(({data})=>{
+ if(data.session) checkAdmin();
+});
+</script>
+
+</body>
+</html>
