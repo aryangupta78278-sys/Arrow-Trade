@@ -805,7 +805,27 @@ async function loadInvestments(){
     money(totalInvestment);
 
   setPL("totalPL",totalProfit);
+const tbody = document.getElementById("myInvestments");
 
+if (!rows.length) {
+  tbody.innerHTML = '<tr><td colspan="4" class="empty">No investments yet</td></tr>';
+} else {
+  tbody.innerHTML = rows.map(item => {
+    const invested = Number(item.invested_amount || 0);
+    const value = Number(item.current_value || 0);
+    const profit = value - invested;
+    const date = item.created_at
+      ? new Date(item.created_at).toLocaleDateString("en-IN")
+      : "—";
+
+    return `<tr>
+      <td>${money(invested)}</td>
+      <td>${money(value)}</td>
+      <td>${money(profit)}</td>
+      <td>${date}</td>
+    </tr>`;
+  }).join("");
+}
   // Daily history table abhi available nahi hai.
   setPL("todayPL",null);
 
