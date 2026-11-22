@@ -5,65 +5,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arrow Trade | Professional Trading Platform</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{
- --bg:#0b0e11;
- --panel:#181a20;
- --panel2:#20232b;
- --line:#30343d;
- --yellow:#f0b90b;
- --text:#eaecef;
- --muted:#848e9c;
- --green:#0ecb81;
- --red:#f6465d;
+--bg:#0b0e11;
+--panel:#181a20;
+--line:#30343d;
+--yellow:#f0b90b;
+--text:#eaecef;
+--muted:#848e9c;
+--green:#0ecb81;
+--red:#f6465d;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
 button,input{font:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
+
 header{
- height:70px;display:flex;align-items:center;justify-content:space-between;
- padding:0 5%;border-bottom:1px solid var(--line);
- background:#0b0e11;position:sticky;top:0;z-index:10
+height:70px;display:flex;align-items:center;
+justify-content:space-between;padding:0 5%;
+border-bottom:1px solid var(--line);
+background:#0b0e11;position:sticky;top:0;z-index:10
 }
 .logo{font-size:23px;font-weight:900;letter-spacing:1px;color:white}
 .logo b{color:var(--yellow)}
 nav{display:flex;gap:30px}
 nav a{color:#b7bdc6;text-decoration:none;font-size:14px}
-nav a:hover{color:var(--yellow)}
 .btn{border:0;border-radius:7px;padding:12px 20px;font-weight:700}
 .yellow{background:var(--yellow);color:#111}
 .darkbtn{background:#202630;color:white;border:1px solid #343b47}
-.btn:hover{filter:brightness(1.1)}
+
 .hero{
- max-width:1250px;margin:auto;padding:85px 25px 65px;
- display:grid;grid-template-columns:1.1fr .9fr;gap:45px;align-items:center
+max-width:1250px;margin:auto;padding:85px 25px 65px;
+display:grid;grid-template-columns:1.1fr .9fr;
+gap:45px;align-items:center
 }
 .tag{color:var(--yellow);font-weight:bold;font-size:12px;letter-spacing:2px}
-h1{font-size:clamp(40px,5vw,68px);line-height:1.08;margin:20px 0;letter-spacing:-2px}
+h1{font-size:clamp(40px,5vw,68px);line-height:1.08;margin:20px 0}
 h1 span{color:var(--yellow)}
-.hero p{color:var(--muted);font-size:16px;line-height:1.8;max-width:560px}
+.hero p{color:var(--muted);font-size:16px;line-height:1.8}
 .hero-buttons{display:flex;gap:12px;margin-top:30px}
-.hero-card{background:linear-gradient(145deg,#20232b,#14171d);border:1px solid #343943;border-radius:17px;padding:25px}
-.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.hero-card{
+background:linear-gradient(145deg,#20232b,#14171d);
+border:1px solid #343943;border-radius:17px;padding:25px
+}
+.card-head{display:flex;justify-content:space-between;margin-bottom:25px}
 .label{font-size:12px;color:var(--muted)}
 .market-price{font-size:30px;font-weight:800;margin:12px 0}
 .chart{height:150px;display:flex;align-items:end;gap:8px;margin-top:25px}
-.chart i{flex:1;background:linear-gradient(#f0b90b,#8b6c12);border-radius:4px 4px 0 0;opacity:.8}
-.stats{max-width:1200px;margin:auto;padding:0 25px 55px;display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.chart i{flex:1;background:linear-gradient(#f0b90b,#8b6c12);border-radius:4px 4px 0 0}
+
+.stats{
+max-width:1200px;margin:auto;padding:0 25px 55px;
+display:grid;grid-template-columns:repeat(4,1fr);gap:15px
+}
 .stat{background:var(--panel);border:1px solid var(--line);padding:22px;border-radius:12px}
 .stat small{color:var(--muted)}
 .stat h3{font-size:22px;margin-top:12px}
 .section{max-width:1200px;margin:auto;padding:25px}
-.section-title{display:flex;justify-content:space-between;align-items:center;margin:30px 0 20px}
-.section-title h2{font-size:25px}
+.section-title{display:flex;justify-content:space-between;margin:30px 0 20px}
 .tablebox{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:650px}
 th,td{text-align:left;padding:18px 20px;border-bottom:1px solid var(--line)}
-th{font-size:12px;color:var(--muted);font-weight:500}
-td{font-size:14px}
-.coin{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#34302a;color:var(--yellow);margin-right:10px;font-weight:bold}
+th{font-size:12px;color:var(--muted)}
+.coin{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#34302a;color:var(--yellow);margin-right:10px}
 .status{color:var(--muted);font-size:11px;background:#292d35;padding:6px 9px;border-radius:20px}
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .feature{background:var(--panel);border:1px solid var(--line);padding:25px;border-radius:12px}
@@ -71,392 +78,589 @@ td{font-size:14px}
 .feature h3{margin:17px 0 10px}
 .feature p{color:var(--muted);line-height:1.7;font-size:14px}
 footer{border-top:1px solid var(--line);padding:30px 5%;color:var(--muted);margin-top:60px}
-.authbox{max-width:440px;margin:65px auto;background:var(--panel);border:1px solid var(--line);padding:30px;border-radius:15px}
+
+.authbox{
+max-width:440px;margin:65px auto;background:var(--panel);
+border:1px solid var(--line);padding:30px;border-radius:15px
+}
 .authbox h2{font-size:27px;margin-bottom:8px}
 .authbox p{color:var(--muted);margin-bottom:22px}
 .field{margin:17px 0}
 .field label{display:block;color:var(--muted);font-size:12px;margin-bottom:9px}
-.field input{width:100%;padding:14px;background:#0b0e11;border:1px solid #383e49;color:white;border-radius:7px;outline:none}
-.field input:focus{border-color:var(--yellow)}
+.field input{
+width:100%;padding:14px;background:#0b0e11;
+border:1px solid #383e49;color:white;border-radius:7px
+}
 .authbox button{width:100%;margin-top:10px}
 .message{color:var(--yellow);font-size:12px;line-height:1.6;margin-top:15px}
 .link{color:var(--yellow);cursor:pointer}
-.dashboard{display:grid;grid-template-columns:230px 1fr;min-height:85vh}
-.sidebar{background:#12151b;border-right:1px solid var(--line);padding:25px 15px}
-.sidebar h4{color:var(--muted);font-size:11px;margin:10px 12px 20px}
-.sidebar button{width:100%;text-align:left;padding:14px 13px;background:transparent;color:#aeb5c0;border:0;border-radius:7px;margin:3px 0}
-.sidebar button:hover,.sidebar button.active{background:#29251a;color:var(--yellow)}
-.main{padding:30px;max-width:1400px;width:100%;margin:auto}
-.main h2{font-size:26px}
+
+.dashboard{
+display:grid;grid-template-columns:250px minmax(0,1fr);
+min-height:calc(100vh - 70px);max-width:1600px;margin:auto
+}
+.sidebar{
+background:#11151c;border-right:1px solid #252b35;
+padding:30px 17px;position:sticky;top:70px;
+height:calc(100vh - 70px);align-self:start
+}
+.sidebar h4{letter-spacing:1.6px;font-size:10px;color:#687386;margin:8px 12px 24px}
+.sidebar button{
+display:flex;align-items:center;gap:12px;
+width:100%;padding:14px 15px;margin:5px 0;
+color:#aab3c2;font-size:13px;font-weight:600;
+background:transparent;border:1px solid transparent;
+border-radius:8px;text-align:left
+}
+.sidebar button:hover{background:#1b222d;color:white}
+.sidebar button.active{
+background:rgba(240,185,11,.10);
+color:var(--yellow);border-color:rgba(240,185,11,.22)
+}
+.main{padding:38px clamp(18px,4vw,54px);max-width:1450px}
+.main h2{font-size:29px;margin-bottom:7px}
 .muted{color:var(--muted)}
-.notice{padding:15px;background:#302817;border:1px solid #69521c;color:#e6c66d;border-radius:8px;margin:20px 0;line-height:1.6;font-size:13px}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:25px 0}
-.box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:20px}
-.box small{color:var(--muted)}
-.box strong{display:block;font-size:23px;margin-top:12px}
-.two{display:grid;grid-template-columns:1.3fr .7fr;gap:15px}
-.action{background:#292d35;color:white;padding:11px 15px;border:1px solid #3b414c;border-radius:7px;margin:5px}
-.action:hover{border-color:var(--yellow)}
+.notice{
+background:rgba(240,185,11,.07);
+border:1px solid rgba(240,185,11,.2);
+color:#d7bd75;border-radius:12px;
+padding:16px 18px;margin:25px 0;font-size:12px
+}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:22px 0}
+.box{
+background:linear-gradient(145deg,#191f29,#141922);
+border:1px solid #293241;border-radius:15px;
+padding:23px;box-shadow:0 8px 28px rgba(0,0,0,.12)
+}
+.box small{font-size:11px;color:#8793a5;text-transform:uppercase}
+.box strong{display:block;font-size:26px;margin-top:14px}
+#panel>.box{margin-top:16px}
+#panel .box h3{font-size:17px;margin-bottom:8px}
+#panel .box p{color:#aab3c2;font-size:13px;line-height:1.7}
+.formbtn,.action{
+border-radius:9px;padding:13px 18px;
+font-size:13px;font-weight:700
+}
+.formbtn{background:var(--yellow);color:#111;border:0}
+.action{background:#202936;color:white;border:1px solid #344052}
 .empty{text-align:center;padding:35px;color:var(--muted)}
-.formbtn{background:var(--yellow);color:#111;padding:13px 18px;border:0;border-radius:7px;font-weight:bold}
+
+.deposit-step{max-width:820px}
+.deposit-step .field{margin:20px 0}
+.deposit-step .field input{
+width:100%;padding:14px;background:#0b0e11;
+border:1px solid #383e49;color:white;border-radius:7px
+}
+.qr-wrap{
+display:grid;grid-template-columns:220px 1fr;
+gap:22px;align-items:center;margin:22px 0;
+padding:18px;background:#0f151e;
+border:1px solid #2b3544;border-radius:14px
+}
+.qr-image{
+width:100%;max-width:220px;aspect-ratio:1/1;
+object-fit:contain;background:white;border-radius:8px;padding:8px
+}
+.step-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.step-note{font-size:13px;line-height:1.6;color:var(--muted);margin-top:12px}
+
 @media(max-width:850px){
- nav{display:none}
- .hero{grid-template-columns:1fr;padding-top:50px}
- .stats,.cards{grid-template-columns:repeat(2,1fr)}
- .features{grid-template-columns:1fr}
- .dashboard{grid-template-columns:1fr}
- .sidebar{display:flex;overflow-x:auto;padding:8px}
- .sidebar h4{display:none}
- .sidebar button{white-space:nowrap;width:auto}
- .main{padding:20px 13px}
- .two{grid-template-columns:1fr}
+nav{display:none}
+.hero{grid-template-columns:1fr;padding-top:50px}
+.stats,.cards{grid-template-columns:repeat(2,1fr)}
+.features{grid-template-columns:1fr}
+.dashboard{grid-template-columns:1fr}
+.sidebar{
+position:sticky;top:70px;height:auto;z-index:8;
+border-right:0;border-bottom:1px solid #252b35;
+padding:8px;background:#11151c;
+display:flex;overflow-x:auto
+}
+.sidebar h4{display:none}
+.sidebar button{white-space:nowrap;width:auto}
+.main{padding:24px 16px}
+}
+@media(max-width:600px){
+.qr-wrap{grid-template-columns:1fr}
+.qr-image{max-width:190px}
 }
 @media(max-width:480px){
- header{padding:0 15px}
- .logo{font-size:19px}
- .hero{padding:45px 17px}
- .stats,.cards{gap:9px;padding-left:14px;padding-right:14px}
- .stat,.box{padding:14px}
- .stat h3,.box strong{font-size:18px}
- .hero-buttons{flex-wrap:wrap}
- .main h2{font-size:22px}
+header{padding:0 15px}
+.logo{font-size:19px}
+.hero{padding:45px 17px}
+.stats,.cards{gap:9px;padding-left:14px;padding-right:14px}
+.stat,.box{padding:14px}
+.stat h3,.box strong{font-size:18px}
+.hero-buttons{flex-wrap:wrap}
+.main h2{font-size:22px}
+#headerUserEmail{display:none}
 }
 </style>
 </head>
+
 <body>
 
 <header>
- <div class="logo">ARROW <b>TRADE</b></div>
- <nav>
-  <a href="#markets">Markets</a>
-  <a href="#features">Products</a>
-  <a href="#about">About</a>
- </nav>
- <div>
-  <button class="btn darkbtn" onclick="authPage('login')">Log In</button>
-  <button class="btn yellow" onclick="authPage('signup')">Sign Up</button>
- </div>
+<div class="logo">ARROW <b>TRADE</b></div>
+
+<nav>
+<a href="#markets">Markets</a>
+<a href="#features">Products</a>
+<a href="#about">About</a>
+</nav>
+
+<div id="publicAuthActions">
+<button class="btn darkbtn" onclick="authPage('login')">Log In</button>
+<button class="btn yellow" onclick="authPage('signup')">Sign Up</button>
+</div>
+
+<div id="signedInActions" class="hidden" style="display:flex;align-items:center;gap:12px">
+<span id="headerUserEmail" class="muted" style="font-size:13px"></span>
+<button class="btn darkbtn" onclick="logout()">Log Out</button>
+</div>
 </header>
 
 <main id="home">
+
 <section class="hero">
- <div>
-  <div class="tag">THE NEXT GENERATION TRADING EXPERIENCE</div>
-  <h1>Explore markets.<br><span>Trade smarter.</span></h1>
-  <p>One powerful platform to monitor global markets, manage your portfolio and access your account tools with clarity and control.</p>
-  <div class="hero-buttons">
-   <button class="btn yellow" onclick="authPage('signup')">Create Account →</button>
-   <button class="btn darkbtn" onclick="document.querySelector('#markets').scrollIntoView({behavior:'smooth'})">Explore Markets</button>
-  </div>
-  <p style="font-size:11px;margin-top:25px">Market quotations require a verified data provider. This platform does not promise returns or execute trades in this starter version.</p>
- </div>
- <div class="hero-card">
-  <div class="card-head">
-   <div><div class="label">MARKET SNAPSHOT</div><h3 style="margin-top:8px">EUR / USD</h3></div>
-   <span class="status">DATA FEED NOT CONNECTED</span>
-  </div>
-  <div class="label">Latest verified price</div>
-  <div class="market-price">— —</div>
-  <div class="muted">Live price will appear when a market-data provider is configured.</div>
-  <div class="chart">
-   <i style="height:35%"></i><i style="height:52%"></i><i style="height:44%"></i>
-   <i style="height:65%"></i><i style="height:58%"></i><i style="height:78%"></i>
-   <i style="height:69%"></i><i style="height:88%"></i><i style="height:76%"></i>
-   <i style="height:96%"></i><i style="height:85%"></i><i style="height:100%"></i>
-  </div>
- </div>
+<div>
+<div class="tag">THE NEXT GENERATION TRADING EXPERIENCE</div>
+<h1>Explore markets.<br><span>Trade smarter.</span></h1>
+<p>One powerful platform to monitor global markets, manage your portfolio and access your account tools with clarity and control.</p>
+
+<div class="hero-buttons">
+<button class="btn yellow" onclick="authPage('signup')">Create Account →</button>
+<button class="btn darkbtn" onclick="document.querySelector('#markets').scrollIntoView({behavior:'smooth'})">Explore Markets</button>
+</div>
+
+<p style="font-size:11px;margin-top:25px">Market quotations require a verified data provider. This platform does not promise returns or execute trades in this starter version.</p>
+</div>
+
+<div class="hero-card">
+<div class="card-head">
+<div><div class="label">MARKET SNAPSHOT</div><h3 style="margin-top:8px">EUR / USD</h3></div>
+<span class="status">DATA FEED NOT CONNECTED</span>
+</div>
+<div class="label">Latest verified price</div>
+<div class="market-price">— —</div>
+<div class="muted">Live price will appear when a market-data provider is configured.</div>
+<div class="chart">
+<i style="height:35%"></i><i style="height:52%"></i><i style="height:44%"></i>
+<i style="height:65%"></i><i style="height:58%"></i><i style="height:78%"></i>
+<i style="height:69%"></i><i style="height:88%"></i><i style="height:76%"></i>
+<i style="height:96%"></i><i style="height:85%"></i><i style="height:100%"></i>
+</div>
+</div>
 </section>
 
 <section class="stats">
- <div class="stat"><small>Platform</small><h3>Global Markets</h3></div>
- <div class="stat"><small>Workspace</small><h3>All-in-One</h3></div>
- <div class="stat"><small>Portfolio</small><h3>Track & Review</h3></div>
- <div class="stat"><small>Experience</small><h3>Built for Clarity</h3></div>
+<div class="stat"><small>Platform</small><h3>Global Markets</h3></div>
+<div class="stat"><small>Workspace</small><h3>All-in-One</h3></div>
+<div class="stat"><small>Portfolio</small><h3>Track & Review</h3></div>
+<div class="stat"><small>Experience</small><h3>Built for Clarity</h3></div>
 </section>
 
 <section class="section" id="markets">
- <div class="section-title"><h2>Market Watch</h2><span class="muted">Live feed not connected</span></div>
- <div class="tablebox"><table>
- <thead><tr><th>PAIR</th><th>MARKET</th><th>PRICE</th><th>24H CHANGE</th><th>STATUS</th></tr></thead>
- <tbody>
- <tr><td><span class="coin">€</span>EUR/USD</td><td>Forex</td><td>—</td><td>—</td><td><span class="status">Awaiting feed</span></td></tr>
- <tr><td><span class="coin">£</span>GBP/USD</td><td>Forex</td><td>—</td><td>—</td><td><span class="status">Awaiting feed</span></td></tr>
- <tr><td><span class="coin">¥</span>USD/JPY</td><td>Forex</td><td>—</td><td>—</td><td><span class="status">Awaiting feed</span></td></tr>
- <tr><td><span class="coin">$</span>USD/INR</td><td>Forex</td><td>—</td><td>—</td><td><span class="status">Awaiting feed</span></td></tr>
- <tr><td><span class="coin">£</span>GBP/INR</td><td>Forex</td><td>—</td><td>—</td><td><span class="status">Awaiting feed</span></td></tr>
- <tr><td><span class="coin">Au</span>XAU/USD</td><td>Metals</td><td>—</td><td>—</td><td><span class="status">Awaiting feed</span></td></tr>
- </tbody></table></div>
+<div class="section-title"><h2>Market Watch</h2><span class="muted">Live feed not connected</span></div>
+<div class="tablebox">
+<table>
+<thead><tr><th>PAIR</th><th>MARKET</th><th>PRICE</th><th>24H CHANGE</th><th>STATUS</th></tr></thead>
+<tbody>
+<tr><td><span class="coin">€</span>EUR/USD</td><td>Forex</td><td>—</td><td>—</td><td>Awaiting feed</td></tr>
+<tr><td><span class="coin">£</span>GBP/USD</td><td>Forex</td><td>—</td><td>—</td><td>Awaiting feed</td></tr>
+<tr><td><span class="coin">¥</span>USD/JPY</td><td>Forex</td><td>—</td><td>—</td><td>Awaiting feed</td></tr>
+<tr><td><span class="coin">$</span>USD/INR</td><td>Forex</td><td>—</td><td>—</td><td>Awaiting feed</td></tr>
+<tr><td><span class="coin">£</span>GBP/INR</td><td>Forex</td><td>—</td><td>—</td><td>Awaiting feed</td></tr>
+<tr><td><span class="coin">Au</span>XAU/USD</td><td>Metals</td><td>—</td><td>—</td><td>Awaiting feed</td></tr>
+</tbody>
+</table>
+</div>
 </section>
 
 <section class="section" id="features">
- <div class="section-title"><h2>One platform. More control.</h2></div>
- <div class="features">
-  <div class="feature"><div class="icon">↗</div><h3>Market Overview</h3><p>Keep track of selected currency pairs and market information in one clean workspace.</p></div>
-  <div class="feature"><div class="icon">▤</div><h3>Portfolio Tracking</h3><p>Review recorded portfolio positions, account valuations and performance history.</p></div>
-  <div class="feature"><div class="icon">◇</div><h3>Account Management</h3><p>Access your profile, funding requests, withdrawals and account notifications.</p></div>
- </div>
+<div class="section-title"><h2>One platform. More control.</h2></div>
+<div class="features">
+<div class="feature"><div class="icon">↗</div><h3>Market Overview</h3><p>Keep track of selected currency pairs and market information in one clean workspace.</p></div>
+<div class="feature"><div class="icon">▤</div><h3>Portfolio Tracking</h3><p>Review recorded portfolio positions, account valuations and performance history.</p></div>
+<div class="feature"><div class="icon">◇</div><h3>Account Management</h3><p>Access your profile, funding requests, withdrawals and account notifications.</p></div>
+</div>
 </section>
 </main>
 
 <section id="auth" class="hidden">
- <div class="authbox">
-  <div class="logo" style="margin-bottom:25px">ARROW <b>TRADE</b></div>
-  <h2 id="authTitle">Welcome Back</h2>
-  <p id="authSubtitle">Log in to your account</p>
-  <form id="authForm">
-   <div class="field hidden" id="nameWrap"><label>FULL NAME</label><input id="fullName" placeholder="Your full name"></div>
-   <div class="field"><label>EMAIL ADDRESS</label><input id="email" type="email" required placeholder="name@example.com"></div>
-   <div class="field"><label>PASSWORD</label><input id="password" type="password" required minlength="6" placeholder="Enter password"></div>
-   <button class="formbtn" id="authButton">Log In</button>
-  </form>
-  <div class="message" id="authMessage"></div>
-  <p style="margin-top:20px"><span class="link" id="switchAuth">Create an account</span> · <span class="link" onclick="homePage()">Back to home</span></p>
- </div>
+<div class="authbox">
+<div class="logo" style="margin-bottom:25px">ARROW <b>TRADE</b></div>
+<h2 id="authTitle">Welcome Back</h2>
+<p id="authSubtitle">Log in to your account</p>
+
+<form id="authForm">
+<div class="field hidden" id="nameWrap">
+<label>FULL NAME</label>
+<input id="fullName" placeholder="Your full name">
+</div>
+<div class="field">
+<label>EMAIL ADDRESS</label>
+<input id="email" type="email" required placeholder="name@example.com">
+</div>
+<div class="field">
+<label>PASSWORD</label>
+<input id="password" type="password" required minlength="6" placeholder="Enter password">
+</div>
+<button class="formbtn" id="authButton">Log In</button>
+</form>
+
+<div class="message" id="authMessage"></div>
+<p style="margin-top:20px">
+<span class="link" id="switchAuth">Create an account</span> ·
+<span class="link" onclick="homePage()">Back to home</span>
+</p>
+</div>
 </section>
 
 <section id="client" class="hidden">
- <div class="dashboard">
-  <aside class="sidebar">
-   <h4>CLIENT WORKSPACE</h4>
-   <button class="active" data-tab="overview">▦ Overview</button>
-   <button data-tab="deposit">＋ Add Funds</button>
-   <button data-tab="withdraw">↗ Withdraw</button>
-   <button data-tab="portfolio">◫ Portfolio</button>
-   <button data-tab="history">◷ History</button>
-   <button data-tab="notifications">♧ Notifications</button>
-   <button data-tab="profile">◎ My Profile</button>
-   <button onclick="logout()">⇥ Log Out</button>
-  </aside>
-  <main class="main">
-   <h2 id="pageTitle">Overview</h2>
-   <p class="muted" id="clientEmail"></p>
-   <div class="notice">Account records are shown only when connected. Funding requests require independent payment verification. No returns or profits are guaranteed.</div>
-   <div id="panel"></div>
-  </main>
- </div>
+<div class="dashboard">
+
+<aside class="sidebar">
+<h4>CLIENT WORKSPACE</h4>
+<button class="active" data-tab="overview">▦ Overview</button>
+<button data-tab="deposit">＋ Add Funds</button>
+<button data-tab="withdraw">↗ Withdraw</button>
+<button data-tab="portfolio">◫ Portfolio</button>
+<button data-tab="history">◷ History</button>
+<button data-tab="notifications">♧ Notifications</button>
+<button data-tab="profile">◎ My Profile</button>
+<button onclick="logout()">⇥ Log Out</button>
+</aside>
+
+<main class="main">
+<h2 id="pageTitle">Overview</h2>
+<p class="muted" id="clientEmail"></p>
+<div class="notice">Account records are shown only when connected. Funding requests require independent payment verification. No returns or profits are guaranteed.</div>
+<div id="panel"></div>
+</main>
+
+</div>
 </section>
 
 <footer id="about">© 2026 Arrow Trade. All rights reserved. Market data is subject to provider availability and applicable regulations.</footer>
 
 <script>
-/* Keep your existing Supabase project URL and publishable key here. */
+
+/* SUPABASE CONFIGURATION */
 const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
 
-let db=null,mode="login";
+let db = null;
+let mode = "login";
 
-if(window.supabase &&
-   SUPABASE_URL.startsWith("https://") &&
-   !SUPABASE_PUBLISHABLE_KEY.startsWith("PASTE")){
- db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+if(window.supabase){
+db = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_PUBLISHABLE_KEY,
+{
+auth:{
+persistSession:true,
+autoRefreshToken:true,
+detectSessionInUrl:true,
+storage:window.localStorage
+}
+}
+);
+}
+
+/* HEADER LOGIN STATE */
+
+function setHeaderAuthState(isLoggedIn,email=""){
+document.getElementById("publicAuthActions").classList.toggle("hidden",isLoggedIn);
+document.getElementById("signedInActions").classList.toggle("hidden",!isLoggedIn);
+document.getElementById("headerUserEmail").textContent=email;
+document.getElementById("about").classList.toggle("hidden",isLoggedIn);
 }
 
 function homePage(){
- document.getElementById("home").classList.remove("hidden");
- document.getElementById("auth").classList.add("hidden");
- document.getElementById("client").classList.add("hidden");
- window.scrollTo(0,0);
+document.getElementById("home").classList.remove("hidden");
+document.getElementById("auth").classList.add("hidden");
+document.getElementById("client").classList.add("hidden");
+setHeaderAuthState(false);
+window.scrollTo(0,0);
 }
 
 function authPage(type){
- mode=type;
- document.getElementById("home").classList.add("hidden");
- document.getElementById("client").classList.add("hidden");
- document.getElementById("auth").classList.remove("hidden");
- document.getElementById("authTitle").textContent=type==="login"?"Welcome Back":"Create Your Account";
- document.getElementById("authSubtitle").textContent=type==="login"?"Log in to your Arrow Trade account":"Join Arrow Trade";
- document.getElementById("authButton").textContent=type==="login"?"Log In":"Create Account";
- document.getElementById("nameWrap").classList.toggle("hidden",type==="login");
- document.getElementById("switchAuth").textContent=type==="login"?"Create an account":"Already have an account? Log in";
- document.getElementById("authMessage").textContent=db?"Secure authentication is ready.":"Supabase configuration is missing.";
+mode=type;
+
+document.getElementById("home").classList.add("hidden");
+document.getElementById("client").classList.add("hidden");
+document.getElementById("auth").classList.remove("hidden");
+
+document.getElementById("authTitle").textContent=
+type==="login"?"Welcome Back":"Create Your Account";
+
+document.getElementById("authSubtitle").textContent=
+type==="login"?"Log in to your Arrow Trade account":"Join Arrow Trade";
+
+document.getElementById("authButton").textContent=
+type==="login"?"Log In":"Create Account";
+
+document.getElementById("nameWrap").classList.toggle("hidden",type==="login");
+
+document.getElementById("switchAuth").textContent=
+type==="login"?"Create an account":"Already have an account? Log in";
+
+document.getElementById("authMessage").textContent=
+db?"Secure authentication is ready.":"Supabase configuration is missing.";
 }
 
-document.getElementById("switchAuth").onclick=()=>authPage(mode==="login"?"signup":"login");
-
-document.getElementById("authForm").onsubmit=async function(e){
- e.preventDefault();
- const msg=document.getElementById("authMessage");
- if(!db){msg.textContent="Add your existing Supabase URL and publishable key in the script section.";return}
- msg.textContent="Please wait...";
- const email=document.getElementById("email").value.trim();
- const password=document.getElementById("password").value;
- let result;
- if(mode==="login"){
-  result=await db.auth.signInWithPassword({email,password});
- }else{
-  result=await db.auth.signUp({
-   email,password,
-   options:{data:{full_name:document.getElementById("fullName").value.trim()}}
-  });
- }
- if(result.error){msg.textContent=result.error.message;return}
- if(mode==="signup"&&!result.data.session){
-  msg.textContent="Account created. Please confirm your email, then log in.";
-  return;
- }
- openClient(email);
+document.getElementById("switchAuth").onclick=()=>{
+authPage(mode==="login"?"signup":"login");
 };
 
-function openClient(email){
- document.getElementById("home").classList.add("hidden");
- document.getElementById("auth").classList.add("hidden");
- document.getElementById("client").classList.remove("hidden");
- document.getElementById("clientEmail").textContent=email;
- showTab("overview");
+/* LOGIN AND SIGNUP */
+
+document.getElementById("authForm").onsubmit=async function(e){
+e.preventDefault();
+
+const msg=document.getElementById("authMessage");
+
+if(!db){
+msg.textContent="Supabase connection unavailable.";
+return;
 }
+
+msg.textContent="Please wait...";
+
+const email=document.getElementById("email").value.trim();
+const password=document.getElementById("password").value;
+
+try{
+let result;
+
+if(mode==="login"){
+result=await db.auth.signInWithPassword({email,password});
+}else{
+result=await db.auth.signUp({
+email,
+password,
+options:{
+data:{
+full_name:document.getElementById("fullName").value.trim()
+}
+}
+});
+}
+
+if(result.error)throw result.error;
+
+if(mode==="signup"&&!result.data.session){
+msg.textContent="Account created. Please confirm your email, then log in.";
+return;
+}
+
+openClient(email);
+
+}catch(error){
+msg.textContent=error.message||"Authentication failed.";
+}
+};
+
+/* OPEN CUSTOMER DASHBOARD */
+
+function openClient(email){
+document.getElementById("home").classList.add("hidden");
+document.getElementById("auth").classList.add("hidden");
+document.getElementById("client").classList.remove("hidden");
+
+document.getElementById("clientEmail").textContent=email||"";
+
+setHeaderAuthState(true,email);
+window.scrollTo(0,0);
+
+showTab("overview");
+}
+
+/* LOGOUT */
 
 async function logout(){
- if(db)await db.auth.signOut();
- homePage();
+if(db)await db.auth.signOut();
+homePage();
 }
+
+/* RESTORE SESSION ON REFRESH */
+
+async function restoreSavedSession(){
+if(!db){
+setHeaderAuthState(false);
+return;
+}
+
+const {data,error}=await db.auth.getSession();
+
+if(error){
+console.error(error.message);
+return;
+}
+
+if(data.session?.user){
+openClient(data.session.user.email||"");
+}else{
+setHeaderAuthState(false);
+}
+}
+
+window.addEventListener("DOMContentLoaded",restoreSavedSession);
+
+/* NAVIGATION */
 
 document.querySelectorAll("[data-tab]").forEach(button=>{
- button.onclick=()=>{
-  document.querySelectorAll("[data-tab]").forEach(b=>b.classList.remove("active"));
-  button.classList.add("active");
-  showTab(button.dataset.tab);
- };
+button.onclick=()=>{
+document.querySelectorAll("[data-tab]").forEach(b=>b.classList.remove("active"));
+button.classList.add("active");
+showTab(button.dataset.tab);
+};
 });
 
-async function showTab(tab) {
-  const titles = {
-    overview: "Overview",
-    deposit: "Add Funds",
-    withdraw: "Withdraw",
-    portfolio: "Portfolio",
-    history: "Transaction History",
-    notifications: "Notifications",
-    profile: "My Profile"
-  };
+/* DEPOSIT SYSTEM */
 
-  document.getElementById("pageTitle").textContent = titles[tab];
+let pendingDepositAmount=0;
+let currentPaymentSettings=null;
 
-  const panel = document.getElementById("panel");
-
-  panel.innerHTML = `
-    <div class="box">
-      <p class="muted">Loading your account information...</p>
-    </div>
-  `;
-
-  if (!db) {
-    panel.innerHTML = `
-      <div class="box">Supabase connection unavailable.</div>
-    `;
-    return;
-  }
-
-  const { data: userData, error: userError } =
-    await db.auth.getUser();
-
-  if (userError || !userData.user) {
-    panel.innerHTML = `
-      <div class="box">Please log in again.</div>
-    `;
-    return;
-  }
-
-  const user = userData.user;
-
-  const { data: profile, error: profileError } =
-    await db.from("profiles")
-      .select("account_id, full_name, status")
-      .eq("id", user.id)
-      .maybeSingle();
-
-  const { data: wallet, error: walletError } =
-    await db.from("wallets")
-      .select("available_balance")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-  if (profileError || walletError) {
-    panel.innerHTML = `
-      <div class="box">
-        Database error: ${
-          profileError?.message || walletError?.message
-        }
-      </div>
-    `;
-    return;
-  }
-
-  const balance = Number(wallet?.available_balance || 0);
-
-  if (tab === "overview") {
-    panel.innerHTML = `
-      <div class="cards">
-        <div class="box">
-          <small>Wallet Balance</small>
-          <strong>₹${balance.toFixed(2)}</strong>
-        </div>
-
-        <div class="box">
-          <small>Total Deposits</small>
-          <strong>₹0.00</strong>
-        </div>
-
-        <div class="box">
-          <small>Invested Amount</small>
-          <strong>₹0.00</strong>
-        </div>
-
-        <div class="box">
-          <small>Portfolio Value</small>
-          <strong>₹0.00</strong>
-        </div>
-      </div>
-
-      <div class="box">
-        <h3>Account Information</h3>
-        <p style="margin-top:15px">
-          Account ID: ${profile?.account_id || "Not available"}
-        </p>
-        <p style="margin-top:12px">
-          Name: ${profile?.full_name || "Not available"}
-        </p>
-        <p style="margin-top:12px">
-          Status: ${profile?.status || "Pending"}
-        </p>
-      </div>
-    `;
-  }
-
-  else if (tab === "profile") {
-    panel.innerHTML = `
-      <div class="box">
-        <h3>My Profile</h3>
-        <p style="margin-top:15px">Name: ${profile?.full_name || "—"}</p>
-        <p style="margin-top:12px">Email: ${user.email || "—"}</p>
-        <p style="margin-top:12px">Account ID: ${profile?.account_id || "—"}</p>
-        <p style="margin-top:12px">Status: ${profile?.status || "Pending"}</p>
-      </div>
-    `;
-  }
-
-  else if (tab === "deposit" || tab === "withdraw") {
-    panel.innerHTML = `
-      <div class="box">
-        <h3>${titles[tab]}</h3>
-        <p class="muted" style="margin-top:12px">
-          Wallet Balance: ₹${balance.toFixed(2)}
-        </p>
-        <p class="muted" style="margin-top:12px">
-          Secure request processing will be connected next.
-        </p>
-      </div>
-    `;
-  }
-
-  else {
-    panel.innerHTML = `
-      <div class="box">
-        <h3>${titles[tab]}</h3>
-        <div class="empty">No records available yet.</div>
-      </div>
-    `;
-  }
+function formatINR(value){
+return Number(value||0).toLocaleString("en-IN",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
 }
-</script>
+
+function escapeHTML(value){
+return String(value??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+}[c]));
+}
+
+function renderDepositAmountStep(){
+document.getElementById("panel").innerHTML=`
+<div class="box deposit-step">
+<h3>Add Funds</h3>
+<p class="muted" style="margin-top:10px">Enter the amount you want to deposit.</p>
+
+<div class="field">
+<label for="depositAmount">DEPOSIT AMOUNT (INR)</label>
+<input id="depositAmount" type="number" min="1" max="1000000" step="1" placeholder="Enter amount, e.g. 5000">
+</div>
+
+<p class="step-note">Next screen par UPI QR dikhega. UPI app mein amount manually enter karna hoga.</p>
+
+<div class="step-actions">
+<button class="formbtn" type="button" onclick="continueToDepositPayment()">Next →</button>
+</div>
+
+<div class="message" id="depositMessage"></div>
+</div>`;
+}
+
+async function continueToDepositPayment(){
+
+const amount=Number(document.getElementById("depositAmount")?.value);
+const message=document.getElementById("depositMessage");
+
+if(!Number.isFinite(amount)||amount<1||amount>1000000){
+message.textContent="Please enter an amount between ₹1 and ₹10,00,000.";
+return;
+}
+
+pendingDepositAmount=Math.round(amount*100)/100;
+message.textContent="Loading UPI payment details...";
+
+try{
+const {data,error}=await db.from("payment_settings")
+.select("upi_id, qr_image_path")
+.eq("id",1)
+.maybeSingle();
+
+if(error)throw error;
+
+currentPaymentSettings=data||{};
+renderDepositPaymentStep();
+
+}catch(e){
+message.textContent="Could not load payment details: "+e.message;
+}
+}
+
+function renderDepositPaymentStep(){
+
+const upiId=currentPaymentSettings?.upi_id||"";
+const qrPath=currentPaymentSettings?.qr_image_path||"";
+const qrUrl=/^https?:\/\//i.test(qrPath)?qrPath:"";
+
+document.getElementById("panel").innerHTML=`
+<div class="box deposit-step">
+<h3>UPI Payment</h3>
+
+<p class="muted" style="margin-top:10px">
+Deposit amount:
+<strong style="color:var(--yellow)">₹${formatINR(pendingDepositAmount)}</strong>
+</p>
+
+<div class="qr-wrap">
+
+${qrUrl?
+`<img class="qr-image" src="${escapeHTML(qrUrl)}" alt="UPI QR code">`:
+`<div class="qr-image" style="display:grid;place-items:center;color:#333;text-align:center">QR not configured</div>`}
+
+<div>
+<p><strong>Scan QR using your UPI app</strong></p>
+
+<p class="step-note">
+Enter ₹${formatINR(pendingDepositAmount)} manually in your UPI app.
+</p>
+
+<p style="margin-top:14px">
+UPI ID: <strong>${escapeHTML(upiId||"Not configured")}</strong>
+</p>
+
+${
+ `<div class="deposit-form" style="margin-top:20px">
+
+<label class="muted">Transaction UTR / Reference Number</label>
+<input
+  type="text"
+  id="depositUtr"
+  class="input"
+  placeholder="Enter 12-digit UTR number"
+  maxlength="30"
+  style="width:100%;margin:10px 0"
+>
+
+<label class="muted">Upload Payment Screenshot</label>
+<input
+  type="file"
+  id="depositProof"
+  accept="image/*"
+  style="width:100%;margin:10px 0"
+>
+
+<button
+  class="btn btn-primary"
+  onclick="submitDeposit()"
+  style="width:100%;margin-top:15px"
+>
+  Submit Deposit Request
+</button>
+
+<p class="step-note">
+  Your deposit will remain pending until payment verification is completed.
+</p>
+
+</div>`
+}
+</div>
+</div>
+</div>
+`;
+ </script>
 </body>
 </html>
