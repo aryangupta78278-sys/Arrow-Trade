@@ -912,20 +912,55 @@ ${safe(status)}
 }).join("");
 }
 
-function selectMarket(){
+async function selectMarket(){
 
-const symbol=document.getElementById("marketSelect").value;
+  const selected = document.getElementById("marketSelect").value;
 
-document.getElementById("selectedSymbol").textContent=
-symbol||"Market data unavailable";
+  const symbols = {
+    EURUSD: "EUR/USD",
+    GBPUSD: "GBP/USD",
+    USDJPY: "USD/JPY",
+    XAUUSD: "XAU/USD",
+    BTCUSD: "BTC/USD"
+  };
 
-document.getElementById("marketPrice").textContent="—";
+  const display = document.getElementById("selectedSymbol");
+  const price = document.getElementById("marketPrice");
+  const change = document.getElementById("marketChange");
 
-document.getElementById("marketChange").textContent=
-"Live market feed not connected";
+  if(!selected){
+    display.textContent = "Market data unavailable";
+    price.textContent = "—";
+    change.textContent = "Select a market";
+    return;
+  }
 
-document.getElementById("marketChange").className=
-"market-change grey";
+  display.textContent = symbols[selected];
+  price.textContent = "Loading...";
+  change.textContent = "Fetching market price...";
+  change.className = "market-change grey";
+
+  try {
+    const response = await fetch(
+      `/api/market?symbol=${encodeURIComponent(symbols[selected])}`
+    );
+
+    const data = await response.json();
+
+    if(!response.ok || !data.price){
+      throw new Error(data.message || data.error || "Price unavailable");
+    }
+
+    price.textContent = Number(data.price).toFixed(5);
+    change.textContent = "Market price received";
+    change.className = "market-change green";
+
+  } catch(error) {
+    console.error("Market API error:", error);
+    price.textContent = "Unavailable";
+    change.textContent = "Market feed error";
+    change.className = "market-change grey";
+  }
 }
 
 db.auth.onAuthStateChange(event=>{
