@@ -285,7 +285,58 @@ color:#806B3F;font-size:11px;line-height:1.6;margin-top:15px;
 <small>Verified daily records</small>
 </div>
 </div>
+<!-- INVEST YOUR MONEY -->
+<div class="panel">
+  <div class="panel-head">
+    <h3>Invest Your Money</h3>
+    <span>Wallet Investment</span>
+  </div>
 
+  <p style="font-size:12px;color:#8993A1;margin-bottom:15px">
+    Available Balance:
+    <strong id="investAvailableBalance">Loading...</strong>
+  </p>
+
+  <label class="form-label">Investment Amount (₹)</label>
+
+  <input type="number" id="investAmount"
+    class="field" min="0.01" step="0.01"
+    placeholder="Enter amount">
+
+  <button class="trade-btn buy-btn"
+    onclick="makeInvestment()">
+    Invest Now
+  </button>
+
+  <p id="investmentMessage"
+    style="font-size:12px;margin-top:12px"></p>
+</div>
+
+<!-- MY INVESTMENTS -->
+<div class="panel">
+  <div class="panel-head">
+    <h3>My Investments</h3>
+    <span>Portfolio Overview</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Investment</th>
+          <th>Current Value</th>
+          <th>Profit / Loss</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="myInvestments">
+        <tr>
+          <td colspan="4" class="empty">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 <div class="trading-grid">
 
 <div class="panel">
