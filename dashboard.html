@@ -679,50 +679,42 @@ document.getElementById("balance").className="red";
 
 async function loadInvestments(){
 
-const {data,error}=await db.from("portfolios")
-.select("*")
-.eq("user_id",currentUser.id);
+  const {data,error}=await db
+    .from("portfolios")
+    .select("id,invested_amount,current_value,created_at")
+    .eq("user_id",currentUser.id);
 
-if(error){
-console.error("Portfolio error:",error);
+  if(error){
+    console.error("Portfolio Error:",error);
 
-document.getElementById("investment").textContent="Unavailable";
+    document.getElementById("investment").textContent="Error";
+    setPL("totalPL",null);
+    setPL("todayPL",null);
 
-setPL("totalPL",null);
-setPL("todayPL",null);
+    alert("Portfolio Error: " + error.message);
+    return;
+  }
 
-return;
-}
+  const rows=data || [];
 
-const rows=data||[];
+  let totalInvestment=0;
+  let currentValue=0;
 
-let total=0;
-let totalProfit=0;
-let todayProfit=0;
+  rows.forEach(item=>{
+    totalInvestment += Number(item.invested_amount || 0);
+    currentValue += Number(item.current_value || 0);
+  });
 
-const today=new Date().toLocaleDateString("en-CA");
+  const totalProfit=currentValue-totalInvestment;
 
-rows.forEach(item=>{
+  document.getElementById("investment").textContent=
+    money(totalInvestment);
 
-total+=Number(item.amount||item.investment_amount||0);
+  setPL("totalPL",totalProfit);
 
-const p=Number(item.verified_profit||0);
+  // Daily history table abhi available nahi hai.
+  setPL("todayPL",null);
 
-totalProfit+=p;
-
-if(item.created_at&&
-new Date(item.created_at).toLocaleDateString("en-CA")===today){
-todayProfit+=p;
-}
-
-});
-
-document.getElementById("investment").textContent=money(total);
-
-setPL("totalPL",totalProfit);
-setPL("todayPL",todayProfit);
-
-renderPositions(rows);
 }
 
 function renderPositions(rows){
