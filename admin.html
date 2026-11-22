@@ -20,11 +20,10 @@ header{
 header h2{color:#ffda00;margin:0}
 #loginBox{
  max-width:420px;margin:45px auto;
- padding:25px;background:#151e2c;
- border-radius:12px
+ padding:25px;background:#151e2c;border-radius:12px
 }
-input{
- width:100%;padding:14px;margin:10px 0;
+input,select{
+ width:100%;padding:13px;margin:10px 0;
  background:#090d14;color:white;
  border:1px solid #39465a;border-radius:7px
 }
@@ -34,28 +33,29 @@ button{cursor:pointer}
  color:#111;border:0;border-radius:7px;
  font-weight:bold;margin:8px 0
 }
+.secondary{
+ padding:9px 13px;background:#293447;
+ color:white;border:1px solid #52617a;
+ border-radius:6px
+}
 .container{display:flex;min-height:85vh}
 .sidebar{
- width:230px;background:#111824;padding:15px;
- flex-shrink:0
+ width:230px;background:#111824;padding:15px;flex-shrink:0
 }
 .sidebar button{
  display:block;width:100%;text-align:left;
- padding:15px;margin:5px 0;
- background:transparent;color:white;
- border:0;border-radius:8px;font-size:15px
+ padding:15px;margin:5px 0;background:transparent;
+ color:white;border:0;border-radius:8px;font-size:15px
 }
-.sidebar button.active,
-.sidebar button:hover{
+.sidebar button.active,.sidebar button:hover{
  background:#293447;color:#ffda00
 }
 main{flex:1;padding:25px;min-width:0}
 .page{display:none}
 .page.active{display:block}
 .card{
- background:#151e2c;padding:20px;
- border-radius:12px;margin-bottom:18px;
- border:1px solid #293447
+ background:#151e2c;padding:20px;border-radius:12px;
+ margin-bottom:18px;border:1px solid #293447
 }
 h3{color:#ffda00}
 .stats{
@@ -63,27 +63,45 @@ h3{color:#ffda00}
  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
  gap:15px
 }
-.stat{
- background:#202c3e;padding:20px;border-radius:10px
-}
-.stat strong{
- display:block;font-size:28px;margin-top:12px
-}
+.stat{background:#202c3e;padding:20px;border-radius:10px}
+.stat strong{display:block;font-size:28px;margin-top:12px}
 .data{
  white-space:pre-wrap;overflow-wrap:anywhere;
- background:#0b111b;padding:15px;
- border-radius:8px;color:#dce5f2;
- font-size:13px;max-height:500px;overflow:auto
+ background:#0b111b;padding:15px;border-radius:8px;
+ color:#dce5f2;font-size:13px;max-height:500px;overflow:auto
 }
 .muted{color:#aab5c5;font-size:14px}
 #app{display:none}
+
+.table-wrap{overflow-x:auto;margin-top:15px}
+table{
+ width:100%;border-collapse:collapse;min-width:650px;
+ background:#0b111b
+}
+th,td{
+ padding:13px;text-align:left;
+ border-bottom:1px solid #293447;font-size:13px
+}
+th{color:#ffda00;background:#202c3e}
+.badge{
+ display:inline-block;padding:5px 9px;
+ border-radius:20px;background:#293447;color:#fff
+}
+.details-grid{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+ gap:12px;margin-top:15px
+}
+.detail{
+ background:#0b111b;padding:13px;border-radius:8px;
+ overflow-wrap:anywhere
+}
+.detail small{display:block;color:#aab5c5;margin-bottom:7px}
+.empty{padding:20px;background:#0b111b;border-radius:8px;color:#aab5c5}
 @media(max-width:650px){
  .container{display:block}
  .sidebar{
-  width:100%;
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:5px
+  width:100%;display:grid;
+  grid-template-columns:repeat(2,1fr);gap:5px
  }
  .sidebar button{font-size:13px;padding:13px}
  main{padding:15px}
@@ -106,7 +124,6 @@ h3{color:#ffda00}
 </div>
 
 <div id="app">
-
 <div class="container">
 
 <nav class="sidebar">
@@ -124,24 +141,11 @@ h3{color:#ffda00}
 
 <section id="page-dashboard" class="page active">
 <h2>Dashboard Overview</h2>
-
 <div class="stats">
-<div class="stat">
-Total Users
-<strong id="stat-users">—</strong>
+<div class="stat">Total Users<strong id="stat-users">—</strong></div>
+<div class="stat">Pending Deposits<strong id="stat-deposits">—</strong></div>
+<div class="stat">Pending Withdrawals<strong id="stat-withdrawals">—</strong></div>
 </div>
-
-<div class="stat">
-Pending Deposits
-<strong id="stat-deposits">—</strong>
-</div>
-
-<div class="stat">
-Pending Withdrawals
-<strong id="stat-withdrawals">—</strong>
-</div>
-</div>
-
 <button class="action" onclick="loadStats()">Refresh Dashboard</button>
 <p id="statsMessage" class="muted"></p>
 </section>
@@ -149,8 +153,38 @@ Pending Withdrawals
 <section id="page-users" class="page">
 <div class="card">
 <h3>User Management</h3>
+
+<input id="userSearch"
+ placeholder="Search by name or Account ID..."
+ oninput="renderUsers()">
+
 <button class="action" onclick="loadUsers()">Refresh Users</button>
-<pre id="userData" class="data">Click Refresh Users.</pre>
+
+<p id="userMessage" class="muted"></p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Account ID</th>
+<th>Status</th>
+<th>Role</th>
+<th>Registration</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="userTable">
+<tr><td colspan="6">Click Refresh Users.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="card" id="userDetails" style="display:none">
+<h3>User Details</h3>
+<div id="userDetailsContent"></div>
+<button class="secondary" onclick="closeUserDetails()">Close Details</button>
 </div>
 </section>
 
@@ -199,73 +233,65 @@ Pending Withdrawals
 </div>
 
 <script>
-const SUPABASE_URL =
-"https://sofargknzehbqkdlyywx.supabase.co";
+const SUPABASE_URL="https://sofargknzehbqkdlyywx.supabase.co";
 
-const SUPABASE_KEY =
-"sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+const SUPABASE_KEY="sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
 
-const db = window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
-);
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let usersCache=[];
 
 function showData(id,data,error){
  const box=document.getElementById(id);
-
  if(error){
   box.textContent="ERROR: "+error.message;
   return;
  }
-
  box.textContent=data && data.length
-  ? JSON.stringify(data,null,2)
-  : "No records found.";
+  ?JSON.stringify(data,null,2)
+  :"No records found.";
 }
 
 function openPage(name){
- document.querySelectorAll(".page").forEach(page=>{
-  page.classList.remove("active");
- });
-
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
  document.getElementById("page-"+name).classList.add("active");
 
- document.querySelectorAll(".sidebar button[data-page]").forEach(btn=>{
-  btn.classList.toggle("active",btn.dataset.page===name);
+ document.querySelectorAll(".sidebar button[data-page]").forEach(b=>{
+  b.classList.toggle("active",b.dataset.page===name);
  });
+
+ if(name==="users")loadUsers();
+ if(name==="deposits")loadDeposits();
+ if(name==="withdrawals")loadWithdrawals();
+ if(name==="wallet")loadWallets();
+ if(name==="payments")loadPayments();
+ if(name==="notifications")loadNotifications();
 }
 
 document.querySelectorAll(".sidebar button[data-page]").forEach(btn=>{
- btn.addEventListener("click",()=>{
-  openPage(btn.dataset.page);
- });
+ btn.addEventListener("click",()=>openPage(btn.dataset.page));
 });
 
 async function checkAdmin(){
- const {data:{user}}=await db.auth.getUser();
+ const {data:{user},error:userError}=await db.auth.getUser();
 
- if(!user){
+ if(userError || !user){
   showLogin();
   return;
  }
 
- const {data,error}=await db
-  .from("profiles")
-  .select("role")
-  .eq("id",user.id)
-  .single();
+ const {data,error}=await db.from("profiles")
+  .select("role").eq("id",user.id).single();
 
  if(error || data?.role!=="admin"){
   await db.auth.signOut();
-  document.getElementById("message").textContent=
-   "Admin access denied.";
+  document.getElementById("message").textContent="Admin access denied.";
   showLogin();
   return;
  }
 
  document.getElementById("loginBox").style.display="none";
  document.getElementById("app").style.display="block";
-
  await loadStats();
 }
 
@@ -275,9 +301,7 @@ async function adminLogin(){
 
  document.getElementById("message").textContent="Checking login...";
 
- const {error}=await db.auth.signInWithPassword({
-  email,password
- });
+ const {error}=await db.auth.signInWithPassword({email,password});
 
  if(error){
   document.getElementById("message").textContent=error.message;
@@ -294,58 +318,129 @@ async function loadStats(){
   db.from("withdrawals").select("*",{count:"exact",head:true}).eq("status","pending")
  ]);
 
- document.getElementById("stat-users").textContent=
-  u.error?"Error":u.count??0;
-
- document.getElementById("stat-deposits").textContent=
-  d.error?"Error":d.count??0;
-
- document.getElementById("stat-withdrawals").textContent=
-  w.error?"Error":w.count??0;
+ document.getElementById("stat-users").textContent=u.error?"Error":u.count??0;
+ document.getElementById("stat-deposits").textContent=d.error?"Error":d.count??0;
+ document.getElementById("stat-withdrawals").textContent=w.error?"Error":w.count??0;
 
  document.getElementById("statsMessage").textContent=
-  [u,d,w].filter(x=>x.error).map(x=>x.error.message).join(" | ");
+ [u,d,w].filter(x=>x.error).map(x=>x.error.message).join(" | ");
 }
+
+/* USER MANAGEMENT */
 
 async function loadUsers(){
- const {data,error}=await db
-  .from("profiles").select("*").limit(100);
+ const msg=document.getElementById("userMessage");
+ msg.textContent="Loading users...";
 
- showData("userData",data,error);
+ const {data,error}=await db.from("profiles")
+  .select("id,account_id,full_name,status,role,created_at")
+  .order("created_at",{ascending:false})
+  .limit(200);
+
+ if(error){
+  msg.textContent="Error: "+error.message;
+  document.getElementById("userTable").innerHTML=
+   '<tr><td colspan="6">Could not load users.</td></tr>';
+  return;
+ }
+
+ usersCache=data||[];
+ msg.textContent=usersCache.length+" users loaded.";
+ renderUsers();
 }
 
-async function loadDeposits(){
- const {data,error}=await db
-  .from("deposits").select("*").limit(100);
+function safe(value){
+ return String(value??"—").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+  '"':"&quot;","'":"&#39;"
+ }[c]));
+}
 
+function renderUsers(){
+ const search=document.getElementById("userSearch").value.toLowerCase().trim();
+
+ const filtered=usersCache.filter(u=>
+  String(u.full_name||"").toLowerCase().includes(search)||
+  String(u.account_id||"").toLowerCase().includes(search)||
+  String(u.id||"").toLowerCase().includes(search)
+ );
+
+ const tbody=document.getElementById("userTable");
+
+ if(!filtered.length){
+  tbody.innerHTML='<tr><td colspan="6">No matching users found.</td></tr>';
+  return;
+ }
+
+ tbody.innerHTML=filtered.map((u,index)=>`
+  <tr>
+   <td>${safe(u.full_name)}</td>
+   <td>${safe(u.account_id)}</td>
+   <td><span class="badge">${safe(u.status)}</span></td>
+   <td>${safe(u.role)}</td>
+   <td>${u.created_at?new Date(u.created_at).toLocaleDateString():"—"}</td>
+   <td><button class="secondary" onclick="viewUser(${index},'${safe(u.id)}')">View</button></td>
+  </tr>
+ `).join("");
+}
+
+async function viewUser(index,id){
+ const user=usersCache.find(u=>u.id===id);
+ if(!user)return;
+
+ const box=document.getElementById("userDetails");
+ const content=document.getElementById("userDetailsContent");
+
+ box.style.display="block";
+ content.innerHTML="<p>Loading wallet information...</p>";
+
+ const {data:wallet,error}=await db.from("wallets")
+  .select("available_balance")
+  .eq("user_id",user.id)
+  .maybeSingle();
+
+ content.innerHTML=`
+  <div class="details-grid">
+   <div class="detail"><small>Full Name</small>${safe(user.full_name)}</div>
+   <div class="detail"><small>Account ID</small>${safe(user.account_id)}</div>
+   <div class="detail"><small>User ID</small>${safe(user.id)}</div>
+   <div class="detail"><small>Status</small>${safe(user.status)}</div>
+   <div class="detail"><small>Role</small>${safe(user.role)}</div>
+   <div class="detail"><small>Registered</small>${user.created_at?safe(new Date(user.created_at).toLocaleString()):"—"}</div>
+   <div class="detail"><small>Wallet Balance</small>${error?"Could not load":safe(wallet?.available_balance??0)}</div>
+  </div>
+ `;
+ box.scrollIntoView({behavior:"smooth"});
+}
+
+function closeUserDetails(){
+ document.getElementById("userDetails").style.display="none";
+}
+
+/* OTHER SECTIONS */
+
+async function loadDeposits(){
+ const {data,error}=await db.from("deposits").select("*").limit(100);
  showData("depositData",data,error);
 }
 
 async function loadWithdrawals(){
- const {data,error}=await db
-  .from("withdrawals").select("*").limit(100);
-
+ const {data,error}=await db.from("withdrawals").select("*").limit(100);
  showData("withdrawalData",data,error);
 }
 
 async function loadWallets(){
- const {data,error}=await db
-  .from("wallets").select("*").limit(100);
-
+ const {data,error}=await db.from("wallets").select("*").limit(100);
  showData("walletData",data,error);
 }
 
 async function loadPayments(){
- const {data,error}=await db
-  .from("payment_settings").select("*").limit(20);
-
+ const {data,error}=await db.from("payment_settings").select("*").limit(20);
  showData("paymentData",data,error);
 }
 
 async function loadNotifications(){
- const {data,error}=await db
-  .from("notifications").select("*").limit(100);
-
+ const {data,error}=await db.from("notifications").select("*").limit(100);
  showData("notificationData",data,error);
 }
 
