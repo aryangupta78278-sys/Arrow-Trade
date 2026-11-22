@@ -3,108 +3,391 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Arrow Trade Admin</title>
+<title>Arrow Trade | Admin Control Center</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+:root{
+--bg:#F7F6F2;
+--white:#FFFFFF;
+--navy:#17263D;
+--navy2:#22344D;
+--gold:#B89B62;
+--text:#252A32;
+--muted:#7A8089;
+--line:#E9E5DC;
+--soft:#F5F0E5;
+--green:#287A59;
+--red:#B34E4E;
+}
+
 *{box-sizing:border-box}
+
 body{
- margin:0;background:#090d14;color:white;
- font-family:Arial,sans-serif
+margin:0;
+background:var(--bg);
+color:var(--text);
+font-family:Arial,sans-serif;
 }
-header{
- padding:22px;background:#151c29;
- border-bottom:1px solid #30394a
+
+button,input,select,textarea{
+font:inherit;
 }
-header h2{color:#ffda00;margin:0}
-#loginBox{
- max-width:420px;margin:45px auto;
- padding:25px;background:#151e2c;border-radius:12px
-}
-input,select{
- width:100%;padding:13px;margin:10px 0;
- background:#090d14;color:white;
- border:1px solid #39465a;border-radius:7px
-}
+
 button{cursor:pointer}
-.action{
- padding:12px 18px;background:#ffda00;
- color:#111;border:0;border-radius:7px;
- font-weight:bold;margin:8px 0
+
+header{
+height:72px;
+background:white;
+border-bottom:1px solid var(--line);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 25px;
+position:sticky;
+top:0;
+z-index:5;
 }
-.secondary{
- padding:9px 13px;background:#293447;
- color:white;border:1px solid #52617a;
- border-radius:6px
+
+.brand{
+font-size:17px;
+font-weight:bold;
+letter-spacing:2px;
+color:var(--navy);
 }
-.container{display:flex;min-height:85vh}
-.sidebar{
- width:230px;background:#111824;padding:15px;flex-shrink:0
+
+.brand span{color:var(--gold)}
+
+.muted{
+color:var(--muted);
+font-size:12px;
 }
-.sidebar button{
- display:block;width:100%;text-align:left;
- padding:15px;margin:5px 0;background:transparent;
- color:white;border:0;border-radius:8px;font-size:15px
+
+#loginBox{
+max-width:420px;
+margin:8vh auto;
+padding:32px;
+background:white;
+border:1px solid var(--line);
+border-radius:16px;
+box-shadow:0 8px 28px #1c26340d;
 }
-.sidebar button.active,.sidebar button:hover{
- background:#293447;color:#ffda00
+
+.eyebrow{
+color:var(--gold);
+font-size:10px;
+font-weight:bold;
+letter-spacing:2px;
+text-transform:uppercase;
 }
-main{flex:1;padding:25px;min-width:0}
-.page{display:none}
-.page.active{display:block}
-.card{
- background:#151e2c;padding:20px;border-radius:12px;
- margin-bottom:18px;border:1px solid #293447
+
+h1{
+color:var(--navy);
+font-size:27px;
 }
-h3{color:#ffda00}
-.stats{
- display:grid;
- grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
- gap:15px
+
+label{
+display:block;
+font-size:11px;
+font-weight:bold;
+color:var(--muted);
+margin:16px 0 7px;
 }
-.stat{background:#202c3e;padding:20px;border-radius:10px}
-.stat strong{display:block;font-size:28px;margin-top:12px}
-.data{
- white-space:pre-wrap;overflow-wrap:anywhere;
- background:#0b111b;padding:15px;border-radius:8px;
- color:#dce5f2;font-size:13px;max-height:500px;overflow:auto
+
+input,select,textarea{
+width:100%;
+padding:13px;
+border:1px solid var(--line);
+border-radius:9px;
+background:white;
+color:var(--text);
+outline:none;
 }
-.muted{color:#aab5c5;font-size:14px}
+
+input:focus,select:focus,textarea:focus{
+border-color:var(--gold);
+}
+
+.btn{
+border:0;
+border-radius:9px;
+padding:11px 15px;
+font-weight:bold;
+}
+
+.primary{
+background:var(--navy);
+color:white;
+}
+
+.gold{
+background:var(--gold);
+color:white;
+}
+
+.light{
+background:white;
+border:1px solid var(--line);
+color:var(--navy);
+}
+
+.danger{
+background:#FBEDEC;
+color:var(--red);
+border:1px solid #F0D5D2;
+}
+
 #app{display:none}
 
-.table-wrap{overflow-x:auto;margin-top:15px}
+.layout{
+display:grid;
+grid-template-columns:240px minmax(0,1fr);
+min-height:calc(100vh - 72px);
+}
+
+.sidebar{
+background:var(--navy);
+padding:20px 14px;
+}
+
+.sidebar .group{
+color:#AEB8C7;
+font-size:10px;
+letter-spacing:1.5px;
+margin:15px 10px 8px;
+}
+
+.sidebar button{
+display:block;
+width:100%;
+text-align:left;
+color:#DCE3ED;
+background:transparent;
+border:0;
+padding:13px;
+border-radius:9px;
+margin:3px 0;
+font-size:13px;
+}
+
+.sidebar button.active,
+.sidebar button:hover{
+background:#FFFFFF18;
+color:#E6CD9A;
+}
+
+main{
+padding:28px;
+min-width:0;
+max-width:1500px;
+width:100%;
+margin:auto;
+}
+
+.page{display:none}
+.page.active{display:block}
+
+.page-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+margin-bottom:20px;
+}
+
+.page-head h1{margin:5px 0}
+
+.subtitle{
+color:var(--muted);
+font-size:12px;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(4,minmax(0,1fr));
+gap:13px;
+margin-bottom:18px;
+}
+
+.stat,.panel{
+background:white;
+border:1px solid var(--line);
+border-radius:14px;
+box-shadow:0 7px 24px #1c26340a;
+}
+
+.stat{padding:18px}
+
+.stat small{color:var(--muted)}
+
+.stat strong{
+display:block;
+color:var(--navy);
+font-size:25px;
+margin-top:12px;
+}
+
+.panel{
+padding:20px;
+margin-bottom:16px;
+}
+
+.panel h3{
+font-size:16px;
+color:var(--navy);
+margin-top:0;
+}
+
+.notice{
+padding:13px 15px;
+border-radius:9px;
+background:var(--soft);
+color:#78643D;
+font-size:12px;
+line-height:1.6;
+margin:14px 0;
+}
+
+.toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin:12px 0;
+}
+
+.toolbar input{max-width:340px}
+
+.table-wrap{
+overflow:auto;
+border:1px solid var(--line);
+border-radius:10px;
+}
+
 table{
- width:100%;border-collapse:collapse;min-width:650px;
- background:#0b111b
+border-collapse:collapse;
+width:100%;
+min-width:650px;
+background:white;
 }
+
 th,td{
- padding:13px;text-align:left;
- border-bottom:1px solid #293447;font-size:13px
+text-align:left;
+padding:12px;
+border-bottom:1px solid var(--line);
+font-size:12px;
 }
-th{color:#ffda00;background:#202c3e}
+
+th{
+background:#FAF9F6;
+color:#8A754D;
+font-size:10px;
+letter-spacing:1px;
+text-transform:uppercase;
+}
+
 .badge{
- display:inline-block;padding:5px 9px;
- border-radius:20px;background:#293447;color:#fff
+padding:5px 9px;
+border-radius:30px;
+background:#F1F2F4;
+color:#68717E;
+font-size:10px;
+font-weight:bold;
 }
-.details-grid{
- display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
- gap:12px;margin-top:15px
+
+.badge.ok{
+background:#EAF5EF;
+color:var(--green);
 }
-.detail{
- background:#0b111b;padding:13px;border-radius:8px;
- overflow-wrap:anywhere
+
+.badge.pending{
+background:#FBF3E3;
+color:#997333;
 }
-.detail small{display:block;color:#aab5c5;margin-bottom:7px}
-.empty{padding:20px;background:#0b111b;border-radius:8px;color:#aab5c5}
+
+.badge.off{
+background:#FBEDEC;
+color:var(--red);
+}
+
+.status{
+font-size:12px;
+color:var(--muted);
+margin-top:10px;
+min-height:16px;
+}
+
+.kv{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.kv div{
+background:#FAF9F6;
+padding:12px;
+border-radius:8px;
+overflow-wrap:anywhere;
+}
+
+.kv small{
+display:block;
+color:var(--muted);
+margin-bottom:5px;
+}
+
+pre{
+white-space:pre-wrap;
+overflow-wrap:anywhere;
+background:#FAF9F6;
+border:1px solid var(--line);
+border-radius:9px;
+padding:14px;
+max-height:400px;
+overflow:auto;
+font-size:12px;
+}
+
+@media(max-width:900px){
+.stats{grid-template-columns:repeat(2,1fr)}
+}
+
 @media(max-width:650px){
- .container{display:block}
- .sidebar{
-  width:100%;display:grid;
-  grid-template-columns:repeat(2,1fr);gap:5px
- }
- .sidebar button{font-size:13px;padding:13px}
- main{padding:15px}
+
+header{
+height:62px;
+padding:0 14px;
+}
+
+.layout{display:block}
+
+.sidebar{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:3px;
+padding:10px;
+}
+
+.sidebar .group{
+grid-column:1/-1;
+margin:7px;
+}
+
+.sidebar button{
+font-size:11px;
+padding:11px 8px;
+}
+
+main{padding:16px 12px}
+
+.stats{gap:8px}
+
+.stat{padding:13px}
+
+.stat strong{font-size:21px}
+
+.page-head h1{font-size:23px}
+
 }
 </style>
 </head>
@@ -112,355 +395,1063 @@ th{color:#ffda00;background:#202c3e}
 <body>
 
 <header>
-<h2>ARROW TRADE — ADMIN</h2>
+<div class="brand">
+ARROW <span>TRADE</span>
+<small style="font-size:9px;color:#9298A1"> / ADMIN</small>
+</div>
+<span class="muted" id="adminEmail">Not signed in</span>
 </header>
 
 <div id="loginBox">
-<h3>Admin Login</h3>
-<input id="email" type="email" placeholder="Admin Email">
-<input id="password" type="password" placeholder="Password">
-<button class="action" id="loginBtn">Login</button>
-<p id="message" class="muted"></p>
+
+<div class="eyebrow">Secure Administrator Access</div>
+
+<h1>Welcome Back</h1>
+
+<p class="muted">
+Sign in with your authorized admin account.
+</p>
+
+<form id="loginForm">
+
+<label>ADMIN EMAIL</label>
+<input id="email" type="email" required>
+
+<label>PASSWORD</label>
+<input id="password" type="password" required>
+
+<button class="btn primary"
+style="width:100%;margin-top:18px"
+id="loginBtn">
+Sign In Securely
+</button>
+
+</form>
+
+<p class="status" id="message"></p>
+
 </div>
 
 <div id="app">
-<div class="container">
+
+<div class="layout">
 
 <nav class="sidebar">
-<button class="active" data-page="dashboard">Dashboard</button>
-<button data-page="users">User Management</button>
-<button data-page="deposits">Deposits</button>
-<button data-page="withdrawals">Withdrawals</button>
-<button data-page="wallet">Wallet Management</button>
-<button data-page="payments">Payment Settings</button>
-<button data-page="notifications">Notifications</button>
-<button id="logoutBtn">Logout</button>
+
+<div class="group">MANAGEMENT</div>
+
+<button class="active" data-page="dashboard">
+◈ Dashboard
+</button>
+
+<button data-page="users">
+♙ User Management
+</button>
+
+<button data-page="deposits">
+＋ Deposits
+</button>
+
+<button data-page="withdrawals">
+↗ Withdrawals
+</button>
+
+<button data-page="wallet">
+▤ Wallet Management
+</button>
+
+<div class="group">CONFIGURATION</div>
+
+<button data-page="payments">
+◇ Payment Settings
+</button>
+
+<button data-page="notifications">
+♧ Notifications
+</button>
+
+<button data-page="profit">
+⌁ Profit & Loss
+</button>
+
+<button data-page="activity">
+◷ Activity Logs
+</button>
+
+<button id="logoutBtn">
+⇥ Sign Out
+</button>
+
 </nav>
 
 <main>
+ <!-- DASHBOARD -->
+<section class="page active" id="page-dashboard">
+  <div class="page-head">
+    <div>
+      <h1>Dashboard Overview</h1>
+      <p>Welcome to Arrow Trade Administration.</p>
+    </div>
+    <button class="btn btn-primary" onclick="refreshAll()">Refresh Data</button>
+  </div>
 
-<section id="page-dashboard" class="page active">
-<h2>Dashboard Overview</h2>
-<div class="stats">
-<div class="stat">Total Users<strong id="stat-users">—</strong></div>
-<div class="stat">Pending Deposits<strong id="stat-deposits">—</strong></div>
-<div class="stat">Pending Withdrawals<strong id="stat-withdrawals">—</strong></div>
-</div>
-<button class="action" onclick="loadStats()">Refresh Dashboard</button>
-<p id="statsMessage" class="muted"></p>
+  <div class="stats">
+    <div class="stat">
+      <span>Total Users</span>
+      <h2 id="totalUsers">—</h2>
+      <small>Registered accounts</small>
+    </div>
+    <div class="stat">
+      <span>Pending Deposits</span>
+      <h2 id="pendingDeposits">—</h2>
+      <small>Awaiting review</small>
+    </div>
+    <div class="stat">
+      <span>Pending Withdrawals</span>
+      <h2 id="pendingWithdrawals">—</h2>
+      <small>Awaiting review</small>
+    </div>
+    <div class="stat">
+      <span>Total Wallet Balance</span>
+      <h2 id="totalWallet">—</h2>
+      <small>Across all accounts</small>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Admin Overview</h3>
+    <p class="muted">Monitor your platform activity and manage customer accounts from one place.</p>
+    <div class="notice">
+      Financial actions will remain disabled until their secure backend functions are configured.
+    </div>
+  </div>
 </section>
 
-<section id="page-users" class="page">
-<div class="card">
-<h3>User Management</h3>
 
-<input id="userSearch"
- placeholder="Search by name or Account ID..."
- oninput="renderUsers()">
+<!-- USERS -->
+<section class="page" id="page-users">
+  <div class="page-head">
+    <div>
+      <h1>User Management</h1>
+      <p>View and manage registered customer accounts.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadUsers()">Refresh Users</button>
+  </div>
 
-<button class="action" onclick="loadUsers()">Refresh Users</button>
+  <div class="panel">
+    <div class="toolbar">
+      <input type="search" id="userSearch" placeholder="Search by name, email or account ID..." oninput="filterUsers()">
+      <select id="userFilter" onchange="filterUsers()">
+        <option value="all">All Users</option>
+        <option value="active">Active</option>
+        <option value="suspended">Suspended</option>
+      </select>
+    </div>
 
-<p id="userMessage" class="muted"></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Account ID</th>
+            <th>Customer Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable">
+          <tr><td colspan="6">Loading users...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Account ID</th>
-<th>Status</th>
-<th>Role</th>
-<th>Registration</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody id="userTable">
-<tr><td colspan="6">Click Refresh Users.</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-
-<div class="card" id="userDetails" style="display:none">
-<h3>User Details</h3>
-<div id="userDetailsContent"></div>
-<button class="secondary" onclick="closeUserDetails()">Close Details</button>
-</div>
+  <div class="panel" id="userDetailsPanel" style="display:none">
+    <h3>Customer Details</h3>
+    <div id="userDetails"></div>
+  </div>
 </section>
 
-<section id="page-deposits" class="page">
-<div class="card">
-<h3>Deposit Management</h3>
-<button class="action" onclick="loadDeposits()">Refresh Deposits</button>
-<pre id="depositData" class="data">Click Refresh Deposits.</pre>
-</div>
+
+<!-- DEPOSITS -->
+<section class="page" id="page-deposits">
+  <div class="page-head">
+    <div>
+      <h1>Deposit Management</h1>
+      <p>Review customer deposit requests.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadDeposits()">Refresh</button>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <input type="search" id="depositSearch" placeholder="Search UTR or customer ID..." oninput="filterTable('depositSearch','depositsTable')">
+      <select id="depositFilter" onchange="filterStatus('depositFilter','depositsTable')">
+        <option value="all">All Deposits</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>UTR Reference</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="depositsTable">
+          <tr><td colspan="6">Loading deposits...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
-<section id="page-withdrawals" class="page">
-<div class="card">
-<h3>Withdrawal Management</h3>
-<button class="action" onclick="loadWithdrawals()">Refresh Withdrawals</button>
-<pre id="withdrawalData" class="data">Click Refresh Withdrawals.</pre>
-</div>
+
+<!-- WITHDRAWALS -->
+<section class="page" id="page-withdrawals">
+  <div class="page-head">
+    <div>
+      <h1>Withdrawal Management</h1>
+      <p>Review customer withdrawal requests.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadWithdrawals()">Refresh</button>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <input type="search" id="withdrawSearch" placeholder="Search withdrawal requests..." oninput="filterTable('withdrawSearch','withdrawalsTable')">
+      <select id="withdrawFilter" onchange="filterStatus('withdrawFilter','withdrawalsTable')">
+        <option value="all">All Withdrawals</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Payout Details</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="withdrawalsTable">
+          <tr><td colspan="6">Loading withdrawals...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
-<section id="page-wallet" class="page">
-<div class="card">
-<h3>Wallet Management</h3>
-<button class="action" onclick="loadWallets()">Refresh Wallets</button>
-<pre id="walletData" class="data">Click Refresh Wallets.</pre>
-</div>
+
+<!-- WALLET -->
+<section class="page" id="page-wallet">
+  <div class="page-head">
+    <div>
+      <h1>Wallet Management</h1>
+      <p>View customer wallet balances and transaction records.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadWallets()">Refresh</button>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <input type="search" id="walletSearch" placeholder="Search customer..." oninput="filterTable('walletSearch','walletsTable')">
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Available Balance</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody id="walletsTable">
+          <tr><td colspan="3">Loading wallets...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Wallet Adjustments</h3>
+    <div class="notice">
+      Credit and debit controls will be activated after secure transaction and audit functions are configured.
+    </div>
+  </div>
 </section>
 
-<section id="page-payments" class="page">
-<div class="card">
-<h3>Payment Settings</h3>
-<button class="action" onclick="loadPayments()">Refresh Settings</button>
-<pre id="paymentData" class="data">Click Refresh Settings.</pre>
-</div>
+
+<!-- PAYMENTS -->
+<section class="page" id="page-payments">
+  <div class="page-head">
+    <div>
+      <h1>Payment Settings</h1>
+      <p>Payment configuration overview.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadPayments()">Refresh</button>
+  </div>
+
+  <div class="panel">
+    <h3>Payment Configuration</h3>
+    <div class="notice">
+      Payment settings are not connected yet. UPI ID, QR code, deposit limits and payment status will be configured after the database structure is verified.
+    </div>
+    <div id="paymentSettings">
+      <p class="muted">Payment settings are currently unavailable.</p>
+    </div>
+  </div>
 </section>
 
-<section id="page-notifications" class="page">
-<div class="card">
-<h3>Notifications</h3>
-<button class="action" onclick="loadNotifications()">Refresh Notifications</button>
-<pre id="notificationData" class="data">Click Refresh Notifications.</pre>
-</div>
+
+<!-- NOTIFICATIONS -->
+<section class="page" id="page-notifications">
+  <div class="page-head">
+    <div>
+      <h1>Notifications</h1>
+      <p>Manage platform announcements.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadNotifications()">Refresh</button>
+  </div>
+
+  <div class="panel">
+    <h3>Send Notification</h3>
+
+    <label>Notification Title</label>
+    <input type="text" id="notificationTitle" placeholder="Enter notification title">
+
+    <label>Message</label>
+    <textarea id="notificationMessage" rows="4" placeholder="Write your announcement..."></textarea>
+
+    <label>Recipient</label>
+    <select id="notificationRecipient">
+      <option value="all">All Customers</option>
+      <option value="individual">Individual Customer</option>
+    </select>
+
+    <input type="text" id="notificationUserId" placeholder="Customer ID (individual only)" style="margin-top:12px">
+
+    <button class="btn btn-primary" style="margin-top:15px" disabled>
+      Send Notification — Backend Pending
+    </button>
+
+    <p class="muted">Sending will be enabled after the notifications table is verified.</p>
+  </div>
+
+  <div class="panel">
+    <h3>Notification History</h3>
+    <div id="notificationsList">
+      <p class="muted">Notification history will appear here.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- PROFIT MANAGEMENT -->
+<section class="page" id="page-profit">
+  <div class="page-head">
+    <div>
+      <h1>Profit Management</h1>
+      <p>Customer portfolio and performance overview.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadProfit()">Refresh</button>
+  </div>
+
+  <div class="panel">
+    <h3>Portfolio Performance</h3>
+    <div class="notice">
+      Portfolio values shown here are read-only. Verified bonuses or accounting corrections will be recorded separately from actual trading profit and loss.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Invested Amount</th>
+            <th>Current Value</th>
+            <th>Difference</th>
+          </tr>
+        </thead>
+        <tbody id="profitTable">
+          <tr><td colspan="4">Loading portfolio data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ACTIVITY LOG -->
+<section class="page" id="page-activity">
+  <div class="page-head">
+    <div>
+      <h1>Admin Activity</h1>
+      <p>Administrative activity and audit overview.</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadActivity()">Refresh</button>
+  </div>
+
+  <div class="panel">
+    <h3>Activity History</h3>
+    <div class="notice">
+      Audit history will be enabled after the activity log database structure is configured.
+    </div>
+    <div id="activityList">
+      <p class="muted">No activity records available yet.</p>
+    </div>
+  </div>
 </section>
 
 </main>
 </div>
 </div>
-
 <script>
-const SUPABASE_URL="https://sofargknzehbqkdlyywx.supabase.co";
+/* =====================================
+   ARROW TRADE — ADMIN PANEL
+===================================== */
 
-const SUPABASE_KEY="sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
 
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
 
-let usersCache=[];
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-function showData(id,data,error){
- const box=document.getElementById(id);
- if(error){
-  box.textContent="ERROR: "+error.message;
-  return;
- }
- box.textContent=data && data.length
-  ?JSON.stringify(data,null,2)
-  :"No records found.";
+let currentAdmin = null;
+let usersData = [];
+let depositsData = [];
+let withdrawalsData = [];
+let walletsData = [];
+let portfoliosData = [];
+
+
+/* =====================================
+   HELPER FUNCTIONS
+===================================== */
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
 }
 
-function openPage(name){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- document.getElementById("page-"+name).classList.add("active");
-
- document.querySelectorAll(".sidebar button[data-page]").forEach(b=>{
-  b.classList.toggle("active",b.dataset.page===name);
- });
-
- if(name==="users")loadUsers();
- if(name==="deposits")loadDeposits();
- if(name==="withdrawals")loadWithdrawals();
- if(name==="wallet")loadWallets();
- if(name==="payments")loadPayments();
- if(name==="notifications")loadNotifications();
+function money(value) {
+  return "₹" + Number(value || 0).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
 
-document.querySelectorAll(".sidebar button[data-page]").forEach(btn=>{
- btn.addEventListener("click",()=>openPage(btn.dataset.page));
+function formatDate(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (isNaN(date.getTime())) return "—";
+
+  return date.toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  });
+}
+
+function shortID(value) {
+  return value ? escapeHTML(String(value).slice(0, 8)) : "—";
+}
+
+function showMessage(message, type = "success") {
+  const box = document.getElementById("message");
+
+  if (!box) {
+    alert(message);
+    return;
+  }
+
+  box.textContent = message;
+  box.style.display = "block";
+  box.style.color = type === "error" ? "#b42318" : "#26734d";
+
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 5000);
+}
+
+function showError(section, error) {
+  console.error(section, error);
+  showMessage(section + ": " + (error?.message || "Something went wrong"), "error");
+}
+
+function statusBadge(status) {
+  const value = String(status || "unknown").toLowerCase();
+
+  return `<span class="badge status">${escapeHTML(value)}</span>`;
+}
+
+
+/* =====================================
+   LOGIN / AUTHENTICATION
+===================================== */
+
+document.getElementById("loginForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const button = document.getElementById("loginBtn");
+
+  button.disabled = true;
+  button.textContent = "Signing in...";
+
+  try {
+    const { data, error } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    await checkAdmin();
+
+  } catch (error) {
+    showMessage(error.message || "Login failed", "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Login";
+  }
 });
 
-async function checkAdmin(){
- const {data:{user},error:userError}=await db.auth.getUser();
 
- if(userError || !user){
-  showLogin();
-  return;
- }
+async function checkAdmin() {
+  const { data: userData, error: userError } = await db.auth.getUser();
 
- const {data,error}=await db.from("profiles")
-  .select("role").eq("id",user.id).single();
+  if (userError || !userData.user) {
+    showLogin();
+    return;
+  }
 
- if(error || data?.role!=="admin"){
+  const user = userData.user;
+
+  const { data: profile, error } = await db
+    .from("profiles")
+    .select("id, full_name, role, status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error || !profile || profile.role !== "admin") {
+    await db.auth.signOut();
+    showLogin();
+    showMessage("Admin access required.", "error");
+    return;
+  }
+
+  currentAdmin = profile;
+
+  document.getElementById("adminEmail").textContent =
+    user.email || profile.full_name || "Administrator";
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  await refreshAll();
+}
+
+
+function showLogin() {
+  document.getElementById("loginBox").style.display = "block";
+  document.getElementById("app").style.display = "none";
+  currentAdmin = null;
+}
+
+
+document.getElementById("logoutBtn").addEventListener("click", async function() {
   await db.auth.signOut();
-  document.getElementById("message").textContent="Admin access denied.";
   showLogin();
-  return;
- }
-
- document.getElementById("loginBox").style.display="none";
- document.getElementById("app").style.display="block";
- await loadStats();
-}
-
-async function adminLogin(){
- const email=document.getElementById("email").value.trim();
- const password=document.getElementById("password").value;
-
- document.getElementById("message").textContent="Checking login...";
-
- const {error}=await db.auth.signInWithPassword({email,password});
-
- if(error){
-  document.getElementById("message").textContent=error.message;
-  return;
- }
-
- await checkAdmin();
-}
-
-async function loadStats(){
- const [u,d,w]=await Promise.all([
-  db.from("profiles").select("*",{count:"exact",head:true}),
-  db.from("deposits").select("*",{count:"exact",head:true}).eq("status","pending"),
-  db.from("withdrawals").select("*",{count:"exact",head:true}).eq("status","pending")
- ]);
-
- document.getElementById("stat-users").textContent=u.error?"Error":u.count??0;
- document.getElementById("stat-deposits").textContent=d.error?"Error":d.count??0;
- document.getElementById("stat-withdrawals").textContent=w.error?"Error":w.count??0;
-
- document.getElementById("statsMessage").textContent=
- [u,d,w].filter(x=>x.error).map(x=>x.error.message).join(" | ");
-}
-
-/* USER MANAGEMENT */
-
-async function loadUsers(){
- const msg=document.getElementById("userMessage");
- msg.textContent="Loading users...";
-
- const {data,error}=await db.from("profiles")
-  .select("id,account_id,full_name,status,role,created_at")
-  .order("created_at",{ascending:false})
-  .limit(200);
-
- if(error){
-  msg.textContent="Error: "+error.message;
-  document.getElementById("userTable").innerHTML=
-   '<tr><td colspan="6">Could not load users.</td></tr>';
-  return;
- }
-
- usersCache=data||[];
- msg.textContent=usersCache.length+" users loaded.";
- renderUsers();
-}
-
-function safe(value){
- return String(value??"—").replace(/[&<>"']/g,c=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",
-  '"':"&quot;","'":"&#39;"
- }[c]));
-}
-
-function renderUsers(){
- const search=document.getElementById("userSearch").value.toLowerCase().trim();
-
- const filtered=usersCache.filter(u=>
-  String(u.full_name||"").toLowerCase().includes(search)||
-  String(u.account_id||"").toLowerCase().includes(search)||
-  String(u.id||"").toLowerCase().includes(search)
- );
-
- const tbody=document.getElementById("userTable");
-
- if(!filtered.length){
-  tbody.innerHTML='<tr><td colspan="6">No matching users found.</td></tr>';
-  return;
- }
-
- tbody.innerHTML=filtered.map((u,index)=>`
-  <tr>
-   <td>${safe(u.full_name)}</td>
-   <td>${safe(u.account_id)}</td>
-   <td><span class="badge">${safe(u.status)}</span></td>
-   <td>${safe(u.role)}</td>
-   <td>${u.created_at?new Date(u.created_at).toLocaleDateString():"—"}</td>
-   <td><button class="secondary" onclick="viewUser(${index},'${safe(u.id)}')">View</button></td>
-  </tr>
- `).join("");
-}
-
-async function viewUser(index,id){
- const user=usersCache.find(u=>u.id===id);
- if(!user)return;
-
- const box=document.getElementById("userDetails");
- const content=document.getElementById("userDetailsContent");
-
- box.style.display="block";
- content.innerHTML="<p>Loading wallet information...</p>";
-
- const {data:wallet,error}=await db.from("wallets")
-  .select("available_balance")
-  .eq("user_id",user.id)
-  .maybeSingle();
-
- content.innerHTML=`
-  <div class="details-grid">
-   <div class="detail"><small>Full Name</small>${safe(user.full_name)}</div>
-   <div class="detail"><small>Account ID</small>${safe(user.account_id)}</div>
-   <div class="detail"><small>User ID</small>${safe(user.id)}</div>
-   <div class="detail"><small>Status</small>${safe(user.status)}</div>
-   <div class="detail"><small>Role</small>${safe(user.role)}</div>
-   <div class="detail"><small>Registered</small>${user.created_at?safe(new Date(user.created_at).toLocaleString()):"—"}</div>
-   <div class="detail"><small>Wallet Balance</small>${error?"Could not load":safe(wallet?.available_balance??0)}</div>
-  </div>
- `;
- box.scrollIntoView({behavior:"smooth"});
-}
-
-function closeUserDetails(){
- document.getElementById("userDetails").style.display="none";
-}
-
-/* OTHER SECTIONS */
-
-async function loadDeposits(){
- const {data,error}=await db.from("deposits").select("*").limit(100);
- showData("depositData",data,error);
-}
-
-async function loadWithdrawals(){
- const {data,error}=await db.from("withdrawals").select("*").limit(100);
- showData("withdrawalData",data,error);
-}
-
-async function loadWallets(){
- const {data,error}=await db.from("wallets").select("*").limit(100);
- showData("walletData",data,error);
-}
-
-async function loadPayments(){
- const {data,error}=await db.from("payment_settings").select("*").limit(20);
- showData("paymentData",data,error);
-}
-
-async function loadNotifications(){
- const {data,error}=await db.from("notifications").select("*").limit(100);
- showData("notificationData",data,error);
-}
-
-function showLogin(){
- document.getElementById("loginBox").style.display="block";
- document.getElementById("app").style.display="none";
-}
-
-async function logout(){
- await db.auth.signOut();
- showLogin();
-}
-
-document.getElementById("loginBtn").addEventListener("click",adminLogin);
-document.getElementById("logoutBtn").addEventListener("click",logout);
-
-db.auth.getSession().then(({data})=>{
- if(data.session)checkAdmin();
+  showMessage("Logged out successfully.");
 });
+
+
+/* =====================================
+   NAVIGATION
+===================================== */
+
+document.querySelectorAll("[data-page]").forEach(button => {
+  button.addEventListener("click", async function() {
+    const page = this.dataset.page;
+
+    document.querySelectorAll("[data-page]").forEach(item => {
+      item.classList.remove("active");
+    });
+
+    document.querySelectorAll(".page").forEach(item => {
+      item.classList.remove("active");
+    });
+
+    this.classList.add("active");
+
+    const target = document.getElementById("page-" + page);
+
+    if (target) target.classList.add("active");
+
+    if (page === "users") await loadUsers();
+    if (page === "deposits") await loadDeposits();
+    if (page === "withdrawals") await loadWithdrawals();
+    if (page === "wallet") await loadWallets();
+    if (page === "payments") await loadPayments();
+    if (page === "notifications") await loadNotifications();
+    if (page === "profit") await loadProfit();
+    if (page === "activity") await loadActivity();
+  });
+});
+
+
+/* =====================================
+   DASHBOARD STATISTICS
+===================================== */
+
+async function loadStats() {
+  try {
+    const [
+      usersResult,
+      depositsResult,
+      withdrawalsResult,
+      walletsResult
+    ] = await Promise.all([
+
+      db.from("profiles")
+        .select("id", { count: "exact", head: true }),
+
+      db.from("deposits")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending"),
+
+      db.from("withdrawals")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending"),
+
+      db.from("wallets")
+        .select("available_balance")
+    ]);
+
+    if (usersResult.error) throw usersResult.error;
+    if (depositsResult.error) throw depositsResult.error;
+    if (withdrawalsResult.error) throw withdrawalsResult.error;
+    if (walletsResult.error) throw walletsResult.error;
+
+    const totalBalance = (walletsResult.data || []).reduce(
+      (sum, wallet) => sum + Number(wallet.available_balance || 0),
+      0
+    );
+
+    document.getElementById("totalUsers").textContent =
+      usersResult.count ?? 0;
+
+    document.getElementById("pendingDeposits").textContent =
+      depositsResult.count ?? 0;
+
+    document.getElementById("pendingWithdrawals").textContent =
+      withdrawalsResult.count ?? 0;
+
+    document.getElementById("totalWallet").textContent =
+      money(totalBalance);
+
+  } catch (error) {
+    showError("Dashboard", error);
+  }
+}
+
+
+/* =====================================
+   USER MANAGEMENT
+===================================== */
+
+async function loadUsers() {
+  const table = document.getElementById("usersTable");
+
+  table.innerHTML = `<tr><td colspan="6">Loading users...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from("profiles")
+      .select("id, account_id, full_name, status, role, created_at, account_suspended")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    usersData = data || [];
+    filterUsers();
+
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="6">Unable to load users.</td></tr>`;
+    showError("Users", error);
+  }
+}
+
+
+function filterUsers() {
+  const search = document.getElementById("userSearch").value.toLowerCase();
+  const filter = document.getElementById("userFilter").value;
+
+  let filtered = usersData.filter(user => {
+    const text = [
+      user.full_name,
+      user.account_id,
+      user.id,
+      user.role
+    ].join(" ").toLowerCase();
+
+    const matchesSearch = text.includes(search);
+
+    const suspended =
+      user.account_suspended === true ||
+      String(user.status || "").toLowerCase() === "suspended";
+
+    const matchesFilter =
+      filter === "all" ||
+      (filter === "suspended" && suspended) ||
+      (filter === "active" && !suspended);
+
+    return matchesSearch && matchesFilter;
+  });
+
+  const table = document.getElementById("usersTable");
+
+  if (!filtered.length) {
+    table.innerHTML = `<tr><td colspan="6">No users found.</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = filtered.map(user => `
+    <tr>
+      <td>${escapeHTML(user.account_id || shortID(user.id))}</td>
+      <td>${escapeHTML(user.full_name || "Unnamed")}</td>
+      <td>${escapeHTML(user.role || "user")}</td>
+      <td>${statusBadge(
+        user.account_suspended ? "suspended" : (user.status || "active")
+      )}</td>
+      <td>${formatDate(user.created_at)}</td>
+      <td>
+        <button class="btn btn-primary"
+          onclick="viewUser('${escapeHTML(user.id)}')">
+          View
+        </button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+
+async function viewUser(userId) {
+  const user = usersData.find(item => item.id === userId);
+
+  if (!user) return;
+
+  const panel = document.getElementById("userDetailsPanel");
+  const details = document.getElementById("userDetails");
+
+  panel.style.display = "block";
+  details.innerHTML = `<p>Loading customer details...</p>`;
+
+  try {
+    const { data: wallet, error } = await db
+      .from("wallets")
+      .select("available_balance, updated_at")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    details.innerHTML = `
+      <div class="kv">
+        <p><strong>Customer Name:</strong> ${escapeHTML(user.full_name || "—")}</p>
+        <p><strong>Account ID:</strong> ${escapeHTML(user.account_id || "—")}</p>
+        <p><strong>User UUID:</strong> ${escapeHTML(user.id)}</p>
+        <p><strong>Role:</strong> ${escapeHTML(user.role || "user")}</p>
+        <p><strong>Status:</strong> ${escapeHTML(user.status || "active")}</p>
+        <p><strong>Suspended:</strong> ${user.account_suspended ? "Yes" : "No"}</p>
+        <p><strong>Wallet Balance:</strong> ${money(wallet?.available_balance)}</p>
+        <p><strong>Joined:</strong> ${formatDate(user.created_at)}</p>
+      </div>
+    `;
+
+    panel.scrollIntoView({ behavior: "smooth" });
+
+  } catch (error) {
+    details.innerHTML = `<p>Unable to load customer details.</p>`;
+    showError("Customer details", error);
+  }
+}
+
+
+/* =====================================
+   DEPOSIT MANAGEMENT
+===================================== */
+
+async function loadDeposits() {
+  const table = document.getElementById("depositsTable");
+
+  table.innerHTML = `<tr><td colspan="6">Loading deposits...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from("deposits")
+      .select("id, user_id, amount, utr_reference, status, created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    depositsData = data || [];
+
+    table.innerHTML = depositsData.map(item => `
+      <tr data-status="${escapeHTML(item.status)}">
+        <td>${shortID(item.id)}</td>
+        <td>${shortID(item.user_id)}</td>
+        <td>${money(item.amount)}</td>
+        <td>${escapeHTML(item.utr_reference || "—")}</td>
+        <td>${formatDate(item.created_at)}</td>
+        <td>${statusBadge(item.status)}</td>
+      </tr>
+    `).join("") || `<tr><td colspan="6">No deposits found.</td></tr>`;
+
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="6">Unable to load deposits.</td></tr>`;
+    showError("Deposits", error);
+  }
+}
+
+
+/* =====================================
+   WITHDRAWAL MANAGEMENT
+===================================== */
+
+async function loadWithdrawals() {
+  const table = document.getElementById("withdrawalsTable");
+
+  table.innerHTML = `<tr><td colspan="6">Loading withdrawals...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from("withdrawals")
+      .select("id, user_id, amount, payout_details, status, created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    withdrawalsData = data || [];
+
+    table.innerHTML = withdrawalsData.map(item => `
+      <tr data-status="${escapeHTML(item.status)}">
+        <td>${shortID(item.id)}</td>
+        <td>${shortID(item.user_id)}</td>
+        <td>${money(item.amount)}</td>
+        <td>${escapeHTML(
+          typeof item.payout_details === "string"
+            ? item.payout_details
+            : JSON.stringify(item.payout_details || {})
+        )}</td>
+        <td>${formatDate(item.created_at)}</td>
+        <td>${statusBadge(item.status)}</td>
+      </tr>
+    `).join("") || `<tr><td colspan="6">No withdrawals found.</td></tr>`;
+
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="6">Unable to load withdrawals.</td></tr>`;
+    showError("Withdrawals", error);
+  }
+}
+
+
+/* =====================================
+   WALLET MANAGEMENT
+===================================== */
+
+async function loadWallets() {
+  const table = document.getElementById("walletsTable");
+
+  table.innerHTML = `<tr><td colspan="3">Loading wallets...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from("wallets")
+      .select("user_id, available_balance, updated_at")
+      .order("updated_at", { ascending: false });
+
+    if (error) throw error;
+
+    walletsData = data || [];
+
+    table.innerHTML = walletsData.map(item => `
+      <tr>
+        <td>${escapeHTML(item.user_id)}</td>
+        <td>${money(item.available_balance)}</td>
+        <td>${formatDate(item.updated_at)}</td>
+      </tr>
+    `).join("") || `<tr><td colspan="3">No wallets found.</td></tr>`;
+
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="3">Unable to load wallets.</td></tr>`;
+    showError("Wallets", error);
+  }
+}
+
+
+/* =====================================
+   PAYMENT SETTINGS
+===================================== */
+
+async function loadPayments() {
+  document.getElementById("paymentSettings").innerHTML = `
+    <p class="muted">
+      Payment settings are not connected yet.
+      Database structure needs to be verified first.
+    </p>
+  `;
+}
+
+
+/* =====================================
+   NOTIFICATIONS
+===================================== */
+
+async function loadNotifications() {
+  document.getElementById("notificationsList").innerHTML = `
+    <p class="muted">
+      Notification history is not connected yet.
+    </p>
+  `;
+}
+
+
+/* =====================================
+   PROFIT / PORTFOLIO MANAGEMENT
+===================================== */
+
+async function loadProfit() {
+  const table = document.getElementById("profitTable");
+
+  table.innerHTML = `<tr><td colspan="4">Loading portfolio data...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from("portfolios")
+      .select("id, user_id, invested_amount, current_value, created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    portfoliosData = data || [];
+
+    table.innerHTML = portfoliosData.map(item => {
+      const invested = Number(item.invested_amount || 0);
+      const current = Number(item.current_value || 0);
+      const difference = current - invested;
+
+      return `
+        <tr>
+          <td>${shortID(item.user_id)}</td>
+          <td>${money(invested)}</td>
+          <td>${money(current)}</td>
+          <td>${money(difference)}</td>
+        </tr>
+      `;
+    }).join("") || `<tr><td colspan="4">No portfolio records found.</td></tr>`;
+
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="4">Unable to load portfolio data.</td></tr>`;
+    showError("Portfolio", error);
+  }
+}
+
+
+/* =====================================
+   ADMIN ACTIVITY
+===================================== */
+
+async function loadActivity() {
+  document.getElementById("activityList").innerHTML = `
+    <p class="muted">
+      Activity log will be connected after its database structure is configured.
+    </p>
+  `;
+}
+
+
+/* =====================================
+   TABLE FILTERS
+===================================== */
+
+function filterTable(inputId, tableId) {
+  const search = document.getElementById(inputId).value.toLowerCase();
+  const rows = document.querySelectorAll(`#${tableId} tr`);
+
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(search)
+      ? ""
+      : "none";
+  });
+}
+
+
+function filterStatus(filterId, tableId) {
+  const filter = document.getElementById(filterId).value;
+  const rows = document.querySelectorAll(`#${tableId} tr`);
+
+  rows.forEach(row => {
+    const status = (row.dataset.status || "").toLowerCase();
+
+    row.style.display =
+      filter === "all" || status === filter ? "" : "none";
+  });
+}
+
+
+/* =====================================
+   REFRESH ALL DATA
+===================================== */
+
+async function refreshAll() {
+  await Promise.all([
+    loadStats(),
+    loadUsers(),
+    loadDeposits(),
+    loadWithdrawals(),
+    loadWallets(),
+    loadProfit()
+  ]);
+}
+
+
+/* =====================================
+   INITIALIZE
+===================================== */
+
+document.addEventListener("DOMContentLoaded", function() {
+  checkAdmin();
+});
+
 </script>
 
 </body>
-</html>
+ </html>
