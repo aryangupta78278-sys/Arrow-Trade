@@ -337,6 +337,35 @@ color:#806B3F;font-size:11px;line-height:1.6;margin-top:15px;
     </table>
   </div>
 </div>
+  <!-- BOOK YOUR PROFIT -->
+<div class="panel">
+  <div class="panel-head">
+    <h3>Book Your Profit</h3>
+    <span>Profit Withdrawal</span>
+  </div>
+
+  <p style="font-size:12px;color:#8993A1;margin-bottom:15px">
+    Eligible Profit:
+    <strong id="eligibleProfit">Loading...</strong>
+  </p>
+
+  <label class="form-label">Amount to Book (₹)</label>
+
+  <input type="number"
+    id="bookProfitAmount"
+    class="field"
+    min="0.01"
+    step="0.01"
+    placeholder="Enter profit amount">
+
+  <button class="trade-btn buy-btn"
+    onclick="bookProfit()">
+    Book Your Profit
+  </button>
+
+  <p id="bookProfitMessage"
+    style="font-size:12px;margin-top:12px"></p>
+</div>
 <div class="trading-grid">
 
 <div class="panel">
