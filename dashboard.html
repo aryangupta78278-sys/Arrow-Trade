@@ -721,33 +721,30 @@ document.getElementById("detailStatus").textContent=data.status||"Active";
 
 async function loadWallet(){
 
-const {data,error}=await db.from("wallets")
-.select("available_balance")
-.eq("user_id",currentUser.id)
-.maybeSingle();
+  const {data,error}=await db
+    .from("wallets")
+    .select("available_balance")
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
 
-if(error){
-console.error("Wallet error:",error);
-showUnavailable();
-return;
+  if(error){
+    console.error("Wallet Error:",error);
+    showUnavailable();
+    return;
+  }
+
+  if(!data){
+    wallet=0;
+  }else{
+    wallet=Number(data.available_balance || 0);
+  }
+
+  document.getElementById("balance").textContent=money(wallet);
+  document.getElementById("walletBalance").textContent=money(wallet);
+  document.getElementById("investAvailableBalance").textContent=money(wallet);
 }
+ }
 
-if(!data){
-wallet=null;
-showUnavailable();
-return;
-}
-
-wallet=Number(data.available_balance);
-
-if(!Number.isFinite(wallet)){
-showUnavailable();
-return;
-}
-
-document.getElementById("balance").textContent=money(wallet);
-document.getElementById("walletBalance").textContent=money(wallet);
-}
 
 function showUnavailable(){
 
