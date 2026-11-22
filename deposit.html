@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrow Trade | Deposit</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:Arial,sans-serif;
+  background:#F7F8FA;
+  color:#14243B;
+  padding:20px;
+}
+
+.container{max-width:550px;margin:30px auto}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+}
+
+.logo{font-size:23px;font-weight:bold}
+.back{
+  text-decoration:none;
+  color:#14243B;
+  font-weight:bold;
+}
+
+.card{
+  background:white;
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 5px 25px rgba(0,0,0,.05);
+}
+
+h2{font-size:21px;margin-bottom:8px}
+.sub{color:#777;font-size:13px;margin-bottom:20px}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin:15px 0 8px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border:1px solid #ddd;
+  border-radius:9px;
+  font-size:15px;
+}
+
+.qr{
+  width:210px;
+  height:210px;
+  border:1px dashed #B99A58;
+  border-radius:12px;
+  margin:20px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#888;
+  padding:15px;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  background:#14243B;
+  color:white;
+  border:0;
+  border-radius:9px;
+  font-weight:bold;
+  margin-top:18px;
+  cursor:pointer;
+}
+
+button:disabled{opacity:.5}
+
+.notice{
+  background:#fff8e9;
+  color:#805d19;
+  padding:12px;
+  border-radius:8px;
+  font-size:12px;
+  line-height:1.6;
+}
+
+.message{margin-top:12px;font-size:13px}
+table{width:100%;font-size:12px;border-collapse:collapse}
+td,th{padding:11px 5px;border-bottom:1px solid #eee;text-align:left}
+.status{font-weight:bold}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+  <div class="logo">ARROW TRADE</div>
+  <a href="dashboard.html" class="back">← Dashboard</a>
+</div>
+
+<div class="card">
+  <h2>Deposit Funds</h2>
+  <p class="sub">Add funds to your Arrow Trade wallet.</p>
+
+  <div class="notice">
+    Minimum Deposit: ₹50<br>
+    Your deposit will be credited only after payment verification.
+  </div>
+
+  <label>Deposit Amount (₹)</label>
+  <input type="number" id="amount" min="50" placeholder="Enter amount">
+
+  <h3 style="text-align:center;margin-top:25px">Scan UPI QR Code</h3>
+
+  <div class="qr">
+    Admin UPI QR Code<br>
+    Will be added here
+  </div>
+
+  <label>UPI Transaction ID / UTR</label>
+  <input type="text" id="utr" placeholder="Enter UTR number">
+
+  <label>Payment Screenshot</label>
+  <input type="file" id="proof" accept="image/*">
+
+  <button id="submitBtn" onclick="submitDeposit()">
+    Submit Deposit Request
+  </button>
+
+  <div class="message" id="message"></div>
+</div>
+
+<div class="card">
+  <h2>Deposit History</h2>
+  <p class="sub">Your previous deposit requests</p>
+
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Amount</th>
+          <th>UTR</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="history">
+        <tr><td colspan="3">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+
+async function init(){
+
+  const {data,error} = await db.auth.getSession();
+
+  if(error || !data.session){
+    location.href = "login.html";
+    return;
+  }
+
+  currentUser = data.session.user;
+
+  loadHistory();
+}
+
+async function submitDeposit(){
+
+  const amount = Number(document.getElementById("amount").value);
+  const utr = document.getElementById("utr").value.trim();
+  const file = document.getElementById("proof").files[0];
+
+  const message = document.getElementById("message");
+  const button = document.getElementById("submitBtn");
+
+  if(!Number.isFinite(amount) || amount < 50){
+    message.textContent = "Minimum deposit amount is ₹50.";
+    return;
+  }
+
+  if(!utr || utr.length < 6){
+    message.textContent = "Please enter a valid UTR number.";
+    return;
+  }
+
+  if(!file){
+    message.textContent = "Please upload payment screenshot.";
+    return;
+  }
+
+  if(!file.type.startsWith("image/") || file.size > 5*1024*1024){
+    message.textContent = "Upload an image under 5 MB.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Submitting request...";
+
+  try{
+
+    const extension = file.name.split(".").pop().toLowerCase();
+    const path = currentUser.id + "/" + crypto.randomUUID() + "." + extension;
+
+    const {error:uploadError} = await db.storage
+      .from("payment-proofs")
+      .upload(path,file,{upsert:false});
+
+    if(uploadError) throw uploadError;
+
+    const {error:insertError} = await db
+      .from("deposits")
+      .insert({
+        user_id:currentUser.id,
+        amount:amount,
+        utr_reference:utr,
+        status:"pending",
+        payment_proof_path:path
+      });
+
+    if(insertError) throw insertError;
+
+    message.textContent = "Deposit request submitted. Awaiting verification.";
+
+    document.getElementById("amount").value = "";
+    document.getElementById("utr").value = "";
+    document.getElementById("proof").value = "";
+
+    await loadHistory();
+
+  }catch(error){
+
+    console.error("Deposit Error:",error);
+    message.textContent = "Request failed: " + error.message;
+
+  }finally{
+
+    button.disabled = false;
+
+  }
+}
+
+async function loadHistory(){
+
+  const tbody = document.getElementById("history");
+
+  const {data,error} = await db
+    .from("deposits")
+    .select("amount,utr_reference,status,created_at")
+    .eq("user_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error("History Error:",error);
+    tbody.innerHTML = "<tr><td colspan='3'>History unavailable</td></tr>";
+    return;
+  }
+
+  if(!data || data.length === 0){
+    tbody.innerHTML = "<tr><td colspan='3'>No deposits yet</td></tr>";
+    return;
+  }
+
+  tbody.innerHTML = data.map(item => `
+    <tr>
+      <td>₹${Number(item.amount).toLocaleString("en-IN")}</td>
+      <td>${escapeHTML(item.utr_reference || "")}</td>
+      <td class="status">${escapeHTML(item.status || "pending")}</td>
+    </tr>
+  `).join("");
+}
+
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[char]));
+}
+
+init();
+</script>
+
+</body>
+</html>
