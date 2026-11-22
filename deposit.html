@@ -126,10 +126,12 @@ td,th{padding:11px 5px;border-bottom:1px solid #eee;text-align:left}
 
   <h3 style="text-align:center;margin-top:25px">Scan UPI QR Code</h3>
 
-  <div class="qr">
-    Admin UPI QR Code<br>
-    Will be added here
-  </div>
+<div class="qr" id="qrContainer" style="width:100%;height:auto;min-height:230px;flex-direction:column;">
+  <p id="qrLoading">Loading payment QR...</p>
+  <img id="paymentQR" src="" alt="Payment QR Code"
+       style="display:none;width:210px;height:210px;object-fit:contain;">
+  <p id="upiDisplay" style="margin-top:12px;font-weight:bold;"></p>
+</div>
 
   <label>UPI Transaction ID / UTR</label>
   <input type="text" id="utr" placeholder="Enter UTR number">
@@ -189,6 +191,31 @@ async function init(){
   currentUser = data.session.user;
 
   loadHistory();
+  loadPaymentSettings();
+
+} 
+  async function loadPaymentSettings(){
+  const { data, error } = await db
+    .from("payment_settings")
+    .select("qr_image_path, upi_id")
+    .eq("is_enabled", true)
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const loading = document.getElementById("qrLoading");
+  const qr = document.getElementById("paymentQR");
+  const upi = document.getElementById("upiDisplay");
+
+  if(error || !data || !data.qr_image_path){
+    loading.textContent = "Payment QR unavailable";
+    return;
+  }
+
+  qr.src = data.qr_image_path;
+  qr.style.display = "block";
+  loading.style.display = "none";
+  upi.textContent = data.upi_id || "";
 }
 
 async function submitDeposit(){
