@@ -721,29 +721,46 @@ document.getElementById("detailStatus").textContent=data.status||"Active";
 
 async function loadWallet(){
 
-  const {data,error}=await db
-    .from("wallets")
-    .select("available_balance")
-    .eq("user_id",currentUser.id)
-    .maybeSingle();
+  const balanceEl = document.getElementById("balance");
+  const walletEl = document.getElementById("walletBalance");
+  const investBalanceEl = document.getElementById("investAvailableBalance");
 
-  if(error){
-    console.error("Wallet Error:",error);
-    showUnavailable();
-    return;
+  try {
+
+    if(!currentUser || !currentUser.id){
+      throw new Error("User session not found");
+    }
+
+    const { data, error } = await db
+      .from("wallets")
+      .select("available_balance")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    if(error){
+      throw error;
+    }
+
+    wallet = Number(data?.available_balance ?? 0);
+
+    if(!Number.isFinite(wallet)){
+      wallet = 0;
+    }
+
+    if(balanceEl) balanceEl.textContent = money(wallet);
+    if(walletEl) walletEl.textContent = money(wallet);
+    if(investBalanceEl) investBalanceEl.textContent = money(wallet);
+
+  } catch(error) {
+
+    console.error("Wallet Loading Error:", error);
+
+    if(balanceEl) balanceEl.textContent = "Unavailable";
+    if(walletEl) walletEl.textContent = "Unavailable";
+    if(investBalanceEl) investBalanceEl.textContent = "Unavailable";
+
   }
-
-  if(!data){
-    wallet=0;
-  }else{
-    wallet=Number(data.available_balance || 0);
-  }
-
-  document.getElementById("balance").textContent=money(wallet);
-  document.getElementById("walletBalance").textContent=money(wallet);
-  document.getElementById("investAvailableBalance").textContent=money(wallet);
 }
- }
 
 
 function showUnavailable(){
