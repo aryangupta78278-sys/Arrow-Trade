@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrow Trade | Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+ --bg:#080b10;
+ --panel:#111720;
+ --panel2:#151d27;
+ --gold:#d6b46a;
+ --gold2:#f1d99a;
+ --text:#f4f1e9;
+ --muted:#89919c;
+ --border:rgba(214,180,106,.16);
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Arial,sans-serif;
+}
+button{cursor:pointer;font-family:inherit}
+.layout{display:flex;min-height:100vh}
+.sidebar{
+ width:245px;background:#0d1219;border-right:1px solid var(--border);
+ padding:28px 18px;position:fixed;height:100vh;
+}
+.logo{font-size:25px;font-weight:800;letter-spacing:2px;padding:0 12px}
+.logo span{color:var(--gold)}
+.brandline{font-size:10px;color:var(--muted);letter-spacing:4px;margin:8px 12px 40px}
+.nav-title{font-size:10px;color:#66717e;padding:0 12px;margin:25px 0 12px;letter-spacing:2px}
+.nav{
+ display:block;width:100%;padding:14px 13px;margin:5px 0;
+ background:transparent;border:0;border-radius:8px;
+ color:#aab2bc;text-align:left;font-size:14px;
+}
+.nav:hover,.nav.active{background:rgba(214,180,106,.11);color:var(--gold2)}
+.main{margin-left:245px;width:calc(100% - 245px);padding:28px 35px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px}
+.welcome h1{font-size:25px;margin:0 0 8px}
+.welcome p{color:var(--muted);margin:0;font-size:13px}
+.profile-wrap{position:relative}
+.profile-btn{
+ background:var(--panel);border:1px solid var(--border);
+ color:var(--gold2);padding:10px 14px;border-radius:30px;
+ display:flex;align-items:center;gap:10px;
+}
+.avatar{
+ width:32px;height:32px;border-radius:50%;
+ display:grid;place-items:center;background:#382f20;color:var(--gold2);
+ font-weight:bold;
+}
+.dropdown{
+ display:none;position:absolute;right:0;top:55px;width:230px;
+ background:#171f2a;border:1px solid var(--border);
+ border-radius:12px;padding:16px;z-index:20;
+ box-shadow:0 15px 40px #0008;
+}
+.dropdown.show{display:block}
+.dropdown strong{display:block;margin-bottom:6px}
+.dropdown small{color:var(--muted);word-break:break-all}
+.dropdown button{
+ width:100%;padding:11px;margin-top:15px;
+ background:#33271a;border:0;color:var(--gold2);border-radius:7px;
+}
+.section-title{font-size:17px;margin:28px 0 17px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
+.card{
+ background:linear-gradient(145deg,#151d27,#0f151d);
+ border:1px solid var(--border);border-radius:13px;padding:22px;
+}
+.card-label{color:var(--muted);font-size:12px}
+.card-value{font-size:27px;font-weight:bold;margin:15px 0 7px}
+.gold{color:var(--gold2)}
+.card-note{font-size:11px;color:#89919c}
+.actions{display:flex;gap:12px;margin-top:22px}
+.action{
+ padding:13px 24px;border-radius:7px;border:1px solid var(--gold);
+ background:var(--gold);color:#101319;font-weight:bold;
+}
+.action.secondary{background:transparent;color:var(--gold2)}
+.content-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
+.chart-box{height:260px;margin-top:15px}
+.transaction{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:15px 0;border-bottom:1px solid var(--border);
+ font-size:13px;
+}
+.transaction:last-child{border:0}
+.status{color:var(--gold2);font-size:11px}
+.empty{color:var(--muted);font-size:13px;padding:20px 0}
+.mobile-menu{display:none}
+@media(max-width:900px){
+ .sidebar{width:200px}
+ .main{margin-left:200px;width:calc(100% - 200px);padding:22px}
+ .grid{grid-template-columns:1fr 1fr}
+ .content-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .sidebar{display:none}
+ .main{margin:0;width:100%;padding:19px 15px}
+ .topbar{align-items:flex-start}
+ .welcome h1{font-size:19px}
+ .grid{grid-template-columns:1fr 1fr;gap:10px}
+ .card{padding:15px}
+ .card-value{font-size:20px}
+ .actions{flex-wrap:wrap}
+ .action{flex:1;padding:12px 10px}
+ .mobile-menu{display:block}
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<aside class="sidebar">
+ <div class="logo">ARROW <span>TRADE</span></div>
+ <div class="brandline">TRADING PLATFORM</div>
+
+ <div class="nav-title">MAIN MENU</div>
+ <button class="nav active" onclick="showSection('overview')">◈ &nbsp; Overview</button>
+ <button class="nav" onclick="showSection('portfolio')">▦ &nbsp; Portfolio</button>
+ <button class="nav" onclick="showSection('transactions')">⇄ &nbsp; Transactions</button>
+
+ <div class="nav-title">ACCOUNT</div>
+ <button class="nav" onclick="showSection('deposit')">＋ &nbsp; Deposit</button>
+ <button class="nav" onclick="showSection('withdraw')">↗ &nbsp; Withdraw</button>
+ <button class="nav" onclick="showSection('profile')">◎ &nbsp; My Profile</button>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+ <div class="welcome">
+  <h1>Welcome back, <span class="gold" id="welcomeName">User</span></h1>
+  <p>Your financial overview at a glance.</p>
+ </div>
+
+ <div class="profile-wrap">
+  <button class="profile-btn" onclick="toggleProfile()">
+   <span class="avatar" id="avatar">U</span>
+   <span>My Account ▾</span>
+  </button>
+
+  <div class="dropdown" id="profileDropdown">
+   <strong id="profileName">User</strong>
+   <small id="profileEmail">Loading...</small>
+   <button onclick="logout()">Logout ↗</button>
+  </div>
+ </div>
+</header>
+
+<section id="overview">
+
+ <div class="grid">
+  <div class="card">
+   <div class="card-label">AVAILABLE BALANCE</div>
+   <div class="card-value gold" id="balance">₹0.00</div>
+   <div class="card-note">Your available wallet balance</div>
+  </div>
+
+  <div class="card">
+   <div class="card-label">TOTAL INVESTMENT</div>
+   <div class="card-value" id="investment">₹0.00</div>
+   <div class="card-note">Portfolio investment value</div>
+  </div>
+
+  <div class="card">
+   <div class="card-label">ACCOUNT STATUS</div>
+   <div class="card-value gold" style="font-size:21px" id="accountStatus">Loading</div>
+   <div class="card-note">Account information</div>
+  </div>
+ </div>
+
+ <div class="actions">
+  <button class="action" onclick="showSection('deposit')">＋ Deposit</button>
+  <button class="action secondary" onclick="showSection('withdraw')">↗ Withdraw</button>
+ </div>
+
+ <h2 class="section-title">Portfolio Overview</h2>
+
+ <div class="content-grid">
+  <div class="card">
+   <div class="card-label">PORTFOLIO PERFORMANCE</div>
+   <div class="chart-box">
+    <canvas id="portfolioChart"></canvas>
+   </div>
+   <div class="empty">Performance chart will display when portfolio history is available.</div>
+  </div>
+
+  <div class="card">
+   <div class="card-label">RECENT TRANSACTIONS</div>
+   <div id="recentTransactions" class="empty">Loading transactions...</div>
+  </div>
+ </div>
+
+ <h2 class="section-title">Market Overview</h2>
+ <div class="card">
+  <div class="empty">
+   Live market data is not connected yet. Connect a verified market data provider to display real quotes.
+  </div>
+ </div>
+
+</section>
+
+<section id="portfolio" style="display:none">
+ <h2 class="section-title">My Portfolio</h2>
+ <div class="card">
+  <div class="card-label">TOTAL INVESTMENT</div>
+  <div class="card-value gold" id="portfolioValue">₹0.00</div>
+  <div class="empty">Your portfolio records will appear here.</div>
+ </div>
+</section>
+
+<section id="transactions" style="display:none">
+ <h2 class="section-title">Transaction History</h2>
+ <div class="card" id="allTransactions">Loading...</div>
+</section>
+
+<section id="deposit" style="display:none">
+ <h2 class="section-title">Deposit Funds</h2>
+ <div class="card">
+  <p>Submit a deposit request through the approved payment process.</p>
+  <div class="empty">Payment instructions will appear here after payment settings are connected.</div>
+ </div>
+</section>
+
+<section id="withdraw" style="display:none">
+ <h2 class="section-title">Withdraw Funds</h2>
+ <div class="card">
+  <p>Withdrawal requests will be available here.</p>
+  <div class="empty">Withdrawal form will be connected after verifying your database fields and approval process.</div>
+ </div>
+</section>
+
+<section id="profile" style="display:none">
+ <h2 class="section-title">My Profile</h2>
+ <div class="card">
+  <p><span class="card-label">FULL NAME</span></p>
+  <strong id="fullName">Loading...</strong>
+  <p><span class="card-label">EMAIL ADDRESS</span></p>
+  <strong id="emailAddress">Loading...</strong>
+  <p><span class="card-label">ACCOUNT ID</span></p>
+  <strong id="accountId">Loading...</strong>
+ </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+
+const db = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY,
+ {
+  auth:{
+   persistSession:true,
+   autoRefreshToken:true,
+   detectSessionInUrl:true
+  }
+ }
+);
+
+let currentUser = null;
+
+function money(value){
+ return "₹" + Number(value || 0).toLocaleString("en-IN",{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+ });
+}
+
+async function initDashboard(){
+
+ const {data,error} = await db.auth.getSession();
+
+ if(error || !data.session){
+  window.location.replace("login.html");
+  return;
+ }
+
+ currentUser = data.session.user;
+
+ await loadUserData();
+}
+
+async function loadUserData(){
+
+ const user = currentUser;
+
+ const {data:profile,error} = await db
+  .from("profiles")
+  .select("id,account_id,full_name,status,role,account_suspended")
+  .eq("id",user.id)
+  .maybeSingle();
+
+ if(error){
+  console.error("Profile error:",error);
+ }
+
+ if(profile && profile.account_suspended === true){
+  alert("Your account is suspended. Please contact support.");
+  await db.auth.signOut();
+  window.location.replace("login.html");
+  return;
+ }
+
+ const name = profile?.full_name || user.user_metadata?.full_name || "User";
+
+ document.getElementById("welcomeName").textContent = name;
+ document.getElementById("profileName").textContent = name;
+ document.getElementById("profileEmail").textContent = user.email || "";
+ document.getElementById("avatar").textContent = name.charAt(0).toUpperCase();
+
+ document.getElementById("fullName").textContent = name;
+ document.getElementById("emailAddress").textContent = user.email || "";
+ document.getElementById("accountId").textContent = profile?.account_id || "Not assigned";
+ document.getElementById("accountStatus").textContent = profile?.status || "Active";
+
+ await loadWallet(user.id);
+ await loadTransactions(user.id);
+ await loadPortfolio(user.id);
+}
+
+async function loadWallet(userId){
+
+ const {data,error} = await db
+  .from("wallets")
+  .select("available_balance")
+  .eq("user_id",userId)
+  .maybeSingle();
+
+ if(error){
+  console.error("Wallet error:",error);
+  document.getElementById("balance").textContent = "Unavailable";
+  return;
+ }
+
+ const balance = data?.available_balance || 0;
+
+ document.getElementById("balance").textContent = money(balance);
+}
+
+async function loadTransactions(userId){
+
+ const container = document.getElementById("recentTransactions");
+ const all = document.getElementById("allTransactions");
+
+ const {data,error} = await db
+  .from("deposits")
+  .select("*")
+  .eq("user_id",userId)
+  .order("created_at",{ascending:false})
+  .limit(10);
+
+ if(error){
+  console.error("Transaction error:",error);
+  container.textContent = "Transaction data unavailable.";
+  all.textContent = "Unable to load transaction history.";
+  return;
+ }
+
+ if(!data || data.length === 0){
+  container.textContent = "No transactions yet.";
+  all.textContent = "No transactions yet.";
+  return;
+ }
+
+ let html = "";
+
+ data.forEach(item=>{
+  html += `
+   <div class="transaction">
+    <div>
+     <strong>Deposit</strong><br>
+     <span class="card-label">${new Date(item.created_at).toLocaleDateString()}</span>
+    </div>
+    <div style="text-align:right">
+     <strong class="gold">${money(item.amount)}</strong><br>
+     <span class="status">${item.status || "Pending"}</span>
+    </div>
+   </div>`;
+ });
+
+ container.innerHTML = html;
+ all.innerHTML = html;
+}
+
+async function loadPortfolio(userId){
+
+ const {data,error} = await db
+  .from("portfolios")
+  .select("*")
+  .eq("user_id",userId);
+
+ if(error){
+  console.error("Portfolio error:",error);
+  return;
+ }
+
+ let total = 0;
+
+ if(data){
+  data.forEach(item=>{
+   total += Number(item.amount || item.investment_amount || 0);
+  });
+ }
+
+ document.getElementById("investment").textContent = money(total);
+ document.getElementById("portfolioValue").textContent = money(total);
+}
+
+function toggleProfile(){
+ document.getElementById("profileDropdown").classList.toggle("show");
+}
+
+document.addEventListener("click",function(e){
+ if(!e.target.closest(".profile-wrap")){
+  document.getElementById("profileDropdown").classList.remove("show");
+ }
+});
+
+function showSection(id){
+
+ document.querySelectorAll("main section").forEach(section=>{
+  section.style.display = "none";
+ });
+
+ document.getElementById(id).style.display = "block";
+
+ document.querySelectorAll(".nav").forEach(btn=>{
+  btn.classList.remove("active");
+ });
+
+ if(event && event.currentTarget && event.currentTarget.classList.contains("nav")){
+  event.currentTarget.classList.add("active");
+ }
+}
+
+async function logout(){
+
+ const confirmLogout = confirm("Are you sure you want to logout?");
+
+ if(!confirmLogout) return;
+
+ const {error} = await db.auth.signOut();
+
+ if(error){
+  alert("Logout failed: " + error.message);
+  return;
+ }
+
+ window.location.replace("login.html");
+}
+
+db.auth.onAuthStateChange((event,session)=>{
+
+ if(event === "SIGNED_OUT"){
+  window.location.replace("login.html");
+ }
+
+});
+
+initDashboard();
+</script>
+
+</body>
+</html>
