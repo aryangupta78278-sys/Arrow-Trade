@@ -2,131 +2,204 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arrow Trade | Admin Panel</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrow Trade Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#090b10;color:#fff;font-family:Arial,sans-serif}
-header{padding:22px;background:#121722;border-bottom:1px solid #292f3b}
-header h2{color:#ffd500}
-.container{max-width:1100px;margin:30px auto;padding:15px}
-.card{background:#141a25;border:1px solid #293141;border-radius:14px;padding:22px;margin-bottom:20px}
-h3{margin-bottom:15px;color:#ffd500}
-input{width:100%;padding:14px;margin:10px 0;background:#090d14;border:1px solid #343d4c;border-radius:8px;color:white}
-button{padding:12px 20px;background:#ffda00;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
-#dashboard{display:none}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
-.stat{background:#202938;padding:20px;border-radius:10px}
-.stat strong{display:block;font-size:25px;margin-top:10px}
-.muted{color:#aab3c2;font-size:13px;margin-top:12px}
+*{box-sizing:border-box}
+body{margin:0;background:#090d14;color:white;font-family:Arial}
+header{padding:20px;background:#151c29;border-bottom:1px solid #30394a}
+header h2{color:#ffda00;margin:0}
+.container{display:flex;min-height:90vh}
+.sidebar{width:220px;background:#111824;padding:15px}
+.sidebar button{display:block;width:100%;text-align:left;padding:15px;margin:5px 0;background:transparent;color:white;border:0;border-radius:8px;font-size:15px}
+.sidebar button.active,.sidebar button:hover{background:#293447;color:#ffda00}
+main{flex:1;padding:25px;min-width:0}
+.card{background:#151e2c;padding:20px;border-radius:12px;margin-bottom:18px;border:1px solid #293447}
+h3{color:#ffda00;margin-top:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px}
+.stat{background:#202c3e;padding:20px;border-radius:10px}
+.stat strong{display:block;font-size:27px;margin-top:12px}
+input{padding:12px;width:100%;margin:8px 0;background:#0b111b;border:1px solid #39465a;color:white;border-radius:7px}
+.action{padding:12px 18px;background:#ffda00;color:#111;border:0;border-radius:7px;font-weight:bold}
+.page{display:none}
+.page.active{display:block}
+#dashboardApp{display:none}
+#loginBox{max-width:400px;margin:60px auto}
+.muted{color:#aab5c5;font-size:14px;line-height:1.6}
+@media(max-width:650px){
+.container{display:block}
+.sidebar{width:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.sidebar button{font-size:13px;padding:12px}
+main{padding:15px}
+}
 </style>
 </head>
 
 <body>
 
-<header>
-<h2>ARROW TRADE — ADMIN</h2>
-</header>
+<header><h2>ARROW TRADE — ADMIN</h2></header>
 
-<div class="container">
-
-<div class="card" id="loginBox">
+<div id="loginBox" class="card">
 <h3>Admin Login</h3>
-<input id="email" type="email" placeholder="Admin Email">
+<input id="email" type="email" placeholder="Admin email">
 <input id="password" type="password" placeholder="Password">
-<button onclick="adminLogin()">Login</button>
+<button class="action" onclick="adminLogin()">Login</button>
 <p id="message" class="muted"></p>
 </div>
 
-<div id="dashboard">
-<div class="card">
-<h3>Welcome to Admin Dashboard</h3>
-<p id="adminEmail"></p>
-</div>
+<div id="dashboardApp">
+<div class="container">
 
+<nav class="sidebar">
+<button class="active" onclick="openPage('dashboard',this)">Dashboard</button>
+<button onclick="openPage('users',this)">User Management</button>
+<button onclick="openPage('deposits',this)">Deposits</button>
+<button onclick="openPage('withdrawals',this)">Withdrawals</button>
+<button onclick="openPage('wallet',this)">Wallet Management</button>
+<button onclick="openPage('payments',this)">Payment Settings</button>
+<button onclick="openPage('notifications',this)">Notifications</button>
+<button onclick="logout()">Logout</button>
+</nav>
+
+<main>
+
+<section id="dashboard" class="page active">
+<h2>Dashboard Overview</h2>
 <div class="stats">
 <div class="stat">Total Users<strong id="users">—</strong></div>
 <div class="stat">Pending Deposits<strong id="deposits">—</strong></div>
 <div class="stat">Pending Withdrawals<strong id="withdrawals">—</strong></div>
 </div>
+</section>
 
+<section id="users" class="page">
 <div class="card">
-<h3>Admin Access</h3>
-<p class="muted">Admin authentication successful.</p>
+<h3>User Management</h3>
+<p class="muted">Registered user records aur account status yahan manage honge.</p>
+<button class="action" onclick="loadUsers()">Refresh Users</button>
+<div id="userList" class="muted"></div>
 </div>
+</section>
 
-<button onclick="logout()">Logout</button>
+<section id="deposits" class="page">
+<div class="card">
+<h3>Deposit Management</h3>
+<p class="muted">Deposit requests, UTR aur payment proofs yahan dekhe ja sakenge.</p>
+<p id="depositInfo">Deposit records load karne ke liye Refresh dabayein.</p>
+<button class="action" onclick="loadDeposits()">Refresh Deposits</button>
 </div>
+</section>
 
+<section id="withdrawals" class="page">
+<div class="card">
+<h3>Withdrawal Management</h3>
+<p class="muted">Withdrawal requests aur unke status yahan dekhe ja sakenge.</p>
+<p id="withdrawalInfo">Withdrawal records load karne ke liye Refresh dabayein.</p>
+<button class="action" onclick="loadWithdrawals()">Refresh Withdrawals</button>
+</div>
+</section>
+
+<section id="wallet" class="page">
+<div class="card">
+<h3>Wallet Management</h3>
+<p class="muted">Wallet records aur verified transactions ka management yahan hoga.</p>
+</div>
+</section>
+
+<section id="payments" class="page">
+<div class="card">
+<h3>Payment Settings</h3>
+<p class="muted">Admin UPI ID aur QR settings yahan configure hongi.</p>
+</div>
+</section>
+
+<section id="notifications" class="page">
+<div class="card">
+<h3>Notifications</h3>
+<p class="muted">Customer notifications ka management yahan configure hoga.</p>
+</div>
+</section>
+
+</main>
+</div>
 </div>
 
 <script>
-const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
-
-const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SUPABASE_URL="https://sofargknzehbqkdlyywx.supabase.co";
+const SUPABASE_KEY="sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 async function adminLogin(){
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
- const message=document.getElementById("message");
+ const msg=document.getElementById("message");
+ msg.textContent="Checking...";
 
- message.textContent="Checking admin access...";
-
- const {data,error}=await db.auth.signInWithPassword({email,password});
-
- if(error){
-  message.textContent=error.message;
-  return;
- }
-
+ const {error}=await db.auth.signInWithPassword({email,password});
+ if(error){msg.textContent=error.message;return}
  await checkAdmin();
 }
 
 async function checkAdmin(){
  const {data:{user}}=await db.auth.getUser();
+ if(!user){showLogin();return}
 
- if(!user){
-  showLogin();
-  return;
- }
+ const {data,error}=await db.from("profiles")
+ .select("role").eq("id",user.id).single();
 
- const {data,error}=await db
- .from("profiles")
- .select("role")
- .eq("id",user.id)
- .single();
-
- if(error || data?.role!=="admin"){
-  await db.auth.signOut();
-  document.getElementById("message").textContent="Access denied. Admin only.";
-  showLogin();
-  return;
+ if(error||data?.role!=="admin"){
+ await db.auth.signOut();
+ document.getElementById("message").textContent="Admin access denied";
+ showLogin();return;
  }
 
  document.getElementById("loginBox").style.display="none";
- document.getElementById("dashboard").style.display="block";
- document.getElementById("adminEmail").textContent=user.email;
-
+ document.getElementById("dashboardApp").style.display="block";
  await loadStats();
 }
 
 async function loadStats(){
- const {count:users}=await db.from("profiles").select("*",{count:"exact",head:true});
- const {count:deposits}=await db.from("deposits").select("*",{count:"exact",head:true}).eq("status","pending");
- const {count:withdrawals}=await db.from("withdrawals").select("*",{count:"exact",head:true}).eq("status","pending");
+ const a=await db.from("profiles").select("*",{count:"exact",head:true});
+ const b=await db.from("deposits").select("*",{count:"exact",head:true}).eq("status","pending");
+ const c=await db.from("withdrawals").select("*",{count:"exact",head:true}).eq("status","pending");
 
- document.getElementById("users").textContent=users??"—";
- document.getElementById("deposits").textContent=deposits??"—";
- document.getElementById("withdrawals").textContent=withdrawals??"—";
+ document.getElementById("users").textContent=a.count??"—";
+ document.getElementById("deposits").textContent=b.error?"—":b.count;
+ document.getElementById("withdrawals").textContent=c.error?"—":c.count;
+}
+
+function openPage(id,button){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".sidebar button").forEach(b=>b.classList.remove("active"));
+ button.classList.add("active");
+}
+
+async function loadUsers(){
+ const box=document.getElementById("userList");
+ box.textContent="Loading...";
+ const {data,error}=await db.from("profiles").select("account_id,full_name,status,role");
+ if(error){box.textContent="Could not load users: "+error.message;return}
+ box.innerHTML=data.map(u=>`<p>${u.full_name||"User"} | ${u.account_id||""} | ${u.status||"—"} | ${u.role||"user"}</p>`).join("")||"No users found";
+}
+
+async function loadDeposits(){
+ const box=document.getElementById("depositInfo");
+ const {data,error}=await db.from("deposits").select("*").order("created_at",{ascending:false}).limit(50);
+ box.textContent=error?"Could not load deposits: "+error.message:JSON.stringify(data,null,2);
+}
+
+async function loadWithdrawals(){
+ const box=document.getElementById("withdrawalInfo");
+ const {data,error}=await db.from("withdrawals").select("*").order("created_at",{ascending:false}).limit(50);
+ box.textContent=error?"Could not load withdrawals: "+error.message:JSON.stringify(data,null,2);
 }
 
 function showLogin(){
  document.getElementById("loginBox").style.display="block";
- document.getElementById("dashboard").style.display="none";
+ document.getElementById("dashboardApp").style.display="none";
 }
 
 async function logout(){
@@ -135,7 +208,7 @@ async function logout(){
 }
 
 db.auth.getSession().then(({data})=>{
- if(data.session) checkAdmin();
+ if(data.session)checkAdmin();
 });
 </script>
 
