@@ -8,21 +8,26 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
 body{
   font-family:Arial,sans-serif;
   background:#F7F8FA;
   color:#14243B;
   padding:20px;
 }
+
 .container{max-width:550px;margin:30px auto}
+
 .header{
   display:flex;
   justify-content:space-between;
   align-items:center;
   margin-bottom:25px;
 }
+
 .logo{font-size:23px;font-weight:bold}
 .back{text-decoration:none;color:#14243B;font-weight:bold}
+
 .card{
   background:white;
   border-radius:16px;
@@ -30,8 +35,10 @@ body{
   margin-bottom:18px;
   box-shadow:0 5px 25px rgba(0,0,0,.05);
 }
+
 h2{font-size:21px;margin-bottom:8px}
 .sub{color:#777;font-size:13px;margin-bottom:20px}
+
 .balance{
   background:#14243B;
   color:white;
@@ -39,15 +46,18 @@ h2{font-size:21px;margin-bottom:8px}
   border-radius:12px;
   margin-bottom:20px;
 }
+
 .balance small{opacity:.75}
 .balance h2{font-size:27px;margin-top:8px}
+
 label{
   display:block;
   font-size:13px;
   font-weight:bold;
   margin:15px 0 8px;
 }
-input,select,textarea{
+
+input,select{
   width:100%;
   padding:14px;
   border:1px solid #ddd;
@@ -56,7 +66,7 @@ input,select,textarea{
   background:white;
   color:#14243B;
 }
-textarea{min-height:90px;resize:vertical}
+
 button{
   width:100%;
   padding:15px;
@@ -68,7 +78,9 @@ button{
   margin-top:18px;
   cursor:pointer;
 }
+
 button:disabled{opacity:.5}
+
 .notice{
   background:#fff8e9;
   color:#805d19;
@@ -77,18 +89,20 @@ button:disabled{opacity:.5}
   font-size:12px;
   line-height:1.6;
 }
+
 .message{margin-top:12px;font-size:13px;line-height:1.5}
+
+.paymentFields{display:none}
+.paymentFields.active{display:block}
+
 table{width:100%;font-size:12px;border-collapse:collapse}
-td,th{
-  padding:11px 5px;
-  border-bottom:1px solid #eee;
-  text-align:left;
-}
+td,th{padding:11px 5px;border-bottom:1px solid #eee;text-align:left}
 .status{font-weight:bold}
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
 <div class="header">
@@ -97,63 +111,96 @@ td,th{
 </div>
 
 <div class="card">
-  <h2>Withdraw Funds</h2>
-  <p class="sub">Request a withdrawal from your wallet.</p>
 
-  <div class="balance">
-    <small>Available Wallet Balance</small>
-    <h2 id="availableBalance">Loading...</h2>
-  </div>
+<h2>Withdraw Funds</h2>
+<p class="sub">Request a withdrawal from your wallet.</p>
 
-  <div class="notice">
-    Withdrawal requests are subject to balance verification and admin approval.
-    Submitting a request does not guarantee payment.
-  </div>
+<div class="balance">
+  <small>Available Wallet Balance</small>
+  <h2 id="availableBalance">Loading...</h2>
+</div>
 
-  <label>Withdrawal Amount (₹)</label>
-  <input type="number" id="amount" min="0.01" step="0.01"
-         placeholder="Enter withdrawal amount">
+<div class="notice">
+  Withdrawal requests are subject to balance verification and admin approval.
+</div>
 
-  <label>Payment Method</label>
-  <select id="paymentMethod">
-    <option value="UPI">UPI</option>
-    <option value="Bank Transfer">Bank Transfer</option>
-  </select>
+<label>Withdrawal Amount (₹)</label>
+<input type="number" id="amount" min="0.01" step="0.01" placeholder="Enter amount">
 
-  <label>UPI ID / Bank Account Details</label>
-  <textarea id="payoutDetails"
-    placeholder="Enter your UPI ID or bank account details"></textarea>
+<label>Payment Method</label>
+<select id="paymentMethod" onchange="changePaymentMethod()">
+  <option value="UPI">UPI</option>
+  <option value="Bank Transfer">Bank Transfer</option>
+</select>
 
-  <button id="submitBtn" onclick="submitWithdrawal()">
-    Submit Withdrawal Request
-  </button>
+<!-- UPI FIELDS -->
 
-  <div class="message" id="message"></div>
+<div id="upiFields" class="paymentFields active">
+
+  <label>Account Holder Name</label>
+  <input type="text" id="upiHolder" placeholder="Enter account holder name">
+
+  <label>UPI ID</label>
+  <input type="text" id="upiId" placeholder="example@upi">
+
+</div>
+
+<!-- BANK FIELDS -->
+
+<div id="bankFields" class="paymentFields">
+
+  <label>Account Holder Name</label>
+  <input type="text" id="bankHolder" placeholder="Enter account holder name">
+
+  <label>Bank Name</label>
+  <input type="text" id="bankName" placeholder="Enter bank name">
+
+  <label>Account Number</label>
+  <input type="text" id="accountNumber" inputmode="numeric" placeholder="Enter account number">
+
+  <label>Confirm Account Number</label>
+  <input type="text" id="confirmAccountNumber" inputmode="numeric" placeholder="Re-enter account number">
+
+  <label>IFSC Code</label>
+  <input type="text" id="ifsc" placeholder="Example: SBIN0001234">
+
+</div>
+
+<button id="submitBtn" onclick="submitWithdrawal()">
+  Submit Withdrawal Request
+</button>
+
+<div class="message" id="message"></div>
+
 </div>
 
 <div class="card">
-  <h2>Withdrawal History</h2>
-  <p class="sub">Track your withdrawal requests.</p>
 
-  <div style="overflow-x:auto">
-    <table>
-      <thead>
-        <tr>
-          <th>Amount</th>
-          <th>Method</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="history">
-        <tr><td colspan="3">Loading...</td></tr>
-      </tbody>
-    </table>
-  </div>
+<h2>Withdrawal History</h2>
+<p class="sub">Track your withdrawal requests.</p>
+
+<div style="overflow-x:auto">
+<table>
+<thead>
+<tr>
+<th>Amount</th>
+<th>Method</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="history">
+<tr><td colspan="3">Loading...</td></tr>
+</tbody>
+
+</table>
 </div>
 
+</div>
 </div>
 
 <script>
+
 const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
 
@@ -165,26 +212,37 @@ const db = window.supabase.createClient(
 let currentUser = null;
 let walletBalance = 0;
 
+function changePaymentMethod(){
+
+  const method = document.getElementById("paymentMethod").value;
+
+  document.getElementById("upiFields").classList.toggle("active",method==="UPI");
+
+  document.getElementById("bankFields").classList.toggle("active",method==="Bank Transfer");
+
+}
+
 async function init(){
 
   const {data,error} = await db.auth.getSession();
 
   if(error || !data.session){
-    location.href = "login.html";
+    location.href="login.html";
     return;
   }
 
-  currentUser = data.session.user;
+  currentUser=data.session.user;
 
   await loadBalance();
   await loadHistory();
+
 }
 
 async function loadBalance(){
 
-  const balanceEl = document.getElementById("availableBalance");
+  const balanceEl=document.getElementById("availableBalance");
 
-  const {data,error} = await db
+  const {data,error}=await db
     .from("wallets")
     .select("available_balance")
     .eq("user_id",currentUser.id)
@@ -192,59 +250,108 @@ async function loadBalance(){
 
   if(error){
     console.error("Wallet Error:",error);
-    balanceEl.textContent = "Unavailable";
+    balanceEl.textContent="Unavailable";
     return;
   }
 
-  walletBalance = Number(data?.available_balance ?? 0);
+  walletBalance=Number(data?.available_balance ?? 0);
 
   if(!Number.isFinite(walletBalance)){
-    walletBalance = 0;
+    walletBalance=0;
   }
 
-  balanceEl.textContent = "₹" + walletBalance.toLocaleString("en-IN",{
+  balanceEl.textContent="₹"+walletBalance.toLocaleString("en-IN",{
     minimumFractionDigits:2,
     maximumFractionDigits:2
   });
+
 }
 
 async function submitWithdrawal(){
 
-  const amount = Number(document.getElementById("amount").value);
-  const method = document.getElementById("paymentMethod").value;
-  const details = document.getElementById("payoutDetails").value.trim();
+  const amount=Number(document.getElementById("amount").value);
+  const method=document.getElementById("paymentMethod").value;
 
-  const message = document.getElementById("message");
-  const button = document.getElementById("submitBtn");
+  const message=document.getElementById("message");
+  const button=document.getElementById("submitBtn");
 
-  if(!Number.isFinite(amount) || amount <= 0){
-    message.textContent = "Enter a valid withdrawal amount.";
+  let payoutDetails="";
+
+  if(!Number.isFinite(amount) || amount<=0){
+    message.textContent="Enter a valid withdrawal amount.";
     return;
   }
 
-  if(amount > walletBalance){
-    message.textContent = "Insufficient wallet balance.";
+  if(amount>walletBalance){
+    message.textContent="Insufficient wallet balance.";
     return;
   }
 
-  if(!details){
-    message.textContent = "Enter your payment details.";
-    return;
+  if(method==="UPI"){
+
+    const holder=document.getElementById("upiHolder").value.trim();
+    const upi=document.getElementById("upiId").value.trim();
+
+    if(!holder || !upi){
+      message.textContent="Please complete all UPI details.";
+      return;
+    }
+
+    if(!/^[A-Za-z0-9._-]{2,256}@[A-Za-z0-9.-]{2,64}$/.test(upi)){
+      message.textContent="Please enter a valid UPI ID.";
+      return;
+    }
+
+    payoutDetails=JSON.stringify({
+      method:"UPI",
+      holder_name:holder,
+      upi_id:upi
+    });
+
+  }else{
+
+    const holder=document.getElementById("bankHolder").value.trim();
+    const bank=document.getElementById("bankName").value.trim();
+    const account=document.getElementById("accountNumber").value.trim();
+    const confirm=document.getElementById("confirmAccountNumber").value.trim();
+    const ifsc=document.getElementById("ifsc").value.trim().toUpperCase();
+
+    if(!holder || !bank || !account || !confirm || !ifsc){
+      message.textContent="Please complete all bank details.";
+      return;
+    }
+
+    if(!/^[0-9]{6,20}$/.test(account)){
+      message.textContent="Enter a valid account number.";
+      return;
+    }
+
+    if(account!==confirm){
+      message.textContent="Account numbers do not match.";
+      return;
+    }
+
+    if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)){
+      message.textContent="Enter a valid IFSC code.";
+      return;
+    }
+
+    payoutDetails=JSON.stringify({
+      method:"Bank Transfer",
+      holder_name:holder,
+      bank_name:bank,
+      account_number:account,
+      ifsc_code:ifsc
+    });
+
   }
 
-  if(details.length > 500){
-    message.textContent = "Payment details are too long.";
-    return;
-  }
-
-  button.disabled = true;
-  message.textContent = "Submitting request...";
+  button.disabled=true;
+  message.textContent="Submitting request...";
 
   try{
 
-    const payoutDetails = method + ": " + details;
-
-    const {error} = await db
+    const {error}=await db
       .from("withdrawals")
       .insert({
         user_id:currentUser.id,
@@ -255,52 +362,63 @@ async function submitWithdrawal(){
 
     if(error) throw error;
 
-    message.textContent =
-      "Withdrawal request submitted successfully. Awaiting admin review.";
+    message.textContent="Withdrawal request submitted successfully. Awaiting admin approval.";
 
-    document.getElementById("amount").value = "";
-    document.getElementById("payoutDetails").value = "";
+    document.getElementById("amount").value="";
+    document.getElementById("upiHolder").value="";
+    document.getElementById("upiId").value="";
+    document.getElementById("bankHolder").value="";
+    document.getElementById("bankName").value="";
+    document.getElementById("accountNumber").value="";
+    document.getElementById("confirmAccountNumber").value="";
+    document.getElementById("ifsc").value="";
 
     await loadHistory();
 
   }catch(error){
 
     console.error("Withdrawal Error:",error);
-    message.textContent = "Request failed: " + error.message;
+    message.textContent="Request failed: "+error.message;
 
   }finally{
 
-    button.disabled = false;
+    button.disabled=false;
 
   }
+
 }
 
 async function loadHistory(){
 
-  const tbody = document.getElementById("history");
+  const tbody=document.getElementById("history");
 
-  const {data,error} = await db
+  const {data,error}=await db
     .from("withdrawals")
     .select("amount,payout_details,status,created_at")
     .eq("user_id",currentUser.id)
     .order("created_at",{ascending:false});
 
   if(error){
-    console.error("Withdrawal History Error:",error);
-    tbody.innerHTML =
-      "<tr><td colspan='3'>History unavailable</td></tr>";
+    console.error("History Error:",error);
+    tbody.innerHTML="<tr><td colspan='3'>History unavailable</td></tr>";
     return;
   }
 
-  if(!data || data.length === 0){
-    tbody.innerHTML =
-      "<tr><td colspan='3'>No withdrawal requests yet</td></tr>";
+  if(!data || data.length===0){
+    tbody.innerHTML="<tr><td colspan='3'>No withdrawal requests yet</td></tr>";
     return;
   }
 
-  tbody.innerHTML = data.map(item => {
+  tbody.innerHTML=data.map(item=>{
 
-    const method = String(item.payout_details || "").split(":")[0];
+    let method="Unknown";
+
+    try{
+      const details=JSON.parse(item.payout_details);
+      method=details.method || "Unknown";
+    }catch(e){
+      method="Unknown";
+    }
 
     return `
       <tr>
@@ -311,6 +429,7 @@ async function loadHistory(){
     `;
 
   }).join("");
+
 }
 
 function escapeHTML(value){
@@ -324,6 +443,8 @@ function escapeHTML(value){
 }
 
 init();
+
 </script>
+
 </body>
 </html>
