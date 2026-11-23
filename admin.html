@@ -180,14 +180,13 @@ th{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase
 <select class="field" id="balanceAction">
 <option value="credit">Wallet credit</option>
 <option value="debit">Wallet debit</option>
-<option value="profit">Verified profit correction</option>
-<option value="loss">Verified loss correction</option>
+
 </select>
 <label class="form-label">Amount (₹)</label>
 <input class="field" id="balanceAmount" type="number" min="0.01" step="0.01" placeholder="Enter amount">
 <label class="form-label">Reason / Reference</label>
 <textarea class="field" id="balanceReason" rows="3" placeholder="Enter adjustment reason"></textarea>
-<button class="action-btn primary-btn" disabled>Secure financial backend required</button>
+<button class="action-btn primary-btn" onclick="adjustCustomerWallet()">Update Customer Balance</button>
 <div class="notice">Financial changes will require server-side admin authorization, balance validation, transaction ledger entries and audit records. No customer money is changed by this screen alone.</div>
 </div>
 <div class="panel">
@@ -678,6 +677,39 @@ location.href="login.html";
 });
 
 initAdmin();
+ async function adjustCustomerWallet(){
+
+  const accountId = document.getElementById("balanceUserId").value.trim();
+  const amount = Number(document.getElementById("balanceAmount").value);
+  const action = document.getElementById("balanceAction").value;
+  const reason = document.getElementById("balanceReason").value.trim();
+
+  if(!accountId || !amount || amount <= 0 || !reason){
+    alert("Customer ID, valid amount aur reason enter karo.");
+    return;
+  }
+
+  if(!confirm("Wallet "+action+" ₹"+amount+" karna hai?")) return;
+
+  const {data,error} = await db.rpc("admin_adjust_wallet",{
+    p_account_id: accountId,
+    p_amount: amount,
+    p_action: action,
+    p_reason: reason
+  });
+
+  if(error){
+    alert("Update failed: "+error.message);
+    return;
+  }
+
+  alert("Balance updated! New balance: ₹"+Number(data.balance_after).toFixed(2));
+
+  document.getElementById("balanceAmount").value="";
+  document.getElementById("balanceReason").value="";
+
+  await refreshAdmin();
+ }
 </script>
 
 </body>
