@@ -280,7 +280,7 @@ color:#806B3F;font-size:11px;line-height:1.6;margin-top:15px;
 </div>
 
 <div class="stat">
-<label>Today's P&L</label>
+<label>Live P&L</label>
 <h2 id="todayPL" class="balance-loading">Loading...</h2>
 <small>Verified daily records</small>
 </div>
@@ -857,8 +857,7 @@ if (!rows.length) {
     </tr>`;
   }).join("");
 }
-  // Daily history table abhi available nahi hai.
-  setPL("todayPL",null);
+  setPL("todayPL", totalProfit);
 
 }
 
