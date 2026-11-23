@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrow Trade | Deposit Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f6f8;color:#18263a;font-family:Arial,sans-serif}
+header{background:#14243b;color:white;padding:20px}
+header h2{margin:0 0 6px}
+header p{margin:0;color:#c7d0dc;font-size:13px}
+.container{padding:20px;max-width:1200px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{border:0;padding:11px 16px;border-radius:8px;background:#14243b;color:white;cursor:pointer}
+input,select{padding:12px;border:1px solid #ddd;border-radius:9px;margin:10px 5px 10px 0}
+input{width:min(100%,350px)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:20px 0}
+.stat,.card{background:white;padding:17px;border-radius:12px;box-shadow:0 3px 15px #00000008}
+.stat small,.muted{color:#788494}
+.stat h2{margin:10px 0 0}
+.tablewrap{overflow-x:auto;background:white;border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:850px}
+th,td{text-align:left;padding:14px;border-bottom:1px solid #eee;font-size:13px}
+th{background:#f8f9fb;color:#657184}
+.badge{padding:5px 9px;border-radius:20px;font-size:11px;background:#edf1f5}
+.pending{background:#fff2d8;color:#946500}
+.approved{background:#e3f7ed;color:#138451}
+.rejected{background:#ffe8e8;color:#c33}
+#message{padding:12px;margin:12px 0;border-radius:8px;background:#fff4dc;color:#795b17;display:none}
+a{color:#14243b;text-decoration:none}
+</style>
+</head>
+<body>
+
+<header>
+<h2>ARROW TRADE</h2>
+<p>Admin Panel / Deposit Management</p>
+</header>
+
+<div class="container">
+
+<div class="top">
+<div>
+<h2>Deposit Management</h2>
+<p class="muted">Customer deposit records</p>
+</div>
+<button onclick="loadDeposits()">Refresh Data ↻</button>
+</div>
+
+<div id="message"></div>
+
+<div class="stats">
+<div class="stat"><small>Total Deposits</small><h2 id="total">—</h2></div>
+<div class="stat"><small>Total Amount</small><h2 id="amount">—</h2></div>
+<div class="stat"><small>Pending</small><h2 id="pending">—</h2></div>
+<div class="stat"><small>Approved</small><h2 id="approved">—</h2></div>
+<div class="stat"><small>Rejected</small><h2 id="rejected">—</h2></div>
+</div>
+
+<div class="card">
+<h3>Deposit Records</h3>
+
+<input id="search" placeholder="Search UTR or Customer ID..." oninput="filterRows()">
+
+<select id="statusFilter" onchange="filterRows()">
+<option value="">All Status</option>
+<option value="pending">Pending</option>
+<option value="approved">Approved</option>
+<option value="rejected">Rejected</option>
+</select>
+
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>Customer</th>
+<th>Amount</th>
+<th>UTR Reference</th>
+<th>Status</th>
+<th>Date</th>
+<th>Payment Proof Path</th>
+</tr>
+</thead>
+<tbody id="depositRows">
+<tr><td colspan="6">Loading deposits...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<a href="admin.html">← Back to Admin Dashboard</a>
+
+</div>
+
+<script>
+const SUPABASE_URL="https://sofargknzehbqkdlyywx.supabase.co";
+const SUPABASE_KEY="sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let deposits=[];
+
+function money(value){
+return "₹"+Number(value||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+}
+
+function message(text){
+const el=document.getElementById("message");
+el.style.display="block";
+el.textContent=text;
+}
+
+function escapeHTML(value){
+return String(value??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+async function checkAdmin(){
+const {data:{session},error}=await db.auth.getSession();
+
+if(error||!session){
+message("Please login with your admin account.");
+return false;
+}
+
+const {data:profile,error:profileError}=await db
+.from("profiles")
+.select("role")
+.eq("id",session.user.id)
+.single();
+
+if(profileError||!profile||profile.role!=="admin"){
+message("Access denied. Admin account required.");
+return false;
+}
+
+return true;
+}
+
+async function loadDeposits(){
+
+document.getElementById("depositRows").innerHTML=
+'<tr><td colspan="6">Loading...</td></tr>';
+
+if(!await checkAdmin())return;
+
+const {data,error}=await db
+.from("deposits")
+.select("id,user_id,amount,utr_reference,status,created_at,payment_proof_path")
+.order("created_at",{ascending:false});
+
+if(error){
+message("Deposit loading error: "+error.message);
+document.getElementById("depositRows").innerHTML=
+'<tr><td colspan="6">Unable to load deposits.</td></tr>';
+return;
+}
+
+deposits=data||[];
+
+const userIds=[...new Set(deposits.map(d=>d.user_id).filter(Boolean))];
+let profiles=[];
+
+if(userIds.length){
+const result=await db.from("profiles")
+.select("id,full_name,account_id")
+.in("id",userIds);
+
+if(!result.error)profiles=result.data||[];
+}
+
+const profileMap={};
+profiles.forEach(p=>profileMap[p.id]=p);
+
+deposits=deposits.map(d=>({
+...d,
+customer:profileMap[d.user_id]||null
+}));
+
+document.getElementById("total").textContent=deposits.length;
+
+document.getElementById("amount").textContent=
+money(deposits.reduce((sum,d)=>sum+Number(d.amount||0),0));
+
+document.getElementById("pending").textContent=
+deposits.filter(d=>String(d.status).toLowerCase()==="pending").length;
+
+document.getElementById("approved").textContent=
+deposits.filter(d=>String(d.status).toLowerCase()==="approved").length;
+
+document.getElementById("rejected").textContent=
+deposits.filter(d=>String(d.status).toLowerCase()==="rejected").length;
+
+renderDeposits(deposits);
+}
+
+function renderDeposits(rows){
+
+const tbody=document.getElementById("depositRows");
+
+if(!rows.length){
+tbody.innerHTML='<tr><td colspan="6">No deposits found.</td></tr>';
+return;
+}
+
+tbody.innerHTML=rows.map(d=>{
+
+const status=String(d.status||"unknown").toLowerCase();
+const customer=d.customer;
+const name=customer?.full_name||"Customer";
+const account=customer?.account_id||d.user_id||"—";
+const proof=d.payment_proof_path;
+
+return `<tr>
+<td><strong>${escapeHTML(name)}</strong><br>
+<small class="muted">${escapeHTML(account)}</small></td>
+<td>${money(d.amount)}</td>
+<td>${escapeHTML(d.utr_reference||"—")}</td>
+<td><span class="badge ${["pending","approved","rejected"].includes(status)?status:""}">${escapeHTML(status)}</span></td>
+<td>${d.created_at?new Date(d.created_at).toLocaleString():"—"}</td>
+<td>${proof?escapeHTML(proof):"Not uploaded"}</td>
+</tr>`;
+}).join("");
+}
+
+function filterRows(){
+
+const q=document.getElementById("search").value.toLowerCase();
+const status=document.getElementById("statusFilter").value;
+
+const filtered=deposits.filter(d=>{
+const text=[
+d.utr_reference,
+d.user_id,
+d.customer?.full_name,
+d.customer?.account_id
+].join(" ").toLowerCase();
+
+return text.includes(q)&&
+(!status||String(d.status).toLowerCase()===status);
+});
+
+renderDeposits(filtered);
+}
+
+loadDeposits();
+</script>
+</body>
+</html>
