@@ -175,7 +175,7 @@ th{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase
 <div class="panel">
 <div class="panel-head"><h3>Customer Balance & P/L Controls</h3></div>
 <label class="form-label">Customer User ID</label>
-<input class="field" id="balanceUserId" placeholder="Enter customer User ID">
+<input class="field" id="balanceUserId" placeholder="Enter customer User ID" onchange="loadCustomerInvestmentOptions()">
 
  <label class="form-label">Select Investment</label>
 <select class="field" id="investmentSelect">
@@ -562,7 +562,50 @@ return `<tr>
 </tr>`;
 }).join("");
 }
+async function loadCustomerInvestmentOptions() {
+    const accountId = document.getElementById("balanceUserId").value.trim();
+    const select = document.getElementById("investmentSelect");
 
+    select.innerHTML = '<option value="">Loading...</option>';
+
+    if (!accountId) {
+        select.innerHTML = '<option value="">Select Investment</option>';
+        return;
+    }
+
+    const { data: profile, error: profileError } = await db
+        .from("profiles")
+        .select("id")
+        .eq("account_id", accountId)
+        .maybeSingle();
+
+    if (profileError || !profile) {
+        select.innerHTML = '<option value="">Customer not found</option>';
+        return;
+    }
+
+    const { data, error } = await db
+        .from("portfolios")
+        .select("id, invested_amount, current_value, created_at")
+        .eq("user_id", profile.id)
+        .order("created_at", { ascending: false });
+
+    select.innerHTML = '<option value="">Select Investment</option>';
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    (data || []).forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent =
+            "Invested ₹" + item.invested_amount +
+            " | Current ₹" + item.current_value;
+        select.appendChild(option);
+    });
+}
 async function loadDeposits(){
 
 const {data,error}=await db
