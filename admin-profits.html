@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Arrow Trade | Profit Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f6f8;color:#18263a;font-family:Arial,sans-serif}
+header{background:#14243b;color:white;padding:20px}
+header h2{margin:0 0 6px}
+header p{margin:0;color:#c7d0dc;font-size:13px}
+.container{padding:20px;max-width:1200px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{border:0;padding:11px 16px;border-radius:8px;background:#14243b;color:white;cursor:pointer}
+input{padding:12px;border:1px solid #ddd;border-radius:9px;margin:10px 5px 10px 0;width:min(100%,350px)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.stat,.card{background:white;padding:17px;border-radius:12px;box-shadow:0 3px 15px #00000008}
+.stat small,.muted{color:#788494}
+.stat h2{margin:10px 0 0}
+.tablewrap{overflow-x:auto;background:white;border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:850px}
+th,td{text-align:left;padding:14px;border-bottom:1px solid #eee;font-size:13px}
+th{background:#f8f9fb;color:#657184}
+.profit{color:#15966a;font-weight:bold}
+.loss{color:#dc4c55;font-weight:bold}
+#message{padding:12px;margin:12px 0;border-radius:8px;background:#fff4dc;color:#795b17;display:none}
+a{color:#14243b;text-decoration:none}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>ARROW TRADE</h2>
+<p>Admin Panel / Profit & Loss Management</p>
+</header>
+
+<div class="container">
+
+<div class="top">
+<div>
+<h2>Profit & Loss Management</h2>
+<p class="muted">Customer portfolio performance</p>
+</div>
+<button onclick="loadProfits()">Refresh Data ↻</button>
+</div>
+
+<div id="message"></div>
+
+<div class="stats">
+
+<div class="stat">
+<small>Total Portfolios</small>
+<h2 id="totalCount">—</h2>
+</div>
+
+<div class="stat">
+<small>Total Invested</small>
+<h2 id="invested">—</h2>
+</div>
+
+<div class="stat">
+<small>Current Value</small>
+<h2 id="current">—</h2>
+</div>
+
+<div class="stat">
+<small>Net Profit / Loss</small>
+<h2 id="netPL">—</h2>
+</div>
+
+<div class="stat">
+<small>Profitable Portfolios</small>
+<h2 id="profitable">—</h2>
+</div>
+
+<div class="stat">
+<small>Loss Portfolios</small>
+<h2 id="lossCount">—</h2>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Customer Profit & Loss Records</h3>
+
+<input id="search"
+placeholder="Search customer or account ID..."
+oninput="filterRows()">
+
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>Customer</th>
+<th>Account ID</th>
+<th>Invested</th>
+<th>Current Value</th>
+<th>Profit / Loss</th>
+<th>Date</th>
+</tr>
+</thead>
+
+<tbody id="profitRows">
+<tr><td colspan="6">Loading records...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h3>Profit Booking Requests</h3>
+<p class="muted">
+Profit booking request records are not connected yet.
+A verified booking-request database table and secure approval workflow
+are required before showing or processing requests.
+</p>
+</div>
+
+<a href="admin.html">← Back to Admin Dashboard</a>
+
+</div>
+<script>
+
+const SUPABASE_URL=
+"https://sofargknzehbqkdlyywx.supabase.co";
+
+const SUPABASE_KEY=
+"sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+
+const db=window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+let portfolios=[];
+
+function money(value){
+return "₹"+Number(value||0).toLocaleString("en-IN",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
+}
+
+function showMessage(text){
+const el=document.getElementById("message");
+el.style.display="block";
+el.textContent=text;
+}
+
+function escapeHTML(value){
+return String(value??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+}[c]));
+}
+
+async function checkAdmin(){
+
+const {data:{session},error}=await db.auth.getSession();
+
+if(error||!session){
+showMessage("Please login with your admin account.");
+return false;
+}
+
+const {data:profile,error:profileError}=await db
+.from("profiles")
+.select("role")
+.eq("id",session.user.id)
+.single();
+
+if(profileError||!profile||profile.role!=="admin"){
+showMessage("Access denied. Admin account required.");
+return false;
+}
+
+return true;
+}
+
+async function loadProfits(){
+
+document.getElementById("profitRows").innerHTML=
+'<tr><td colspan="6">Loading...</td></tr>';
+
+if(!await checkAdmin())return;
+
+const {data,error}=await db
+.from("portfolios")
+.select("id,user_id,invested_amount,current_value,created_at")
+.order("created_at",{ascending:false});
+
+if(error){
+showMessage("Portfolio error: "+error.message);
+document.getElementById("profitRows").innerHTML=
+'<tr><td colspan="6">Unable to load records.</td></tr>';
+return;
+}
+
+portfolios=data||[];
+
+const userIds=[
+...new Set(portfolios.map(p=>p.user_id).filter(Boolean))
+];
+
+let profiles=[];
+
+if(userIds.length){
+
+const result=await db
+.from("profiles")
+.select("id,full_name,account_id")
+.in("id",userIds);
+
+if(!result.error){
+profiles=result.data||[];
+}
+
+}
+
+const profileMap={};
+
+profiles.forEach(p=>{
+profileMap[p.id]=p;
+});
+
+portfolios=portfolios.map(p=>({
+...p,
+customer:profileMap[p.user_id]||null
+}));
+
+const invested=portfolios.reduce(
+(sum,p)=>sum+Number(p.invested_amount||0),0
+);
+
+const current=portfolios.reduce(
+(sum,p)=>sum+Number(p.current_value||0),0
+);
+
+const netPL=current-invested;
+
+document.getElementById("totalCount").textContent=
+portfolios.length;
+
+document.getElementById("invested").textContent=
+money(invested);
+
+document.getElementById("current").textContent=
+money(current);
+
+const plElement=document.getElementById("netPL");
+
+plElement.textContent=(netPL>0?"+":"")+money(netPL);
+plElement.className=netPL>0?"profit":netPL<0?"loss":"";
+
+document.getElementById("profitable").textContent=
+portfolios.filter(p=>
+Number(p.current_value)>Number(p.invested_amount)
+).length;
+
+document.getElementById("lossCount").textContent=
+portfolios.filter(p=>
+Number(p.current_value)<Number(p.invested_amount)
+).length;
+
+renderRows(portfolios);
+
+}
+
+function renderRows(rows){
+
+const tbody=document.getElementById("profitRows");
+
+if(!rows.length){
+tbody.innerHTML=
+'<tr><td colspan="6">No portfolio records found.</td></tr>';
+return;
+}
+
+tbody.innerHTML=rows.map(p=>{
+
+const invested=Number(p.invested_amount||0);
+const current=Number(p.current_value||0);
+const pl=current-invested;
+
+return `
+<tr>
+<td>
+<strong>${escapeHTML(p.customer?.full_name||"Customer")}</strong>
+<br>
+<small class="muted">${escapeHTML(p.user_id)}</small>
+</td>
+
+<td>${escapeHTML(p.customer?.account_id||"—")}</td>
+
+<td>${money(invested)}</td>
+
+<td>${money(current)}</td>
+
+<td class="${pl>0?"profit":pl<0?"loss":""}">
+${pl>0?"+":""}${money(pl)}
+</td>
+
+<td>
+${p.created_at
+?new Date(p.created_at).toLocaleDateString()
+:"—"}
+</td>
+</tr>
+`;
+
+}).join("");
+
+}
+
+function filterRows(){
+
+const q=document.getElementById("search").value.toLowerCase();
+
+const filtered=portfolios.filter(p=>{
+
+const text=[
+p.user_id,
+p.customer?.full_name,
+p.customer?.account_id
+].join(" ").toLowerCase();
+
+return text.includes(q);
+
+});
+
+renderRows(filtered);
+
+}
+
+loadProfits();
+
+</script>
+
+</body>
+</html>
