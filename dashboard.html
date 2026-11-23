@@ -847,13 +847,7 @@ setPL("totalPL", totalProfit);
 
   document.getElementById("investment").textContent=
     money(totalInvestment);
-const eligibleProfit = rows.reduce((sum, item) => {
-  return sum + Math.max(
-    0,
-    Number(item.current_value || 0) -
-    Number(item.invested_amount || 0)
-  );
-}, 0);
+const eligibleProfit = Math.max(0, totalProfit);
 
 document.getElementById("eligibleProfit").textContent =
   money(eligibleProfit);
