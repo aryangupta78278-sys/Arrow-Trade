@@ -989,7 +989,37 @@ async function selectMarket(){
     change.className = "market-change grey";
   }
 }
+async function loadMarketWatch(){
 
+  const symbols = ["EUR/USD","GBP/USD","USD/JPY","XAU/USD","BTC/USD"];
+
+  const items = document.querySelectorAll(".watch-item");
+
+  for(let i=0;i<symbols.length;i++){
+
+    const priceElement = items[i]?.querySelector("b");
+    if(!priceElement) continue;
+
+    try{
+      const response = await fetch(
+        "/api/market?symbol=" + encodeURIComponent(symbols[i])
+      );
+
+      const data = await response.json();
+
+      if(!response.ok || !data.price){
+        throw new Error(data.message || data.error || "Price unavailable");
+      }
+
+      priceElement.textContent = Number(data.price).toFixed(5);
+      priceElement.className = "green";
+
+    }catch(error){
+      console.error(symbols[i],error);
+      priceElement.textContent = "Unavailable";
+    }
+  }
+}
 db.auth.onAuthStateChange(event=>{
 
 if(event==="SIGNED_OUT"){
@@ -997,7 +1027,8 @@ location.href="login.html";
 }
 
 });
-
+loadMarketWatch();
+setInterval(loadMarketWatch,30000);
 init();
 </script>
 
