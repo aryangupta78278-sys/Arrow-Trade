@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -842,12 +842,14 @@ async function loadInvestments(){
     currentValue += getCalculatedValue(item);
   });
 
-  const totalProfit=currentValue-totalInvestment;
+  const totalProfit = currentValue - totalInvestment;
+setPL("totalPL", totalProfit);
 
   document.getElementById("investment").textContent=
     money(totalInvestment);
 
-  setPL("totalPL",totalProfit);
+  
+ 
 const tbody = document.getElementById("myInvestments");
 
 if (!rows.length) {
