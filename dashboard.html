@@ -285,6 +285,8 @@ color:#806B3F;font-size:11px;line-height:1.6;margin-top:15px;
 <small>Verified daily records</small>
 </div>
 </div>
+  <div style="font-size:12px;color:#777;text-align:center;margin:10px 0 18px;padding:10px;background:#f5f5f5;border-radius:8px;">
+  </div>
 <!-- INVEST YOUR MONEY -->
 <div class="panel">
   <div class="panel-head">
@@ -801,7 +803,17 @@ document.getElementById("walletBalance").textContent="Unavailable";
 
 document.getElementById("balance").className="red";
 }
+function getCalculatedValue(item) {
+  const invested = Number(item.invested_amount || 0);
+  const created = new Date(item.created_at).getTime();
 
+  if (!invested || !created) return invested;
+
+  const elapsedMinutes = Math.max(0, (Date.now() - created) / 60000);
+  const progress = Math.min(elapsedMinutes / 60, 1);
+
+  return invested * (1 + 1.5 * progress);
+}
 async function loadInvestments(){
 
   const {data,error}=await db
@@ -827,7 +839,7 @@ async function loadInvestments(){
 
   rows.forEach(item=>{
     totalInvestment += Number(item.invested_amount || 0);
-    currentValue += Number(item.current_value || 0);
+    currentValue += getCalculatedValue(item);
   });
 
   const totalProfit=currentValue-totalInvestment;
@@ -843,7 +855,7 @@ if (!rows.length) {
 } else {
   tbody.innerHTML = rows.map(item => {
     const invested = Number(item.invested_amount || 0);
-    const value = Number(item.current_value || 0);
+    const value = getCalculatedValue(item);
     const profit = value - invested;
     const date = item.created_at
       ? new Date(item.created_at).toLocaleDateString("en-IN")
