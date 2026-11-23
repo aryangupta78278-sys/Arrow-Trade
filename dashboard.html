@@ -1034,6 +1034,55 @@ location.href="login.html";
 loadMarketWatch();
 setInterval(loadMarketWatch,30000);
 init();
+ async function makeInvestment() {
+  const amount = Number(
+    document.getElementById("investAmount").value
+  );
+
+  const message = document.getElementById("investmentMessage");
+  const button = document.querySelector(
+    'button[onclick="makeInvestment()"]'
+  );
+
+  if (!currentUser) {
+    message.textContent = "Please login first.";
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    message.textContent = "Enter a valid investment amount.";
+    return;
+  }
+
+  if (button) button.disabled = true;
+  message.textContent = "Processing investment...";
+
+  try {
+    const { data, error } = await db.rpc("make_investment", {
+      p_amount: amount
+    });
+
+    if (error) throw error;
+
+    if (!data || data.success !== true) {
+      throw new Error("Investment could not be confirmed.");
+    }
+
+    message.textContent =
+      "Investment successful! Remaining balance: ₹" +
+      Number(data.remaining_balance).toFixed(2);
+
+    document.getElementById("investAmount").value = "";
+
+    setTimeout(() => location.reload(), 1200);
+
+  } catch (error) {
+    console.error("Investment error:", error);
+    message.textContent = "Investment failed: " + error.message;
+  } finally {
+    if (button) button.disabled = false;
+  }
+ }
 </script>
 
 </body>
