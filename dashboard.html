@@ -1083,6 +1083,53 @@ init();
     if (button) button.disabled = false;
   }
  }
+ async function bookProfit() {
+  const amountInput = document.getElementById("bookProfitAmount");
+  const message = document.getElementById("bookProfitMessage");
+  const amount = Number(amountInput.value);
+
+  if (!currentUser) {
+    message.textContent = "Please login first.";
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    message.textContent = "Valid amount enter karo.";
+    return;
+  }
+
+  const button = document.querySelector(
+    'button[onclick="bookProfit()"]'
+  );
+
+  if (button) button.disabled = true;
+  message.textContent = "Processing profit booking...";
+
+  try {
+    const { data, error } = await db.rpc(
+      "book_portfolio_profit",
+      { p_amount: amount }
+    );
+
+    if (error) throw error;
+
+    if (!data || data.success !== true) {
+      throw new Error(data?.message || "Booking not confirmed.");
+    }
+
+    message.textContent = "Profit successfully transferred to wallet.";
+    amountInput.value = "";
+
+    await loadWallet();
+    await loadInvestments();
+
+  } catch (error) {
+    console.error("Profit booking error:", error);
+    message.textContent = "Booking failed: " + error.message;
+  } finally {
+    if (button) button.disabled = false;
+  }
+ }
 </script>
 
 </body>
