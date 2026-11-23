@@ -588,7 +588,7 @@ async function loadCustomerInvestmentOptions() {
     const { data, error } = await db
         .from("portfolios")
         .select("id, invested_amount, current_value, created_at")
-        .eq("user_id", profile.id)
+        .eq("profile_id", profile.id)
         .order("created_at", { ascending: false });
 
     select.innerHTML = '<option value="">Select Investment</option>';
