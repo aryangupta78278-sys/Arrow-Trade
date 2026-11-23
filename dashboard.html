@@ -839,7 +839,7 @@ async function loadInvestments(){
 
   rows.forEach(item=>{
     totalInvestment += Number(item.invested_amount || 0);
-    currentValue += getCalculatedValue(item);
+    currentValue += Number(item.current_value || 0);
   });
 
   const totalProfit = currentValue - totalInvestment;
@@ -860,7 +860,7 @@ if (!rows.length) {
 } else {
   tbody.innerHTML = rows.map(item => {
     const invested = Number(item.invested_amount || 0);
-    const value = getCalculatedValue(item);
+    const value = Number(item.current_value || 0);
     const profit = value - invested;
     const date = item.created_at
       ? new Date(item.created_at).toLocaleDateString("en-IN")
