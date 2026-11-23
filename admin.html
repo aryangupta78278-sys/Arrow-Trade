@@ -259,7 +259,8 @@ th{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase
 <label class="form-label">Upload New QR Image</label>
 <input class="field" type="file" id="qrFile" accept="image/*">
 <div id="qrPreview" class="notice">QR preview will appear here.</div>
-<button class="action-btn primary-btn" disabled>Storage backend required</button>
+<button class="action-btn primary-btn" id="qrUploadBtn" type="button">Upload / Replace QR</button>
+<p class="notice" id="qrUploadStatus">QR upload status yahan dikhega.</p>
 </div>
 <div class="panel">
 <h3>UPI Settings</h3>
@@ -826,6 +827,77 @@ initAdmin();
         btn.disabled = false;
         btn.textContent = "Review Deposit";
     }
+});
+ document.getElementById("qrUploadBtn").addEventListener("click", async function () {
+  const btn = this;
+  const file = document.getElementById("qrFile").files[0];
+  const status = document.getElementById("qrUploadStatus");
+
+  if (!file) {
+    status.textContent = "Pehle QR image select karo.";
+    return;
+  }
+
+  if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+    status.textContent = "Image file honi chahiye aur size 5 MB se kam.";
+    return;
+  }
+
+  btn.disabled = true;
+  status.textContent = "Uploading QR...";
+
+  try {
+    const { data: settings, error: readError } = await db
+      .from("payment_settings")
+      .select("id")
+      .limit(1)
+      .maybeSingle();
+
+    if (readError) throw readError;
+    if (!settings) throw new Error("payment_settings mein row nahi mili.");
+
+    const filePath = "qr/" + Date.now() + "-" +
+      file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    const { error: uploadError } = await db.storage
+      .from("payment-assets")
+      .upload(filePath, file, {
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicData } = db.storage
+      .from("payment-assets")
+      .getPublicUrl(filePath);
+
+    const { error: saveError } = await db
+      .from("payment_settings")
+      .update({
+        qr_image_path: publicData.publicUrl,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", settings.id);
+
+    if (saveError) throw saveError;
+
+    const preview = document.getElementById("qrPreview");
+    preview.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = publicData.publicUrl;
+    img.alt = "Payment QR";
+    img.style.maxWidth = "220px";
+    img.style.display = "block";
+    img.style.margin = "10px auto";
+    preview.appendChild(img);
+
+    status.textContent = "QR successfully uploaded and saved.";
+  } catch (err) {
+    status.textContent = "QR upload failed: " + err.message;
+  } finally {
+    btn.disabled = false;
+  }
 });
 </script>
 
