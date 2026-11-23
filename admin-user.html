@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrow Trade | Customer Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f6f8;color:#18263a;font-family:Arial,sans-serif}
+header{background:#14243b;color:white;padding:20px}
+header h2{margin:0 0 6px}
+header p{margin:0;color:#c7d0dc;font-size:13px}
+.container{padding:20px;max-width:1200px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button{border:0;padding:11px 16px;border-radius:8px;background:#14243b;color:white;cursor:pointer}
+input{width:100%;padding:13px;border:1px solid #ddd;border-radius:9px;margin:18px 0}
+.card{background:white;padding:18px;border-radius:12px;margin-bottom:18px;box-shadow:0 3px 15px #00000008}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:white;padding:17px;border-radius:12px}
+.stat small{color:#788494}
+.stat h2{margin:10px 0 0}
+.tablewrap{overflow-x:auto;background:white;border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:750px}
+th,td{text-align:left;padding:14px;border-bottom:1px solid #eee;font-size:13px}
+th{background:#f8f9fb;color:#657184}
+.badge{padding:5px 9px;border-radius:20px;font-size:11px;background:#edf1f5}
+.active{background:#e3f7ed;color:#138451}
+.suspended{background:#ffe8e8;color:#c33}
+.muted{color:#8993a1}
+#message{padding:12px;margin:12px 0;border-radius:8px;background:#fff4dc;color:#795b17;display:none}
+a{color:#14243b;text-decoration:none;font-size:13px}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>ARROW TRADE</h2>
+<p>Admin Panel / Customer Management</p>
+</header>
+
+<div class="container">
+
+<div class="top">
+<div>
+<h2>Customers</h2>
+<p class="muted">View and manage registered accounts</p>
+</div>
+<button onclick="loadUsers()">Refresh Data ↻</button>
+</div>
+
+<div id="message"></div>
+
+<div class="stats">
+<div class="stat">
+<small>Total Customers</small>
+<h2 id="totalUsers">—</h2>
+</div>
+<div class="stat">
+<small>Active Accounts</small>
+<h2 id="activeUsers">—</h2>
+</div>
+<div class="stat">
+<small>Suspended Accounts</small>
+<h2 id="suspendedUsers">—</h2>
+</div>
+</div>
+
+<div class="card" style="margin-top:20px">
+<h3>Customer Directory</h3>
+<input id="search" placeholder="Search name, email or account ID..." oninput="filterUsers()">
+
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>Customer</th>
+<th>Account ID</th>
+<th>Role</th>
+<th>Status</th>
+<th>Created</th>
+</tr>
+</thead>
+<tbody id="usersTable">
+<tr><td colspan="5">Loading customers...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<a href="admin.html">← Back to Admin Dashboard</a>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
+
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let allUsers = [];
+
+function showMessage(msg){
+const box=document.getElementById("message");
+box.style.display="block";
+box.textContent=msg;
+}
+
+async function checkAdmin(){
+
+const {data:{session},error}=await db.auth.getSession();
+
+if(error || !session){
+showMessage("Please login with your admin account.");
+return false;
+}
+
+const {data:profile,error:profileError}=await db
+.from("profiles")
+.select("role")
+.eq("id",session.user.id)
+.single();
+
+if(profileError || !profile || profile.role!=="admin"){
+showMessage("Access denied. Admin account required.");
+return false;
+}
+
+return true;
+}
+
+async function loadUsers(){
+
+document.getElementById("usersTable").innerHTML=
+'<tr><td colspan="5">Loading...</td></tr>';
+
+const allowed=await checkAdmin();
+if(!allowed)return;
+
+const {data,error}=await db
+.from("profiles")
+.select("id,account_id,full_name,status,role,created_at,account_suspended")
+.order("created_at",{ascending:false});
+
+if(error){
+showMessage("Could not load customers: "+error.message);
+document.getElementById("usersTable").innerHTML=
+'<tr><td colspan="5">Unable to load data.</td></tr>';
+return;
+}
+
+allUsers=data||[];
+
+document.getElementById("totalUsers").textContent=allUsers.length;
+
+document.getElementById("activeUsers").textContent=
+allUsers.filter(u=>!u.account_suspended).length;
+
+document.getElementById("suspendedUsers").textContent=
+allUsers.filter(u=>u.account_suspended).length;
+
+renderUsers(allUsers);
+}
+
+function renderUsers(users){
+
+const table=document.getElementById("usersTable");
+
+if(!users.length){
+table.innerHTML='<tr><td colspan="5">No customers found.</td></tr>';
+return;
+}
+
+table.innerHTML=users.map(u=>{
+
+const suspended=u.account_suspended===true;
+
+return `
+<tr>
+<td>
+<strong>${escapeHTML(u.full_name||"Unnamed")}</strong><br>
+<small class="muted">${escapeHTML(u.id)}</small>
+</td>
+<td>${escapeHTML(u.account_id||"—")}</td>
+<td>${escapeHTML(u.role||"customer")}</td>
+<td>
+<span class="badge ${suspended?"suspended":"active"}">
+${suspended?"Suspended":escapeHTML(u.status||"Active")}
+</span>
+</td>
+<td>${u.created_at?new Date(u.created_at).toLocaleDateString():"—"}</td>
+</tr>
+`;
+
+}).join("");
+}
+
+function filterUsers(){
+
+const q=document.getElementById("search").value.toLowerCase();
+
+const filtered=allUsers.filter(u=>
+(u.full_name||"").toLowerCase().includes(q)||
+(u.account_id||"").toLowerCase().includes(q)||
+(u.id||"").toLowerCase().includes(q)||
+(u.role||"").toLowerCase().includes(q)
+);
+
+renderUsers(filtered);
+}
+
+function escapeHTML(value){
+
+return String(value).replace(/[&<>"']/g,char=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+}[char]));
+
+}
+
+loadUsers();
+</script>
+
+</body>
+</html>
