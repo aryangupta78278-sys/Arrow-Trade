@@ -781,6 +781,52 @@ initAdmin();
 
   await refreshAdmin();
  }
+ document.getElementById("reviewDepositBtn").addEventListener("click", async function () {
+    const btn = this;
+
+    const depositId = document.getElementById("depositId").value.trim();
+    const decision = document.getElementById("depositDecision").value;
+    const reason = document.getElementById("depositReason").value.trim();
+
+    if (!depositId) {
+        alert("Please enter Deposit ID");
+        return;
+    }
+
+    if (!confirm("Confirm " + decision + " for this deposit?")) {
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Processing...";
+
+    try {
+        const { data, error } = await db.rpc("admin_review_deposit", {
+            p_deposit_id: depositId,
+            p_decision: decision,
+            p_reason: reason || null
+        });
+
+        if (error) throw error;
+
+        if (!data || data.success !== true) {
+            throw new Error("Deposit review was not confirmed");
+        }
+
+        alert("Deposit " + decision + " successfully!");
+
+        document.getElementById("depositId").value = "";
+        document.getElementById("depositReason").value = "";
+
+        await refreshAdmin();
+
+    } catch (error) {
+        alert("Deposit review failed: " + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Review Deposit";
+    }
+});
 </script>
 
 </body>
