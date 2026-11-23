@@ -134,8 +134,8 @@ th{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase
 <div class="panel-head"><h3>All Customers</h3><span id="customerCount">Loading...</span></div>
 <div class="search-row"><input class="field" id="customerSearch" placeholder="Search name, email or account ID..." oninput="filterCustomers()"></div>
 <div class="table-wrap"><table>
-<thead><tr><th>Name</th><th>Account ID</th><th>Status</th><th>Role</th><th>User ID</th></tr></thead>
-<tbody id="customersTable"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
+<thead><tr><th>Name</th><th>Account ID</th><th>Status</th><th>Role</th><th>Wallet Balance</th><th>User ID</th></tr></thead>
+<tbody id="customersTable"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
 </table></div>
 </div>
 <div class="panel">
@@ -335,7 +335,7 @@ detectSessionInUrl:true
 
 let adminUser=null;
 let customerCache=[];
-
+let customerWalletMap = {};
 function money(n){
 return "₹"+Number(n||0).toLocaleString("en-IN",{
 minimumFractionDigits:2,
@@ -447,7 +447,17 @@ return;
 }
 
 customerCache=data||[];
+customerWalletMap = {};
 
+const { data: walletRows, error: walletError } = await db
+  .from("wallets")
+  .select("user_id, available_balance");
+
+if (!walletError) {
+  (walletRows || []).forEach(w => {
+    customerWalletMap[w.user_id] = Number(w.available_balance || 0);
+  });
+}
 setText("totalCustomers",customerCache.length);
 setText("customerCount",customerCache.length+" customers");
 
@@ -469,6 +479,7 @@ tbody.innerHTML=rows.map(x=>`
 <td>${safe(x.account_id||"—")}</td>
 <td><span class="badge ${x.account_suspended?"badge-red":"badge-green"}">${x.account_suspended?"Suspended":safe(x.status||"Active")}</span></td>
 <td>${safe(x.role||"user")}</td>
+<td>${customerWalletMap[x.id] === undefined ? "No wallet" : money(customerWalletMap[x.id])}</td>
 <td>
 <button class="action-btn primary-btn" onclick="selectCustomer('${safe(x.id)}')">Select</button>
 </td>
