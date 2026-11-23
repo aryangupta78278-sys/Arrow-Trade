@@ -176,7 +176,12 @@ th{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase
 <div class="panel-head"><h3>Customer Balance & P/L Controls</h3></div>
 <label class="form-label">Customer User ID</label>
 <input class="field" id="balanceUserId" placeholder="Enter customer User ID">
-<label class="form-label">Adjustment Type</label>
+
+ <label class="form-label">Select Investment</label>
+<select class="field" id="investmentSelect">
+  <option value="">Select Investment</option>
+</select>
+ <label class="form-label">Adjustment Type</label>
 <select class="field" id="balanceAction">
 <option value="credit">Wallet credit</option>
 <option value="debit">Wallet debit</option>
@@ -678,36 +683,57 @@ location.href="login.html";
 });
 
 initAdmin();
- async function adjustCustomerWallet(){
-
+ async function adjustCustomerWallet() {
   const accountId = document.getElementById("balanceUserId").value.trim();
   const amount = Number(document.getElementById("balanceAmount").value);
   const action = document.getElementById("balanceAction").value;
   const reason = document.getElementById("balanceReason").value.trim();
+  const portfolioId = document.getElementById("investmentSelect").value;
 
-  if(!accountId || !amount || amount <= 0 || !reason){
-    alert("Customer ID, valid amount aur reason enter karo.");
+  if (!accountId || amount <= 0 || !reason) {
+    alert("Customer ID, amount aur reason enter karo.");
     return;
   }
 
-  if(!confirm("Wallet "+action+" ₹"+amount+" karna hai?")) return;
+  let rpcName;
+  let rpcArgs;
 
-  const {data,error} = await db.rpc("admin_adjust_wallet",{
-    p_account_id: accountId,
-    p_amount: amount,
-    p_action: action,
-    p_reason: reason
-  });
+  if (action === "increase" || action === "decrease") {
+    if (!portfolioId) {
+      alert("Pehle investment select karo.");
+      return;
+    }
 
-  if(error){
-    alert("Update failed: "+error.message);
+    rpcName = "admin_adjust_investment";
+    rpcArgs = {
+      p_portfolio_id: portfolioId,
+      p_amount: amount,
+      p_action: action,
+      p_reason: reason
+    };
+  } else {
+    rpcName = "admin_adjust_wallet";
+    rpcArgs = {
+      p_account_id: accountId,
+      p_amount: amount,
+      p_action: action,
+      p_reason: reason
+    };
+  }
+
+  if (!confirm("Are you sure you want to update?")) return;
+
+  const { data, error } = await db.rpc(rpcName, rpcArgs);
+
+  if (error) {
+    alert("Update failed: " + error.message);
     return;
   }
 
-  alert("Balance updated! New balance: ₹"+Number(data.balance_after).toFixed(2));
+  alert("Update successful!");
 
-  document.getElementById("balanceAmount").value="";
-  document.getElementById("balanceReason").value="";
+  document.getElementById("balanceAmount").value = "";
+  document.getElementById("balanceReason").value = "";
 
   await refreshAdmin();
  }
