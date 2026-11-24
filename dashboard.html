@@ -1316,6 +1316,58 @@ td{
     font-size: 16px !important;
   }
 }
+.market-watch-new {
+  margin-top: 18px;
+}
+
+.market-watch-new .watch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border, #eeeeee);
+  gap: 12px;
+}
+
+.market-watch-new .watch-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.market-watch-new .watch-logo {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  font-weight: 700;
+  background: #f0f2f5;
+  color: #222;
+}
+
+.market-watch-new .watch-name strong {
+  display: block;
+  font-size: 14px;
+}
+
+.market-watch-new .watch-name small {
+  display: block;
+  font-size: 11px;
+  color: #8993a1;
+  margin-top: 3px;
+}
+
+.market-watch-new .watch-price {
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+} 
 </style>
 </head>
 
@@ -1690,7 +1742,67 @@ td{
     </div>
   </div>
 
-  
+  <div class="panel market-watch-new">
+  <div class="panel-head">
+    <h3>Market Watch</h3>
+    <span>Live Market Prices</span>
+  </div>
+
+  <div class="watch-row watch-item">
+    <div class="watch-left">
+      <div class="watch-logo" style="background:#e8f1ff;color:#2775ca;">€</div>
+      <div class="watch-name">
+        <strong>EUR/USD</strong>
+        <small>Euro / US Dollar</small>
+      </div>
+    </div>
+    <b class="grey watch-price">—</b>
+  </div>
+
+  <div class="watch-row watch-item">
+    <div class="watch-left">
+      <div class="watch-logo" style="background:#e9e3ff;color:#6b45bd;">£</div>
+      <div class="watch-name">
+        <strong>GBP/USD</strong>
+        <small>British Pound / US Dollar</small>
+      </div>
+    </div>
+    <b class="grey watch-price">—</b>
+  </div>
+
+  <div class="watch-row watch-item">
+    <div class="watch-left">
+      <div class="watch-logo" style="background:#e5f5ff;color:#1675a9;">¥</div>
+      <div class="watch-name">
+        <strong>USD/JPY</strong>
+        <small>US Dollar / Japanese Yen</small>
+      </div>
+    </div>
+    <b class="grey watch-price">—</b>
+  </div>
+
+  <div class="watch-row watch-item">
+    <div class="watch-left">
+      <div class="watch-logo" style="background:#fff2d9;color:#c28a16;">Au</div>
+      <div class="watch-name">
+        <strong>GOLD</strong>
+        <small>Gold / US Dollar</small>
+      </div>
+    </div>
+    <b class="grey watch-price">—</b>
+  </div>
+
+  <div class="watch-row watch-item">
+    <div class="watch-left">
+      <div class="watch-logo" style="background:#fff0dc;color:#f7931a;">₿</div>
+      <div class="watch-name">
+        <strong>BTC/USD</strong>
+        <small>Bitcoin / US Dollar</small>
+      </div>
+    </div>
+    <b class="grey watch-price">—</b>
+  </div>
+  </div>
 </section>
 
 <section id="positions" class="section">
