@@ -1368,6 +1368,41 @@ td{
   text-align: right;
   white-space: nowrap;
 } 
+ .market-watch-new .watch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.watch-mini-chart {
+  width: 65px;
+  height: 28px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.watch-mini-chart polyline {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.watch-mini-chart.up polyline {
+  stroke: #16a36a;
+}
+
+.watch-mini-chart.down polyline {
+  stroke: #e04455;
+}
+
+.watch-price.up {
+  color: #16a36a !important;
+}
+
+.watch-price.down {
+  color: #e04455 !important;
+}
 </style>
 </head>
 
