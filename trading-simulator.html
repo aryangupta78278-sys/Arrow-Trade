@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrow Trade | Trading Simulator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#f8fafc;font-family:Arial,sans-serif;padding:18px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{font-size:24px}
+.tag{background:#173c35;color:#65e6b3;padding:8px 12px;border-radius:20px;font-size:12px}
+.card{background:#172337;border:1px solid #26364e;border-radius:15px;padding:17px;margin:15px 0}
+.muted{color:#9eacc0;font-size:13px}
+.price{font-size:27px;font-weight:bold;margin:10px 0}
+.green{color:#28d99a}
+.red{color:#ff727c}
+select,input{width:100%;padding:13px;background:#0e1929;border:1px solid #34445c;color:white;border-radius:9px;margin:7px 0 14px;font-size:16px}
+label{font-size:13px;color:#b9c5d5}
+button{border:0;border-radius:9px;padding:14px;font-weight:bold;font-size:15px;cursor:pointer}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.buy{background:#079b70;color:white}
+.sell{background:#d94b59;color:white}
+.close{background:#34445c;color:white;padding:9px 12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:11px 7px;border-bottom:1px solid #34445c}
+.tablewrap{overflow-x:auto}
+.stat{font-size:23px;font-weight:bold;margin-top:8px}
+button:disabled{opacity:.5}
+</style>
+</head>
+<body>
+
+<header>
+ <div>
+  <h1>ARROW TRADE</h1>
+  <div class="muted">Personal Trading Simulator</div>
+ </div>
+ <div class="tag">SIMULATED</div>
+</header>
+
+<div class="card">
+ <div class="muted">Market connection</div>
+ <h3 id="connection">Connecting...</h3>
+ <div class="muted">Quotes refresh every 5 seconds when available.</div>
+</div>
+
+<div id="markets"></div>
+
+<div class="card">
+ <h3>Place Simulated Trade</h3>
+
+ <label>Trading Pair</label>
+ <select id="symbol">
+  <option value="EURUSD">EUR/USD</option>
+  <option value="GBPUSD">GBP/USD</option>
+  <option value="XAUUSD">XAU/USD (Gold)</option>
+ </select>
+
+ <label>Trade Direction</label>
+ <div class="actions">
+  <button class="buy" onclick="placeTrade('BUY')">BUY</button>
+  <button class="sell" onclick="placeTrade('SELL')">SELL</button>
+ </div>
+
+ <label>Quantity (units / ounces)</label>
+ <input id="quantity" type="number" value="1000" min="0.01" step="any">
+
+ <label>Stop Loss (optional price)</label>
+ <input id="stopLoss" type="number" step="any" placeholder="Example: 1.09000">
+
+ <label>Take Profit (optional price)</label>
+ <input id="takeProfit" type="number" step="any" placeholder="Example: 1.10000">
+
+ <div class="muted">BUY enters at ask; SELL enters at bid. P&L is calculated in USD before fees.</div>
+ <p id="message"></p>
+</div>
+
+<div class="card">
+ <h3>Account Overview</h3>
+ <div class="muted">Simulated starting balance</div>
+ <div class="stat">$10,000.00</div>
+ <div class="muted">Open trade floating P&L</div>
+ <div class="stat" id="floating">$0.00</div>
+ <div class="muted">Closed trade P&L</div>
+ <div class="stat" id="closedPL">$0.00</div>
+</div>
+
+<div class="card">
+ <h3>Open Trades</h3>
+ <div class="tablewrap">
+  <table>
+   <thead><tr><th>Pair</th><th>Side</th><th>Entry</th><th>Live P&L</th><th>Action</th></tr></thead>
+   <tbody id="openTrades"></tbody>
+  </table>
+ </div>
+</div>
+
+<div class="card">
+ <h3>Trade History</h3>
+ <div class="tablewrap">
+  <table>
+   <thead><tr><th>Pair</th><th>Side</th><th>Entry</th><th>Exit</th><th>P&L</th></tr></thead>
+   <tbody id="history"></tbody>
+  </table>
+ </div>
+ <button class="close" onclick="clearHistory()" style="margin-top:15px">Clear History</button>
+</div>
+
+<script>
+const symbols=["EURUSD","GBPUSD","XAUUSD"];
+const digits={EURUSD:5,GBPUSD:5,XAUUSD:2};
+const quotes={};
+let openTrades=[];
+let history=[];
+
+try{
+ openTrades=JSON.parse(localStorage.getItem("arrow_open")||"[]");
+ history=JSON.parse(localStorage.getItem("arrow_history")||"[]");
+ if(!Array.isArray(openTrades))openTrades=[];
+ if(!Array.isArray(history))history=[];
+}catch(e){
+ openTrades=[];
+ history=[];
+}
+
+const money=n=>"$"+Number(n||0).toFixed(2);
+const fmt=(n,s)=>Number(n).toFixed(digits[s]);
+
+function save(){
+ localStorage.setItem("arrow_open",JSON.stringify(openTrades));
+ localStorage.setItem("arrow_history",JSON.stringify(history));
+}
+
+function initMarkets(){
+ document.getElementById("markets").innerHTML=symbols.map(s=>`
+ <div class="card">
+  <h3>${s}</h3>
+  <div class="price" id="mid_${s}">Loading...</div>
+  <div class="muted" id="detail_${s}">Waiting for quote...</div>
+  <div class="muted">Bid: <span id="bid_${s}">--</span> | Ask: <span id="ask_${s}">--</span></div>
+ </div>`).join("");
+}
+
+async function fetchQuote(s){
+ try{
+  const r=await fetch("https://biquote.io/api/"+s,{cache:"no-store"});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const d=await r.json();
+  const bid=Number(d.bid),ask=Number(d.ask),mid=Number(d.mid);
+
+  if(!Number.isFinite(bid)||!Number.isFinite(ask)||
+     !Number.isFinite(mid)||bid<=0||ask<bid)
+    throw new Error("Invalid quote");
+
+  quotes[s]={bid,ask,mid,stale:d.stale===true,updated:Date.now()};
+  document.getElementById("mid_"+s).textContent=fmt(mid,s);
+  document.getElementById("bid_"+s).textContent=fmt(bid,s);
+  document.getElementById("ask_"+s).textContent=fmt(ask,s);
+  document.getElementById("detail_"+s).textContent=
+   (d.marketState||"Unknown")+" | Quote age: "+d.quoteAgeSeconds+" sec"+
+   (d.stale?" | STALE":"");
+ }catch(e){
+  document.getElementById("detail_"+s).textContent="Feed error: "+e.message;
+ }
+}
+
+function getExitPrice(t){
+ const q=quotes[t.symbol];
+ if(!q||q.stale||Date.now()-q.updated>15000)return null;
+ return t.side==="BUY"?q.bid:q.ask;
+}
+
+function calculatePL(t,exit){
+ const difference=t.side==="BUY"
+  ?exit-t.entry
+  :t.entry-exit;
+ return difference*t.quantity;
+}
+
+function placeTrade(side){
+ const s=document.getElementById("symbol").value;
+ const q=quotes[s];
+ const quantity=Number(document.getElementById("quantity").value);
+ const sl=Number(document.getElementById("stopLoss").value)||null;
+ const tp=Number(document.getElementById("takeProfit").value)||null;
+ const msg=document.getElementById("message");
+
+ if(!q||q.stale||Date.now()-q.updated>15000){
+  msg.textContent="Fresh market quote unavailable. Try again.";
+  return;
+ }
+ if(!Number.isFinite(quantity)||quantity<=0){
+  msg.textContent="Enter a valid quantity.";
+  return;
+ }
+
+ const entry=side==="BUY"?q.ask:q.bid;
+
+ if(sl!==null && (side==="BUY"?sl>=entry:sl<=entry)){
+  msg.textContent="Stop Loss price is on the wrong side of entry.";
+  return;
+ }
+ if(tp!==null && (side==="BUY"?tp<=entry:tp>=entry)){
+  msg.textContent="Take Profit price is on the wrong side of entry.";
+  return;
+ }
+
+ openTrades.push({
+  id:Date.now()+"_"+Math.random().toString(36).slice(2),
+  symbol:s,side,entry,quantity,sl,tp,
+  created:new Date().toISOString()
+ });
+ save();
+ msg.textContent=side+" simulated trade opened at "+fmt(entry,s);
+ render();
+}
+
+function closeTrade(id,reason="Manual close"){
+ const t=openTrades.find(x=>x.id===id);
+ if(!t)return;
+ const exit=getExitPrice(t);
+ if(exit===null){
+  alert("Fresh quote unavailable. Cannot close trade right now.");
+  return;
+ }
+ const pl=calculatePL(t,exit);
+ history.unshift({
+  ...t,exit,pl,reason,closed:new Date().toISOString()
+ });
+ openTrades=openTrades.filter(x=>x.id!==id);
+ save();
+ render();
+}
+
+function updateTrades(){
+ const remaining=[];
+ for(const t of openTrades){
+  const exit=getExitPrice(t);
+  if(exit===null){remaining.push(t);continue;}
+  const hitSL=t.sl!==null&&
+   (t.side==="BUY"?exit<=t.sl:exit>=t.sl);
+  const hitTP=t.tp!==null&&
+   (t.side==="BUY"?exit>=t.tp:exit<=t.tp);
+  if(hitSL||hitTP){
+   history.unshift({
+    ...t,exit,pl:calculatePL(t,exit),
+    reason:hitSL?"Stop Loss":"Take Profit",
+    closed:new Date().toISOString()
+   });
+  }else remaining.push(t);
+ }
+ if(remaining.length!==openTrades.length){
+  openTrades=remaining;
+  save();
+ }
+ render();
+}
+
+function render(){
+ let floating=0;
+ document.getElementById("openTrades").innerHTML=
+ openTrades.map(t=>{
+  const exit=getExitPrice(t);
+  const pl=exit===null?null:calculatePL(t,exit);
+  if(pl!==null)floating+=pl;
+  return `<tr>
+   <td>${t.symbol}</td>
+   <td>${t.side}</td>
+   <td>${fmt(t.entry,t.symbol)}</td>
+   <td class="${pl>=0?"green":"red"}">${pl===null?"Quote unavailable":money(pl)}</td>
+   <td><button class="close" onclick="closeTrade('${t.id}')">Close</button></td>
+  </tr>`;
+ }).join("")||'<tr><td colspan="5">No open trades</td></tr>';
+
+ document.getElementById("history").innerHTML=
+ history.slice(0,100).map(t=>`
+ <tr>
+  <td>${t.symbol}</td><td>${t.side}</td>
+  <td>${fmt(t.entry,t.symbol)}</td>
+  <td>${fmt(t.exit,t.symbol)}</td>
+  <td class="${t.pl>=0?"green":"red"}">${money(t.pl)}</td>
+ </tr>`).join("")||'<tr><td colspan="5">No closed trades</td></tr>';
+
+ const closed=history.reduce((sum,t)=>sum+Number(t.pl||0),0);
+ document.getElementById("floating").textContent=money(floating);
+ document.getElementById("floating").className="stat "+(floating>=0?"green":"red");
+ document.getElementById("closedPL").textContent=money(closed);
+ document.getElementById("closedPL").className="stat "+(closed>=0?"green":"red");
+}
+
+function clearHistory(){
+ if(!confirm("Delete all local trade history?"))return;
+ history=[];
+ save();
+ render();
+}
+
+async function refresh(){
+ await Promise.all(symbols.map(fetchQuote));
+ document.getElementById("connection").textContent=
+  symbols.every(s=>quotes[s]&&!quotes[s].stale&&Date.now()-quotes[s].updated<15000)
+  ?"Market quotes available":"Some market quotes unavailable";
+ updateTrades();
+}
+
+initMarkets();
+render();
+refresh();
+setInterval(refresh,5000);
+</script>
+</body>
+</html>
