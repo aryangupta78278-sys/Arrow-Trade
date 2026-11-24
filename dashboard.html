@@ -1182,8 +1182,20 @@ const {data,error}=await db.from("deposits")
 .limit(50);
 
 if(error){
-console.error("Deposits error:",error);
-return;
+  console.error("Deposits error:", error);
+
+  const recent = document.getElementById("recentActivity");
+  const wallet = document.getElementById("walletTransactions");
+
+  if(recent){
+    recent.innerHTML = '<tr><td colspan="4" class="empty">Unable to load recent activity</td></tr>';
+  }
+
+  if(wallet){
+    wallet.innerHTML = '<tr><td colspan="4" class="empty">Unable to load transactions</td></tr>';
+  }
+
+  return;
 }
 
 const rows=data||[];
