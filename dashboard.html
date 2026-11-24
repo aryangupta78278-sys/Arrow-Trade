@@ -1111,7 +1111,7 @@ async function loadInvestments(){
     totalInvestment += Number(item.invested_amount || 0);
     currentValue += Number(item.current_value || 0);
   });
-
+const totalProfit = currentValue - totalInvestment;
   const realProfit = rows.reduce((sum, item) => {
   const invested = Number(item.invested_amount || 0);
   return sum + Math.max(0, getCalculatedValue(item) - invested);
