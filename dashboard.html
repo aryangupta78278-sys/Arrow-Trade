@@ -462,52 +462,72 @@ Market prices will appear after connecting a genuine market-data provider. No si
 
 <section id="markets" class="section">
 
-<div class="panel">
-<div class="panel-head"><h3>Markets</h3><span>Authorized feed required</span></div>
-<div class="notice">Live quotes are not configured yet. Prices will not be fabricated.</div>
-</div>
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Trading Terminal</h3>
+      <span id="tradePriceStatus">Connecting...</span>
+    </div>
 
-<div class="panel">
-<h3>Trading Order</h3>
+    <label class="form-label">Select Market</label>
+    <select class="field" id="tradeSymbol" onchange="refreshTradeQuote()">
+      <option value="EUR/USD">EUR/USD</option>
+      <option value="GBP/USD">GBP/USD</option>
+      <option value="XAU/USD">GOLD (XAU/USD)</option>
+    </select>
 
-<div class="trade-tabs">
-<button id="buyTab" class="buy-active" onclick="setSide('buy')">BUY</button>
-<button id="sellTab" onclick="setSide('sell')">SELL</button>
-</div>
+    <div style="padding:18px 0">
+      <div style="font-size:12px;color:#8993A1">Current Market Price</div>
+      <h2 id="tradeLivePrice" style="font-size:28px;margin-top:8px">Loading...</h2>
+      <p id="tradePriceTime" style="font-size:11px;color:#8993A1;margin-top:5px">
+        Waiting for price
+      </p>
+    </div>
 
-<label class="form-label">Trading Instrument</label>
-<select class="field" id="tradeSymbol">
-<option value="">Select Instrument</option>
-<option value="EURUSD">EUR/USD</option>
-<option value="GBPUSD">GBP/USD</option>
-<option value="USDJPY">USD/JPY</option>
-<option value="XAUUSD">GOLD</option>
-<option value="BTCUSD">BTC/USD</option>
-</select>
+    <div style="height:320px;overflow:hidden;border-radius:10px">
+      <iframe
+        id="tradeChart"
+        src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=OANDA%3AEURUSD&interval=15&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&theme=light&style=1&timezone=Asia%2FKolkata"
+        style="width:100%;height:100%;border:0"
+        loading="lazy">
+      </iframe>
+    </div>
+  </div>
 
-<label class="form-label">Order Type</label>
-<select class="field" id="orderType">
-<option value="market">Market Order</option>
-<option value="limit">Limit Order</option>
-</select>
+  <div class="panel">
+    <h3>Place Trade</h3>
 
-<label class="form-label">Quantity / Units</label>
-<input class="field" id="tradeQuantity" type="number" min="0.01" step="0.01" placeholder="Enter quantity">
+    <div class="trade-tabs" style="margin-top:16px">
+      <button id="buyTab" class="buy-active"
+        onclick="setSide('buy')">BUY</button>
+      <button id="sellTab"
+        onclick="setSide('sell')">SELL</button>
+    </div>
 
-<label class="form-label">Stop Loss (Optional)</label>
-<input class="field" id="stopLoss" type="number" min="0" step="any" placeholder="Stop loss price">
+    <label class="form-label">Trade Amount (₹)</label>
+    <input
+      class="field"
+      id="tradeAmount"
+      type="number"
+      min="1"
+      step="1"
+      placeholder="Enter amount">
 
-<label class="form-label">Take Profit (Optional)</label>
-<input class="field" id="takeProfit" type="number" min="0" step="any" placeholder="Take profit price">
+    <p id="tradePreview"
+      style="font-size:12px;color:#8993A1;margin-top:12px">
+      Select BUY or SELL and enter amount.
+    </p>
 
-<button class="trade-btn disabled-btn" id="placeOrder" disabled>
-Broker Connection Required
-</button>
+    <button
+      class="trade-btn buy-btn"
+      id="placeOrder"
+      onclick="placeMarketTrade()">
+      BUY NOW
+    </button>
 
-<div class="notice">
-Order execution is disabled until an authorized broker API is connected and tested. No order will be falsely marked as executed.
-</div>
-</div>
+    <p id="tradeMessage"
+      style="font-size:12px;margin-top:12px"></p>
+  </div>
+
 </section>
 
 <section id="positions" class="section">
