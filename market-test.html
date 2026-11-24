@@ -4,72 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Arrow Trade Market Feed</title>
+
 <style>
-body{background:#101827;color:white;font-family:Arial;padding:20px}
-.card{background:#1d293b;padding:18px;margin:12px 0;border-radius:12px}
-.price{font-size:30px;font-weight:bold;margin:12px 0}
-small{color:#aab6c8}
+*{box-sizing:border-box}
+body{
+ background:#101827;color:white;
+ font-family:Arial,sans-serif;padding:20px;
+}
+.card{
+ background:#1d293b;padding:20px;
+ margin:14px 0;border-radius:14px;
+}
+.price{font-size:32px;font-weight:bold;margin:14px 0}
+small{color:#aab6c8;line-height:1.7}
+.green{color:#38d9a0}
+.red{color:#ff737d}
 </style>
 </head>
+
 <body>
+
 <h2>Arrow Trade Market Feed</h2>
-<p id="status">Connecting...</p>
+<p id="status">Connecting to market...</p>
+
 <div id="markets"></div>
 
 <script>
-const symbols=["EURUSD","GBPUSD","XAUUSD"];
-const digits={EURUSD:5,GBPUSD:5,XAUUSD:2};
-const container=document.getElementById("markets");
+const symbols=["EUR/USD","GBP/USD","XAU/USD"];
 
-symbols.forEach(s=>{
+const digits={
+ "EUR/USD":5,
+ "GBP/USD":5,
+ "XAU/USD":5
+};
+
+const container=document.getElementById("markets");
+let refreshing=false;
+
+const lastPrices={};
+
+symbols.forEach(symbol=>{
+ const id=symbol.replace("/","");
  container.innerHTML+=`
  <div class="card">
-  <h3>${s}</h3>
-  <div class="price" id="${s}">Loading...</div>
-  <small id="${s}_info">Waiting for quote...</small>
+  <h3>${symbol}</h3>
+  <div class="price" id="price_${id}">Loading...</div>
+  <small id="info_${id}">Waiting for market data...</small>
  </div>`;
 });
 
-async function updatePrice(symbol){
+async function refreshPrices(){
+
+ if(refreshing)return;
+ refreshing=true;
+
+ document.getElementById("status").textContent=
+ "Fetching prices from Twelve Data...";
+
  try{
+
   const response=await fetch(
-   "https://biquote.io/api/"+symbol,
+   "/api/market?symbols="+
+   encodeURIComponent(symbols.join(",")),
    {cache:"no-store"}
   );
-  if(!response.ok) throw new Error("HTTP "+response.status);
+
+  if(!response.ok){
+   throw new Error("API HTTP "+response.status);
+  }
 
   const data=await response.json();
-  const price=Number(data.mid);
 
-  if(!Number.isFinite(price)) throw new Error("Invalid price");
+  if(!data.prices){
+   throw new Error(data.error||"Invalid API response");
+  }
 
-  document.getElementById(symbol).textContent=
-   price.toFixed(digits[symbol]);
+  const receivedAt=new Date().toLocaleTimeString();
 
-  document.getElementById(symbol+"_info").textContent=
-   "Updated: "+new Date().toLocaleTimeString()+
-   " | "+(data.marketState||"unknown")+
-   " | "+(data.stale?"STALE":"Not marked stale")+
-   " | Quote age: "+data.quoteAgeSeconds+" sec";
+  let success=0;
+
+  symbols.forEach(symbol=>{
+
+   const id=symbol.replace("/","");
+   const item=data.prices[symbol];
+
+   const price=Number(item?.price);
+
+   if(!item || item.error || !Number.isFinite(price) || price<=0){
+
+    document.getElementById("info_"+id).innerHTML=
+     '<span class="red">Price unavailable: '+
+     (item?.error||"No valid price")+'</span>';
+
+    return;
+   }
+
+   lastPrices[symbol]=price;
+
+   document.getElementById("price_"+id).textContent=
+    price.toFixed(digits[symbol]);
+
+   document.getElementById("info_"+id).innerHTML=
+    '<span class="green">Price received</span><br>'+
+    'Last response: '+receivedAt+
+    '<br>Source: '+data.source+
+    '<br>API cache: '+(data.cached?"Yes":"No");
+
+   success++;
+  });
+
+  document.getElementById("status").textContent=
+   success+" of "+symbols.length+
+   " market prices received | Refresh every 30 seconds";
 
  }catch(error){
-  document.getElementById(symbol+"_info").textContent=
-   "Feed error: "+error.message;
+
+  document.getElementById("status").innerHTML=
+   '<span class="red">Connection error: '+
+   error.message+'</span>';
+
+  symbols.forEach(symbol=>{
+   const id=symbol.replace("/","");
+   document.getElementById("info_"+id).innerHTML=
+    '<span class="red">Latest request failed. '+
+    'Displayed price, if any, is not confirmed fresh.</span>';
+  });
+
+ }finally{
+  refreshing=false;
  }
 }
 
-async function refresh(){
- document.getElementById("status").textContent=
-  "Checking market prices...";
+refreshPrices();
+setInterval(refreshPrices,30000);
 
- await Promise.all(symbols.map(updatePrice));
-
- document.getElementById("status").textContent=
-  "Price check completed | Refresh every 5 seconds";
-}
-
-refresh();
-setInterval(refresh,5000);
 </script>
 </body>
 </html>
