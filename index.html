@@ -878,6 +878,127 @@ font-weight:800
     height: 165px;
   }
   }
+  /* ===== ARROW TRADE PREMIUM MOBILE EFFECTS ===== */
+
+@media (max-width: 760px) {
+
+  /* Smooth section reveal */
+  body.motion-ready .reveal-item {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .65s ease, transform .65s ease;
+  }
+
+  body.motion-ready .reveal-item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Premium market cards */
+  .market-card {
+    border-radius: 17px;
+    box-shadow: 0 7px 24px rgba(24,45,78,.045);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+
+  .market-card:active {
+    transform: scale(.98);
+    box-shadow: 0 12px 28px rgba(21,91,179,.10);
+  }
+
+  .market-icon {
+    box-shadow: 0 5px 14px rgba(21,91,179,.08);
+  }
+
+  /* Animated chart */
+  .terminal-wrap {
+    box-shadow: 0 18px 45px rgba(16,33,58,.13);
+  }
+
+  .chart {
+    overflow: hidden;
+  }
+
+  .chart svg path[stroke="#d6ad63"] {
+    stroke-dasharray: 7 7;
+    animation: arrowTrend 4s linear infinite;
+  }
+
+  @keyframes arrowTrend {
+    to {
+      stroke-dashoffset: -56;
+    }
+  }
+
+  .terminal {
+    box-shadow: inset 0 0 25px rgba(255,255,255,.025);
+  }
+
+  /* Trust items */
+  .trust-item {
+    padding: 9px 11px;
+    border-radius: 12px;
+    background: #fbfcff;
+  }
+
+  .trust-icon {
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(21,91,179,.08);
+  }
+
+  /* Approach card */
+  .approach-visual {
+    box-shadow: 0 16px 35px rgba(16,33,58,.16);
+  }
+
+  .visual-card {
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+  }
+
+  /* CTA polish */
+  .cta {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta .btn {
+    border-radius: 10px;
+    min-height: 47px;
+    padding: 0 24px;
+    font-weight: 800;
+    box-shadow: 0 7px 20px rgba(0,0,0,.15);
+  }
+
+  /* Footer polish */
+  footer {
+    border-top: 3px solid var(--gold);
+  }
+
+  .footer-links a {
+    transition: color .2s ease;
+  }
+
+  .footer-links a:active {
+    color: #fff;
+  }
+
+  /* Active navigation */
+  .nav-links a.active {
+    color: var(--blue);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart svg path[stroke="#d6ad63"] {
+    animation: none !important;
+  }
+
+  body.motion-ready .reveal-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  }
 </style>
 </head>
 
@@ -1245,6 +1366,61 @@ navLinks.classList.remove('open');
 menuToggle.setAttribute('aria-expanded', 'false');
 });
 });
+  /* ===== ARROW TRADE SCROLL ANIMATIONS ===== */
+
+const revealTargets = document.querySelectorAll(
+  '.hero-grid > div, .trust-item, .section-head, .market-card, .approach-visual, .approach-copy, .company-box, .company-note, .cta .container, .footer-grid > div'
+);
+
+revealTargets.forEach(element => {
+  element.classList.add('reveal-item');
+});
+
+if ('IntersectionObserver' in window) {
+  document.body.classList.add('motion-ready');
+
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.12
+  });
+
+  revealTargets.forEach(element => {
+    revealObserver.observe(element);
+  });
+}
+
+/* Active navigation while scrolling */
+
+const pageSections = document.querySelectorAll(
+  'main section[id]'
+);
+
+if ('IntersectionObserver' in window) {
+  const sectionObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.querySelectorAll('a').forEach(link => {
+          link.classList.toggle(
+            'active',
+            link.getAttribute('href') === '#' + entry.target.id
+          );
+        });
+      }
+    });
+  }, {
+    rootMargin: '-25% 0px -65% 0px'
+  });
+
+  pageSections.forEach(section => {
+    sectionObserver.observe(section);
+  });
+}
 </script>
 
 </body>
