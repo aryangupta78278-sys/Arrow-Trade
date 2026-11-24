@@ -1347,7 +1347,7 @@ function renderTradeTables() {
   const positions = document.getElementById("positionsTable");
   const history = document.getElementById("ordersTable");
 
-  if (!positions || !history) return;
+  if (!positions) return;
 
   const open = tradeRows.filter(t => t.status === "OPEN");
   const closed = tradeRows.filter(t => t.status === "CLOSED");
