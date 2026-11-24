@@ -1183,6 +1183,7 @@ const {data,error}=await db.from("deposits")
 
 if(error){
   console.error("Deposits error:", error);
+ alert("Recent Activity Error: " + error.message);
 
   const recent = document.getElementById("recentActivity");
   const wallet = document.getElementById("walletTransactions");
