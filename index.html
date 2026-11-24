@@ -3,585 +3,466 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Arrow Trade | Financial Markets & Trading</title>
-
-<meta name="description" content="Arrow Trade — Financial markets information, market insights and trading education.">
+<title>Arrow Trade | Understand the Markets</title>
+<meta name="description" content="Explore financial markets, market education and risk-aware insights with Arrow Trade.">
+<meta name="theme-color" content="#f7f8fc">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --navy:#142238;
-  --gold:#b69a63;
-  --gold-light:#d5c49b;
-  --white:#ffffff;
-  --cream:#f8f7f3;
-  --text:#253247;
-  --muted:#788291;
-  --border:#e9e7e0;
+--blue:#155bb3;
+--blue2:#0d438b;
+--navy:#17243a;
+--ink:#202b3d;
+--muted:#718096;
+--bg:#f5f7fc;
+--line:#e6eaf1;
+--white:#fff;
+--gold:#b69a63;
+--green:#168b68;
+--red:#e56b59;
+--shadow:0 18px 55px rgba(24,45,78,.09);
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{font-family:'DM Sans',sans-serif;color:var(--ink);background:#fff;line-height:1.65}
+a{text-decoration:none;color:inherit}
+button{font:inherit}
+.container{width:min(1160px,calc(100% - 44px));margin:auto}
+
+.site-header{
+position:sticky;
+top:0;
+z-index:50;
+background:rgba(255,255,255,.94);
+backdrop-filter:blur(14px);
+border-bottom:1px solid var(--line)
 }
 
-html{
-  scroll-behavior:smooth;
+.nav{
+height:76px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:22px
 }
 
-body{
-  font-family:'DM Sans',sans-serif;
-  color:var(--text);
-  background:var(--white);
-  line-height:1.7;
+.brand{
+font-family:Manrope,sans-serif;
+font-size:22px;
+font-weight:800;
+letter-spacing:1.5px;
+color:var(--navy);
+white-space:nowrap
 }
 
-a{
-  text-decoration:none;
-  color:inherit;
-}
-
-.container{
-  width:min(1160px,90%);
-  margin:auto;
-}
-
-/* NAVIGATION */
-
-header{
-  background:#fff;
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-
-.navbar{
-  min-height:84px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:25px;
-}
-
-.logo{
-  font-size:23px;
-  font-weight:700;
-  letter-spacing:2px;
-  color:var(--navy);
-}
-
-.logo span{
-  color:var(--gold);
-}
+.brand span{color:var(--blue)}
 
 .nav-links{
-  display:flex;
-  align-items:center;
-  gap:32px;
-  font-size:13px;
-  font-weight:600;
-  color:#536071;
+display:flex;
+align-items:center;
+gap:28px;
+color:#59677a;
+font-size:13px;
+font-weight:700
 }
 
-.nav-links a:hover{
-  color:var(--gold);
-}
-
-.nav-actions{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+.nav-links a:hover{color:var(--blue)}
+.nav-actions{display:flex;align-items:center;gap:10px}
 
 .btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:12px 23px;
-  font-size:13px;
-  font-weight:600;
-  border-radius:3px;
-  transition:.25s;
-  cursor:pointer;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+min-height:46px;
+padding:0 20px;
+border-radius:9px;
+font-size:13px;
+font-weight:800;
+border:1px solid transparent;
+transition:.2s;
+cursor:pointer
 }
+
+.btn-primary{
+background:var(--blue);
+color:#fff;
+box-shadow:0 7px 18px rgba(21,91,179,.18)
+}
+
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px)}
 
 .btn-outline{
-  border:1px solid var(--navy);
-  color:var(--navy);
+border-color:#d6deea;
+color:var(--navy);
+background:#fff
 }
 
-.btn-outline:hover{
-  background:var(--navy);
-  color:#fff;
-}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
 
-.btn-gold{
-  background:var(--gold);
-  color:#fff;
-  border:1px solid var(--gold);
+.menu-toggle{
+display:none;
+border:1px solid var(--line);
+background:#fff;
+border-radius:9px;
+padding:9px 12px;
+color:var(--navy);
+font-weight:700
 }
-
-.btn-gold:hover{
-  background:#9e824d;
-}
-
-/* HERO */
 
 .hero{
-  background:
-    linear-gradient(90deg,rgba(255,255,255,.98),rgba(255,255,255,.86)),
-    url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1800&q=85');
-
-  background-size:cover;
-  background-position:center;
-  padding:115px 0 120px;
+position:relative;
+overflow:hidden;
+background:linear-gradient(135deg,#f8faff 0%,#edf3ff 58%,#fff 100%);
+padding:78px 0 82px
 }
 
-.hero-content{
-  max-width:760px;
+.hero:before{
+content:"";
+position:absolute;
+width:520px;
+height:520px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(21,91,179,.12),transparent 68%);
+right:-160px;
+top:-170px
+}
+
+.hero-grid{
+position:relative;
+display:grid;
+grid-template-columns:1fr 1.02fr;
+align-items:center;
+gap:48px
 }
 
 .eyebrow{
-  color:var(--gold);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  margin-bottom:22px;
+display:inline-flex;
+align-items:center;
+gap:9px;
+color:var(--blue);
+font-size:11px;
+font-weight:800;
+letter-spacing:2.1px;
+text-transform:uppercase;
+margin-bottom:19px
 }
+
+.eyebrow:before{
+content:"";
+width:23px;
+height:2px;
+background:var(--gold)
+}
+
+h1,h2,h3{font-family:Manrope,sans-serif}
 
 .hero h1{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(43px,6vw,76px);
-  line-height:1.12;
-  color:var(--navy);
-  font-weight:600;
-  margin-bottom:24px;
+font-size:clamp(39px,5.4vw,66px);
+line-height:1.12;
+letter-spacing:-2.5px;
+color:var(--navy);
+font-weight:800;
+max-width:620px
 }
 
-.hero h1 span{
-  color:var(--gold);
+.hero h1 span{color:var(--blue)}
+
+.hero-copy{
+font-size:16px;
+color:#68778b;
+max-width:520px;
+margin:22px 0 28px;
+line-height:1.85
 }
 
-.hero p{
-  max-width:590px;
-  color:#687383;
-  font-size:16px;
-  margin-bottom:34px;
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.hero-note{font-size:11px;color:#8792a2;margin-top:18px}
+
+.terminal-wrap{
+position:relative;
+padding:14px;
+border:1px solid #dce5f3;
+border-radius:22px;
+background:rgba(255,255,255,.8);
+box-shadow:var(--shadow);
+transform:rotate(1deg)
 }
 
-.hero-buttons{
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
+.terminal{
+overflow:hidden;
+border-radius:15px;
+background:#101a2a;
+color:#fff;
+min-height:390px
 }
 
-/* TRUST STRIP */
+.terminal-top{
+height:53px;
+padding:0 19px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid rgba(255,255,255,.1);
+font-size:12px;
+color:#c5d0df
+}
 
-.trust-strip{
-  background:var(--navy);
-  color:#fff;
-  padding:27px 0;
+.terminal-dots{display:flex;gap:6px}
+.terminal-dots i{
+width:7px;height:7px;border-radius:50%;background:#63738a
+}
+
+.terminal-body{padding:22px 20px 18px}
+.terminal-label{font-size:11px;color:#8ea0b8;letter-spacing:1.3px;text-transform:uppercase}
+.terminal-title{font-size:18px;font-weight:800;margin-top:4px}
+
+.chart{
+height:225px;
+margin-top:16px;
+position:relative;
+border-left:1px solid #314158;
+border-bottom:1px solid #314158;
+background:
+repeating-linear-gradient(to bottom,transparent 0,transparent 55px,rgba(160,180,210,.11) 56px),
+repeating-linear-gradient(to right,transparent 0,transparent 67px,rgba(160,180,210,.08) 68px)
+}
+
+.chart svg{width:100%;height:100%;display:block}
+
+.chart-legend{
+display:flex;
+gap:18px;
+margin-top:13px;
+color:#aab7c8;
+font-size:10px
+}
+
+.legend-dot{
+display:inline-block;
+width:7px;
+height:7px;
+border-radius:50%;
+margin-right:6px;
+background:#18b88a
+}
+
+.legend-dot.gold{background:#d6ad63}
+
+.terminal-foot{
+display:flex;
+justify-content:space-between;
+gap:12px;
+padding:13px 18px;
+background:#17243a;
+color:#b9c5d5;
+font-size:10px
+}
+
+.terminal-foot strong{color:#fff;font-size:12px}
+
+.trust{
+padding:24px 0;
+background:#fff;
+border-bottom:1px solid var(--line)
 }
 
 .trust-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-  text-align:center;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px
 }
 
 .trust-item{
-  border-right:1px solid rgba(255,255,255,.15);
+display:flex;
+align-items:center;
+justify-content:center;
+gap:12px;
+text-align:left
 }
 
-.trust-item:last-child{
-  border:0;
+.trust-icon{
+width:38px;
+height:38px;
+border-radius:11px;
+background:#edf4ff;
+color:var(--blue);
+display:grid;
+place-items:center;
+font-weight:800;
+font-size:17px
 }
 
-.trust-item strong{
-  display:block;
-  font-size:14px;
-  letter-spacing:1px;
+.trust-item strong{display:block;font-size:12px;color:var(--navy)}
+.trust-item small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+
+.section{padding:86px 0}
+.section-soft{background:var(--bg)}
+
+.section-head{
+text-align:center;
+max-width:690px;
+margin:0 auto 42px
 }
 
-.trust-item span{
-  display:block;
-  color:#c5ced9;
-  font-size:12px;
-  margin-top:5px;
+.section-head .eyebrow{margin-bottom:12px}
+
+.section-head h2{
+font-size:clamp(28px,4vw,42px);
+line-height:1.2;
+letter-spacing:-1.2px;
+color:var(--navy)
 }
 
-/* GENERAL SECTIONS */
-
-section.content-section{
-  padding:95px 0;
-}
-
-.section-heading{
-  text-align:center;
-  max-width:700px;
-  margin:0 auto 48px;
-}
-
-.section-heading .eyebrow{
-  margin-bottom:12px;
-}
-
-.section-heading h2{
-  font-family:'Playfair Display',serif;
-  color:var(--navy);
-  font-size:clamp(30px,4vw,43px);
-  line-height:1.25;
-  margin-bottom:15px;
-}
-
-.section-heading p{
-  color:var(--muted);
-  font-size:14px;
-}
-
-/* MARKETS */
+.section-head p{color:var(--muted);font-size:14px;margin-top:13px}
 
 .market-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:18px
 }
 
 .market-card{
-  padding:32px 27px;
-  border:1px solid var(--border);
-  background:#fff;
-  transition:.25s;
+padding:27px;
+border:1px solid var(--line);
+border-radius:15px;
+background:#fff;
+transition:.2s
 }
 
 .market-card:hover{
-  border-color:var(--gold-light);
-  transform:translateY(-4px);
-  box-shadow:0 15px 35px rgba(20,34,56,.06);
+transform:translateY(-4px);
+box-shadow:var(--shadow);
+border-color:#c9d9f0
 }
 
-.market-number{
-  color:var(--gold);
-  font-size:12px;
-  letter-spacing:2px;
-  font-weight:700;
+.market-icon{
+width:46px;
+height:46px;
+display:grid;
+place-items:center;
+border-radius:13px;
+background:#edf4ff;
+color:var(--blue);
+font-size:21px;
+font-weight:800;
+margin-bottom:19px
 }
 
-.market-card h3{
-  font-family:'Playfair Display',serif;
-  color:var(--navy);
-  font-size:25px;
-  margin:15px 0 10px;
+.market-card h3{font-size:18px;color:var(--navy);margin-bottom:8px}
+.market-card p{font-size:12px;color:var(--muted);line-height:1.8}
+
+.approach-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:54px;
+align-items:center
 }
 
-.market-card p{
-  font-size:13px;
-  color:var(--muted);
+.approach-visual{
+min-height:350px;
+border-radius:20px;
+background:linear-gradient(145deg,#10213a,#1b4d87);
+padding:28px;
+display:flex;
+align-items:flex-end;
+position:relative;
+overflow:hidden;
+box-shadow:var(--shadow)
 }
 
-/* ABOUT */
-
-.about-section{
-  background:var(--cream);
+.approach-visual:before,.approach-visual:after{
+content:"";
+position:absolute;
+border:1px solid rgba(255,255,255,.13);
+border-radius:50%;
+width:330px;
+height:330px;
+right:-70px;
+top:-100px
 }
 
-.about-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:center;
-  gap:65px;
+.approach-visual:after{
+width:220px;
+height:220px;
+right:-15px;
+top:-45px
 }
 
-.about-image{
-  min-height:430px;
-  background:
-    linear-gradient(rgba(20,34,56,.05),rgba(20,34,56,.15)),
-    url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=85');
-
-  background-size:cover;
-  background-position:center;
+.visual-card{
+position:relative;
+z-index:1;
+background:rgba(255,255,255,.1);
+border:1px solid rgba(255,255,255,.2);
+border-radius:14px;
+padding:20px;
+color:#fff;
+width:100%;
+backdrop-filter:blur(8px)
 }
 
-.about-copy h2{
-  font-family:'Playfair Display',serif;
-  color:var(--navy);
-  font-size:42px;
-  line-height:1.2;
-  margin-bottom:20px;
+.visual-card small{
+color:#bdcce0;
+font-size:10px;
+letter-spacing:1px;
+text-transform:uppercase
 }
 
-.about-copy p{
-  color:var(--muted);
-  font-size:14px;
-  margin-bottom:18px;
+.visual-card h3{font-size:23px;margin:6px 0}
+.visual-card p{font-size:12px;color:#d2deed}
+
+.approach-copy h2{
+font-size:clamp(29px,4vw,43px);
+line-height:1.2;
+letter-spacing:-1.3px;
+color:var(--navy);
+margin-bottom:17px
 }
 
-/* VALUES */
+.approach-copy>p{font-size:14px;color:var(--muted);margin-bottom:23px}
 
-.values-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:18px;
+.principles{display:grid;gap:15px}
+.principle{display:flex;gap:13px;align-items:flex-start}
+
+.check{
+flex:0 0 25px;
+width:25px;
+height:25px;
+border-radius:8px;
+background:#eaf5f1;
+color:var(--green);
+display:grid;
+place-items:center;
+font-weight:800
 }
 
-.value-card{
-  padding:27px 22px;
-  border:1px solid var(--border);
-}
-
-.value-card h3{
-  font-size:15px;
-  color:var(--navy);
-  margin-bottom:10px;
-}
-
-.value-card p{
-  color:var(--muted);
-  font-size:12px;
-}
-
-/* COMPANY DETAILS */
-
-.company-section{
-  background:var(--cream);
-}
-
-.company-box{
-  max-width:850px;
-  margin:auto;
-  background:#fff;
-  border:1px solid var(--border);
-}
-
-.company-row{
-  display:grid;
-  grid-template-columns:40% 60%;
-  padding:17px 22px;
-  border-bottom:1px solid var(--border);
-  font-size:13px;
-  gap:15px;
-}
-
-.company-row:last-child{
-  border-bottom:0;
-}
-
-.company-row strong{
-  color:var(--navy);
-}
-
-.company-row span{
-  color:#687383;
-  overflow-wrap:anywhere;
-}
-
-/* CTA */
-
-.cta{
-  background:var(--navy);
-  color:#fff;
-  padding:75px 20px;
-  text-align:center;
-}
-
-.cta h2{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(30px,4vw,45px);
-  margin-bottom:15px;
-}
-
-.cta p{
-  color:#c3cbd6;
-  font-size:14px;
-  margin-bottom:27px;
-}
-
-/* FOOTER */
-
-footer{
-  background:#101b2b;
-  color:#fff;
-  padding:60px 0 25px;
-}
-
-.footer-grid{
-  display:grid;
-  grid-template-columns:1.5fr 1fr 1fr;
-  gap:45px;
-  margin-bottom:45px;
-}
-
-.footer-brand{
-  font-size:22px;
-  font-weight:700;
-  letter-spacing:2px;
-  margin-bottom:16px;
-}
-
-.footer-brand span{
-  color:var(--gold);
-}
-
-footer p{
-  color:#aeb8c7;
-  font-size:12px;
-}
-
-footer h4{
-  font-size:13px;
-  margin-bottom:18px;
-  color:var(--gold-light);
-}
-
-.footer-links a{
-  display:block;
-  color:#aeb8c7;
-  font-size:12px;
-  margin:10px 0;
-}
-
-.footer-links a:hover{
-  color:#fff;
-}
-
-.footer-bottom{
-  border-top:1px solid rgba(255,255,255,.12);
-  padding-top:23px;
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  flex-wrap:wrap;
-}
-
-/* RISK NOTICE */
-
-.risk{
-  background:#f2f0e9;
-  padding:25px 0;
-}
-
-.risk p{
-  font-size:11px;
-  color:#6d7480;
-  line-height:1.8;
-}
-
-/* MOBILE */
-
-@media(max-width:850px){
-
-  .nav-links{
-    display:none;
-  }
-
-  .navbar{
-    min-height:72px;
-  }
-
-  .market-grid{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .about-grid{
-    grid-template-columns:1fr;
-    gap:35px;
-  }
-
-  .about-image{
-    min-height:280px;
-  }
-
-  .values-grid{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .footer-grid{
-    grid-template-columns:1fr 1fr;
-  }
-}
-
-@media(max-width:520px){
-
-  .logo{
-    font-size:18px;
-  }
-
-  .nav-actions{
-    gap:7px;
-  }
-
-  .btn{
-    padding:10px 12px;
-    font-size:11px;
-  }
-
-  .hero{
-    padding:85px 0;
-  }
-
-  .hero p{
-    font-size:14px;
-  }
-
-  .trust-grid{
-    grid-template-columns:1fr;
-    gap:20px;
-  }
-
-  .trust-item{
-    border-right:0;
-    border-bottom:1px solid rgba(255,255,255,.15);
-    padding-bottom:16px;
-  }
-
-  .market-grid{
-    grid-template-columns:1fr;
-  }
-
-  .values-grid{
-    grid-template-columns:1fr;
-  }
-
-  .company-row{
-    grid-template-columns:1fr;
-    gap:5px;
-  }
-
-  .footer-grid{
-    grid-template-columns:1fr;
-    gap:30px;
-  }
-}
+.principle strong{display:block;font-size:13px;color:var(--navy)}
+.principle span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="container navbar">
+<header class="site-header">
+<div class="container nav">
 
-<a href="#" class="logo">ARROW <span>TRADE.</span></a>
+<a class="brand" href="#home">ARROW <span>TRADE.</span></a>
 
-<nav class="nav-links">
+<nav class="nav-links" id="navLinks" aria-label="Main navigation">
 <a href="#home">Home</a>
 <a href="#markets">Markets</a>
-<a href="#about">About Us</a>
-<a href="#values">Our Approach</a>
+<a href="#approach">Our Approach</a>
 <a href="#company">Company</a>
 </nav>
 
 <div class="nav-actions">
-<a href="login.html" class="btn btn-outline">Login</a>
-<a href="signup.html" class="btn btn-gold">Get Started</a>
+<a class="btn btn-outline" href="login.html">Login</a>
+<a class="btn btn-primary" href="signup.html">Get Started</a>
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
 </div>
 
 </div>
@@ -589,221 +470,207 @@ footer h4{
 
 <main>
 
-<!-- HERO -->
-
 <section class="hero" id="home">
-<div class="container">
+<div class="container hero-grid">
 
-<div class="hero-content">
-
+<div>
 <div class="eyebrow">Independent Market Perspective</div>
 
-<h1>
-A Clearer Perspective.<br>
-A More <span>Disciplined</span><br>
-Approach to Markets.
-</h1>
+<h1>See the markets with <span>greater clarity.</span></h1>
 
-<p>
-Explore the world of financial markets through informed
-analysis, market awareness and a disciplined approach
-to understanding global opportunities and risks.
+<p class="hero-copy">
+Explore global financial markets through informed perspectives,
+market awareness and a disciplined approach to understanding
+opportunities and risks.
 </p>
 
-<div class="hero-buttons">
-<a href="signup.html" class="btn btn-gold">
-Explore Arrow Trade
-</a>
+<div class="hero-actions">
+<a class="btn btn-primary" href="signup.html">Explore Arrow Trade&nbsp; →</a>
+<a class="btn btn-outline" href="#approach">Discover Our Approach</a>
+</div>
 
-<a href="#about" class="btn btn-outline">
-Discover Our Approach
-</a>
+<p class="hero-note">Market information and education. Trading involves risk.</p>
+</div>
+
+<div class="terminal-wrap" aria-label="Decorative market chart illustration">
+<div class="terminal">
+
+<div class="terminal-top">
+<span>ARROW TRADE / MARKET VIEW</span>
+<span class="terminal-dots"><i></i><i></i><i></i></span>
+</div>
+
+<div class="terminal-body">
+<div class="terminal-label">Market perspective</div>
+<div class="terminal-title">A clearer view of market movement</div>
+
+<div class="chart">
+<svg viewBox="0 0 560 225" preserveAspectRatio="none" role="img" aria-label="Illustrative candlestick chart">
+
+<g stroke="#314158" stroke-width="1" opacity=".8">
+<path d="M0 45H560M0 100H560M0 155H560M70 0V225M180 0V225M290 0V225M400 0V225M510 0V225"/>
+</g>
+
+<g stroke-width="2">
+<path d="M38 155V190M64 125V175M90 105V160M116 120V184M142 85V145M168 92V153M194 65V126M220 78V145M246 48V115M272 60V130M298 72V148M324 38V108M350 55V120M376 28V96M402 44V111M428 20V85M454 37V101M480 15V73M506 26V88" stroke="#20b88c"/>
+
+<path d="M38 165h-12v-28h12zM90 122h-12v-31h12zM142 140h-12v-36h12zM194 91h-12v-25h12zM246 77h-12v-30h12zM298 112h-12v-30h12zM350 73h-12v-30h12zM402 62h-12v-27h12zM454 53h-12v-25h12zM506 42h-12v-24h12z" fill="#20b88c" stroke="#20b88c"/>
+
+<path d="M64 142h-12v-23h12zM116 162h-12v-27h12zM168 128h-12v-24h12zM220 116h-12v-26h12zM272 101h-12v-29h12zM324 92h-12v-26h12zM376 80h-12v-24h12zM428 71h-12v-24h12zM480 62h-12v-24h12z" fill="#e87965" stroke="#e87965"/>
+</g>
+
+<path d="M0 177 C65 160 75 145 125 151 S205 118 250 125 S335 94 385 103 S470 55 560 48" fill="none" stroke="#d6ad63" stroke-width="2" stroke-dasharray="5 6" opacity=".9"/>
+
+</svg>
+</div>
+
+<div class="chart-legend">
+<span><i class="legend-dot"></i>Illustrative upward candle</span>
+<span><i class="legend-dot gold"></i>Trend line</span>
+</div>
+</div>
+
+<div class="terminal-foot">
+<span>Illustrative visual · Not live prices</span>
+<strong>Market insights</strong>
 </div>
 
 </div>
+</div>
+
 </div>
 </section>
 
-<!-- TRUST STRIP -->
-
-<div class="trust-strip">
+<section class="trust">
 <div class="container trust-grid">
 
 <div class="trust-item">
+<div class="trust-icon">◎</div>
+<div>
 <strong>MARKET AWARENESS</strong>
-<span>Understanding global financial markets</span>
+<small>Understand global market activity</small>
+</div>
 </div>
 
 <div class="trust-item">
+<div class="trust-icon">⌁</div>
+<div>
 <strong>DISCIPLINED THINKING</strong>
-<span>Planning before making decisions</span>
+<small>Preparation before decisions</small>
+</div>
 </div>
 
 <div class="trust-item">
+<div class="trust-icon">◇</div>
+<div>
 <strong>RISK CONSCIOUSNESS</strong>
-<span>Understanding exposure and uncertainty</span>
-</div>
-
+<small>Know the risks and uncertainty</small>
 </div>
 </div>
 
-<!-- MARKETS -->
+</div>
+</section>
 
-<section class="content-section" id="markets">
+<section class="section section-soft" id="markets">
 <div class="container">
 
-<div class="section-heading">
-<div class="eyebrow">Global Financial Markets</div>
-
-<h2>Explore Different Market Segments</h2>
-
-<p>
-Financial markets bring together currencies, commodities
-and other instruments. Each market has its own structure,
-dynamics and risks.
-</p>
+<div class="section-head">
+<div class="eyebrow">Explore the markets</div>
+<h2>One perspective. Different market segments.</h2>
+<p>Learn about the structure and forces that shape major financial markets.</p>
 </div>
 
 <div class="market-grid">
 
-<div class="market-card">
-<div class="market-number">01 / FOREX</div>
+<article class="market-card">
+<div class="market-icon">↗</div>
 <h3>Currency Markets</h3>
-<p>
-Explore major and minor currency pairs and understand
-the factors that influence global exchange rates.
-</p>
-</div>
+<p>Explore major and minor currency pairs and the economic factors that influence exchange rates.</p>
+</article>
 
-<div class="market-card">
-<div class="market-number">02 / COMMODITIES</div>
-<h3>Gold & Metals</h3>
-<p>
-Understand precious metals and the economic factors
-that can influence commodity markets.
-</p>
-</div>
+<article class="market-card">
+<div class="market-icon">◈</div>
+<h3>Commodities</h3>
+<p>Understand precious metals and other commodities, including the forces that can influence their markets.</p>
+</article>
 
-<div class="market-card">
-<div class="market-number">03 / ANALYSIS</div>
+<article class="market-card">
+<div class="market-icon">⌁</div>
 <h3>Market Analysis</h3>
-<p>
-Explore technical structures, economic developments
-and broader market trends.
-</p>
-</div>
+<p>Discover technical concepts, economic developments and broader market trends.</p>
+</article>
 
 </div>
 </div>
 </section>
 
-<!-- ABOUT -->
+<section class="section" id="approach">
+<div class="container approach-grid">
 
-<section class="content-section about-section" id="about">
-<div class="container about-grid">
+<div class="approach-visual">
+<div class="visual-card">
+<small>The Arrow Trade approach</small>
+<h3>Knowledge. Discipline. Awareness.</h3>
+<p>A thoughtful approach starts with understanding the market and recognising uncertainty.</p>
+</div>
+</div>
 
-<div class="about-image"></div>
-
-<div class="about-copy">
-
-<div class="eyebrow">About Arrow Trade</div>
-
-<h2>Built Around Knowledge, Discipline & Awareness.</h2>
-
-<p>
-Financial markets require more than observation.
-They require preparation, informed thinking and an
-understanding of the risks involved.
-</p>
+<div class="approach-copy">
+<div class="eyebrow">Our philosophy</div>
+<h2>Better decisions begin with better understanding.</h2>
 
 <p>
-Arrow Trade presents a market-focused approach centred
-on financial market awareness, trading knowledge and
-disciplined decision-making.
+Financial markets require preparation, informed thinking and an
+understanding of the risks involved. Our content is centred on
+market awareness and disciplined decision-making.
 </p>
 
-<p>
-Our philosophy is simple: understand the market,
-evaluate the risks and make informed decisions.
-</p>
+<div class="principles">
 
-<a href="#company" class="btn btn-gold">
-Company Information
-</a>
+<div class="principle">
+<div class="check">✓</div>
+<div>
+<strong>Knowledge first</strong>
+<span>Build understanding of financial market structures.</span>
+</div>
+</div>
+
+<div class="principle">
+<div class="check">✓</div>
+<div>
+<strong>Risk awareness</strong>
+<span>Recognise that market participation can result in losses.</span>
+</div>
+</div>
+
+<div class="principle">
+<div class="check">✓</div>
+<div>
+<strong>Transparency</strong>
+<span>Make company and risk information easy to find.</span>
+</div>
+</div>
+
+<div class="principle">
+<div class="check">✓</div>
+<div>
+<strong>Discipline</strong>
+<span>Value preparation over impulsive decisions.</span>
+</div>
+</div>
 
 </div>
+</div>
+
 </div>
 </section>
-
-<!-- VALUES -->
-
-<section class="content-section" id="values">
+<section class="section section-soft" id="company">
 <div class="container">
 
-<div class="section-heading">
-<div class="eyebrow">Our Philosophy</div>
-
-<h2>Principles That Matter</h2>
-
-<p>
-A responsible approach to financial markets begins
-with clear information and realistic expectations.
-</p>
-</div>
-
-<div class="values-grid">
-
-<div class="value-card">
-<h3>Knowledge First</h3>
-<p>
-Continuous learning and understanding of financial
-market structures.
-</p>
-</div>
-
-<div class="value-card">
-<h3>Risk Awareness</h3>
-<p>
-Recognising that market participation involves
-financial uncertainty and potential losses.
-</p>
-</div>
-
-<div class="value-card">
-<h3>Transparency</h3>
-<p>
-Clear company information and accessible
-legal documentation.
-</p>
-</div>
-
-<div class="value-card">
-<h3>Discipline</h3>
-<p>
-A structured mindset built around preparation
-and responsible decision-making.
-</p>
-</div>
-
-</div>
-</div>
-</section>
-
-<!-- COMPANY DETAILS -->
-
-<section class="content-section company-section" id="company">
-<div class="container">
-
-<div class="section-heading">
-<div class="eyebrow">Corporate Information</div>
-
-<h2>Company Reference</h2>
-
-<p>
-The following details are reproduced from the
-company information supplied for this website.
-They should be independently verified before reliance.
-</p>
+<div class="section-head">
+<div class="eyebrow">Corporate information</div>
+<h2>Company reference</h2>
+<p>Company details reproduced from the information supplied for this website.</p>
 </div>
 
 <div class="company-box">
@@ -814,7 +681,7 @@ They should be independently verified before reliance.
 </div>
 
 <div class="company-row">
-<strong>Jurisdiction</strong>
+<strong>Jurisdiction stated in supplied document</strong>
 <span>Republic of Mauritius</span>
 </div>
 
@@ -824,13 +691,13 @@ They should be independently verified before reliance.
 </div>
 
 <div class="company-row">
-<strong>Company Registration Number</strong>
-<span>214424</span>
+<strong>Business activity stated in supplied document</strong>
+<span>Investment Dealer — Full Service Dealer, excluding Underwriting</span>
 </div>
 
 <div class="company-row">
-<strong>Investment Dealer Licence Number</strong>
-<span>GB24202940</span>
+<strong>Company Registration Number</strong>
+<span>214424</span>
 </div>
 
 <div class="company-row">
@@ -839,61 +706,58 @@ They should be independently verified before reliance.
 </div>
 
 <div class="company-row">
-<strong>Registered Address stated in supplied document</strong>
-<span>3 Emerald Park, Trianon, Quatre Bornes, Mauritius</span>
+<strong>Investment Dealer Licence Number</strong>
+<span>GB24202940</span>
 </div>
 
 <div class="company-row">
-<strong>Website stated in supplied document</strong>
-<span>www.arrowtradefx.com</span>
+<strong>Licence category stated in supplied document</strong>
+<span>SEC-2.1B</span>
+</div>
+
+<div class="company-row">
+<strong>Registered address stated in supplied document</strong>
+<span>3 Emerald Park, Trianon, Quatre Bornes, Mauritius</span>
 </div>
 
 </div>
+
+<p class="company-note">
+Important: These identifiers and regulatory details are reproduced
+from a supplied document and have not been independently verified here.
+Their publication does not establish that Arrow Trade is licensed,
+regulated, or authorised. Verify all details directly with the relevant
+official registry before relying on or publishing them. No website
+address is stated in this section.
+</p>
 
 </div>
 </section>
 
-<!-- CTA -->
-
 <section class="cta">
 <div class="container">
-
-<h2>Think Clearly. Understand the Markets.</h2>
-
-<p>
-Build your understanding of financial markets
-through knowledge, preparation and discipline.
-</p>
-
-<a href="signup.html" class="btn btn-gold">
-Create Your Account
-</a>
-
+<h2>Start with clarity. Move with discipline.</h2>
+<p>Explore Arrow Trade and build a more informed understanding of financial markets, opportunities and risks.</p>
+<a class="btn" href="signup.html">Get Started&nbsp; →</a>
 </div>
 </section>
 
 </main>
 
-<!-- RISK NOTICE -->
-
 <section class="risk">
 <div class="container">
-
 <p>
 <strong>Risk Disclosure:</strong>
-Trading foreign exchange, commodities and other financial
-instruments involves significant risk and may not be suitable
-for all investors. Prices can move rapidly, and you may lose
-some or all of your invested capital. Past performance does
-not guarantee future results. No profit or return is guaranteed.
-Please understand the risks and seek independent financial
-advice where appropriate before making financial decisions.
+Trading foreign exchange, commodities and other financial instruments
+involves significant risk and may not be suitable for all investors.
+Prices can move rapidly, and you may lose some or all of your invested
+capital. Past performance does not guarantee future results.
+No profit or return is guaranteed. Please understand the risks and seek
+independent financial advice where appropriate before making financial
+decisions.
 </p>
-
 </div>
 </section>
-
-<!-- FOOTER -->
 
 <footer>
 <div class="container">
@@ -902,18 +766,14 @@ advice where appropriate before making financial decisions.
 
 <div>
 <div class="footer-brand">ARROW <span>TRADE.</span></div>
-
-<p>
-A market-focused platform centred on financial
-knowledge, market awareness and disciplined thinking.
-</p>
+<p>A market-focused platform centred on financial knowledge, market awareness and disciplined thinking.</p>
 </div>
 
 <div class="footer-links">
 <h4>Explore</h4>
 <a href="#home">Home</a>
 <a href="#markets">Markets</a>
-<a href="#about">About Us</a>
+<a href="#approach">Our Approach</a>
 <a href="#company">Company Information</a>
 </div>
 
@@ -922,18 +782,34 @@ knowledge, market awareness and disciplined thinking.
 <a href="login.html">Login</a>
 <a href="signup.html">Create Account</a>
 <a href="#company">Corporate Details</a>
-<a href="#company">Legal Information</a>
 </div>
 
 </div>
 
 <div class="footer-bottom">
 <p>© 2026 Arrow Trade. All rights reserved.</p>
-<p>Think Clearly. Trade Responsibly.</p>
+<p>Think Clearly. Understand the Markets.</p>
 </div>
 
 </div>
 </footer>
+
+<script>
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+
+menuToggle.addEventListener('click', () => {
+const isOpen = navLinks.classList.toggle('open');
+menuToggle.setAttribute('aria-expanded', String(isOpen));
+});
+
+navLinks.querySelectorAll('a').forEach(link => {
+link.addEventListener('click', () => {
+navLinks.classList.remove('open');
+menuToggle.setAttribute('aria-expanded', 'false');
+});
+});
+</script>
 
 </body>
 </html>
