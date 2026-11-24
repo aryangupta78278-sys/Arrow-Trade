@@ -209,6 +209,247 @@ color:#806B3F;font-size:11px;line-height:1.6;margin-top:15px;
 .profile-btn{padding:7px}
 .profile-btn .profile-text{display:none}
 }
+ /* ARROW TRADE PREMIUM DESIGN */
+:root{
+  --bg:#080E19;
+  --white:#111C2D;
+  --navy:#080E19;
+  --gold:#D6B36A;
+  --text:#F4F6FA;
+  --muted:#98A6BA;
+  --border:#26354A;
+  --green:#19C58A;
+  --red:#F06472;
+  --softgreen:#12392F;
+  --softred:#3A202B;
+}
+
+body{
+  background:var(--bg)!important;
+  color:var(--text)!important;
+  font-family:'DM Sans',sans-serif;
+}
+
+.sidebar{
+  background:#0B1423!important;
+  border-right:1px solid var(--border);
+  box-shadow:10px 0 35px #0003;
+}
+
+.logo{
+  color:var(--gold)!important;
+  letter-spacing:1px;
+}
+
+.nav-label{color:#75869D!important}
+
+.nav-btn{
+  border-radius:12px!important;
+  padding:14px!important;
+  transition:.2s;
+}
+
+.nav-btn:hover,.nav-btn.active{
+  background:#D6B36A18!important;
+  color:var(--gold)!important;
+}
+
+.main{background:var(--bg)}
+
+.heading h1{
+  color:#fff;
+  font-size:29px;
+}
+
+.heading p,.stat label,.stat small{
+  color:var(--muted)!important;
+}
+
+.account-tag{
+  background:#12392F!important;
+  color:#27D99C!important;
+}
+
+.profile-btn{
+  background:var(--white)!important;
+  color:white;
+  border-color:var(--border)!important;
+  border-radius:13px;
+}
+
+.avatar{
+  background:#26354A!important;
+  color:var(--gold)!important;
+}
+
+.profile-menu{
+  background:#152237!important;
+  color:white;
+  border-color:var(--border)!important;
+}
+
+.profile-menu button{
+  background:#26354A!important;
+  color:white;
+}
+
+.stat,.panel{
+  background:linear-gradient(145deg,#152237,#101A2B)!important;
+  border:1px solid var(--border)!important;
+  border-radius:18px!important;
+  box-shadow:0 12px 35px #0002;
+}
+
+.stat{
+  padding:23px!important;
+  transition:.25s;
+}
+
+.stat:hover,.panel:hover{
+  border-color:#A98B52!important;
+}
+
+.stat h2{
+  color:#fff;
+  font-size:27px;
+  letter-spacing:-.7px;
+}
+
+.panel{
+  padding:24px!important;
+  margin-bottom:20px!important;
+}
+
+.panel-head h3{
+  color:#fff;
+  font-size:16px;
+}
+
+.panel-head span{
+  color:var(--gold)!important;
+}
+
+.green{color:#20D69A!important}
+.red{color:#FF6979!important}
+.grey{color:#98A6BA!important}
+
+.form-label{
+  color:#A9B6C8!important;
+}
+
+.field{
+  background:#0B1423!important;
+  color:#fff!important;
+  border:1px solid #30415A!important;
+  border-radius:12px!important;
+  padding:14px!important;
+}
+
+.field:focus{
+  border-color:var(--gold)!important;
+  box-shadow:0 0 0 3px #D6B36A20;
+}
+
+.field::placeholder{color:#718096}
+
+.trade-btn{
+  border-radius:12px!important;
+  padding:15px!important;
+  font-weight:800;
+  transition:.2s;
+}
+
+.buy-btn{
+  background:linear-gradient(110deg,#11996F,#20C58F)!important;
+  color:white!important;
+}
+
+.sell-btn{
+  background:linear-gradient(110deg,#B93650,#F06472)!important;
+}
+
+.trade-btn:active{transform:scale(.98)}
+
+.trade-tabs button{
+  background:#0B1423!important;
+  color:#A9B6C8;
+  border-color:var(--border)!important;
+  border-radius:11px!important;
+}
+
+.trade-tabs .buy-active{
+  background:#12392F!important;
+  color:#20D69A!important;
+}
+
+.trade-tabs .sell-active{
+  background:#3A202B!important;
+  color:#FF6979!important;
+}
+
+table{color:#EAF0F8}
+
+th{
+  color:#A5B3C6!important;
+  border-color:var(--border)!important;
+}
+
+td{
+  border-color:var(--border)!important;
+}
+
+.badge{
+  background:#26354A!important;
+  color:#D4DCE8!important;
+}
+
+.badge-green{
+  background:#12392F!important;
+  color:#20D69A!important;
+}
+
+.badge-red{
+  background:#3A202B!important;
+  color:#FF6979!important;
+}
+
+.notice{
+  background:#252A32!important;
+  color:#D6B36A!important;
+  border:1px solid #66532F;
+  border-radius:12px!important;
+}
+
+.empty{color:#8D9BB0!important}
+
+#marketSelect{
+  background:#0B1423;
+  color:white;
+  border:1px solid var(--border);
+  padding:12px;
+  border-radius:10px;
+}
+
+.chart-area{
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.mobile-menu{
+  background:#18263B!important;
+  border:1px solid var(--border)!important;
+  border-radius:11px!important;
+}
+
+@media(max-width:700px){
+  .main{padding:17px 12px!important}
+  .heading h1{font-size:23px!important}
+  .stats{gap:11px!important}
+  .stat{padding:16px!important;border-radius:15px!important}
+  .stat h2{font-size:20px!important}
+  .panel{padding:18px!important;border-radius:16px!important}
+  .topbar{gap:8px}
+ }
 </style>
 </head>
 
