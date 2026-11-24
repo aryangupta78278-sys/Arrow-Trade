@@ -3,76 +3,323 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101c31">
 <title>Create Account | Arrow Trade</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-*{box-sizing:border-box}
+:root {
+  --navy:#101c31;
+  --navy2:#172b49;
+  --blue:#155bb3;
+  --gold:#b99a58;
+  --gold-light:#e2cf9f;
+  --ink:#202b3d;
+  --muted:#8290a3;
+  --line:#e7ebf1;
+  --white:#fff;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
 body{
- margin:0;min-height:100vh;display:flex;align-items:center;
- justify-content:center;background:#f8f8f6;
- font-family:Arial,sans-serif;color:#14243b;padding:20px
+  min-height:100vh;
+  font-family:'DM Sans',sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse at 10% 10%,rgba(185,154,88,.15),transparent 35%),
+    radial-gradient(ellipse at 90% 85%,rgba(21,91,179,.13),transparent 35%),
+    #f3f5f9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px;
+  overflow-x:hidden;
 }
+
+body:before{
+  content:"";
+  position:fixed;
+  width:280px;
+  height:280px;
+  border:1px solid rgba(185,154,88,.18);
+  border-radius:50%;
+  top:-150px;
+  right:-90px;
+  pointer-events:none;
+}
+
+body:after{
+  content:"";
+  position:fixed;
+  width:220px;
+  height:220px;
+  border:1px solid rgba(21,91,179,.12);
+  border-radius:50%;
+  bottom:-120px;
+  left:-80px;
+  pointer-events:none;
+}
+
 .box{
- width:100%;max-width:430px;background:white;padding:38px;
- border:1px solid #e8e5dc;border-radius:16px;
- box-shadow:0 15px 45px rgba(0,0,0,.06)
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:465px;
+  background:rgba(255,255,255,.94);
+  padding:40px 38px 34px;
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:23px;
+  box-shadow:0 25px 75px rgba(20,36,59,.10);
+  animation:cardEnter .65s ease both;
 }
-.logo{text-align:center;font-size:27px;font-weight:bold;letter-spacing:2px}
-.logo span{color:#b99a58}
-h2{text-align:center;margin:30px 0 8px}
-.sub{text-align:center;color:#777;font-size:14px;margin-bottom:28px}
-label{font-size:13px;font-weight:bold;display:block;margin:17px 0 8px}
+
+@keyframes cardEnter{
+  from{opacity:0;transform:translateY(22px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.logo{
+  text-align:center;
+  font-family:Manrope,sans-serif;
+  font-size:29px;
+  font-weight:800;
+  letter-spacing:2.5px;
+  color:var(--navy);
+}
+
+.logo span{color:var(--gold)}
+
+.logo-line{
+  width:45px;
+  height:3px;
+  background:var(--gold);
+  border-radius:5px;
+  margin:13px auto 0;
+}
+
+.tag{
+  text-align:center;
+  color:var(--gold);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  margin-top:27px;
+}
+
+h2{
+  font-family:Manrope,sans-serif;
+  text-align:center;
+  font-size:29px;
+  line-height:1.25;
+  color:var(--navy);
+  margin:10px 0 8px;
+  letter-spacing:-.7px;
+}
+
+.sub{
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:29px;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  color:var(--navy);
+  margin:17px 0 8px;
+}
+
+.field{
+  position:relative;
+}
+
 input{
- width:100%;padding:14px;border:1px solid #ddd;
- border-radius:8px;font-size:15px;outline:none
+  width:100%;
+  height:53px;
+  padding:0 15px;
+  border:1px solid #dfe5ed;
+  border-radius:11px;
+  background:#fbfcfe;
+  font-family:inherit;
+  font-size:14px;
+  color:var(--navy);
+  outline:none;
+  transition:.2s;
 }
-input:focus{border-color:#b99a58}
-button{
- width:100%;padding:15px;margin-top:24px;border:0;
- border-radius:8px;background:#14243b;color:white;
- font-size:15px;font-weight:bold;cursor:pointer
+
+input::placeholder{color:#a0a9b6}
+
+input:focus{
+  border-color:var(--gold);
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(185,154,88,.10);
 }
-button:disabled{opacity:.6}
-#message{text-align:center;font-size:13px;margin-top:16px;line-height:1.6}
-.bottom{text-align:center;margin-top:22px;font-size:14px;color:#777}
-a{color:#a48645;text-decoration:none}
+
+.password-toggle{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  border:0;
+  background:transparent;
+  color:#8a96a7;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+  padding:7px;
+}
+
+.password-toggle:hover{color:var(--blue)}
+
+.submit-btn{
+  width:100%;
+  min-height:54px;
+  margin-top:27px;
+  border:0;
+  border-radius:11px;
+  background:linear-gradient(110deg,#101c31,#1c3d67);
+  color:#fff;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:1px;
+  cursor:pointer;
+  box-shadow:0 10px 22px rgba(16,28,49,.17);
+  transition:transform .2s,box-shadow .2s;
+}
+
+.submit-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 27px rgba(16,28,49,.22);
+}
+
+.submit-btn:disabled{
+  opacity:.65;
+  cursor:wait;
+  transform:none;
+}
+
+#message{
+  text-align:center;
+  font-size:12px;
+  margin-top:15px;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+
+.bottom{
+  text-align:center;
+  margin-top:25px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:2;
+}
+
+a{
+  color:#9b7c3e;
+  text-decoration:none;
+  font-weight:700;
+}
+
+a:hover{color:var(--blue)}
+
+.back-home{
+  display:inline-block;
+  margin-top:5px;
+}
+
+.security-note{
+  text-align:center;
+  margin-top:24px;
+  padding-top:17px;
+  border-top:1px solid var(--line);
+  color:#9aa4b1;
+  font-size:10px;
+  letter-spacing:.3px;
+}
+
+@media(max-width:480px){
+  body{padding:18px 13px}
+  .box{
+    padding:32px 23px 25px;
+    border-radius:19px;
+  }
+  .logo{font-size:26px}
+  h2{font-size:27px}
+  .sub{font-size:13px}
+  input{height:52px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{
+    animation:none!important;
+    transition:none!important;
+  }
+}
 </style>
 </head>
 
 <body>
+
 <div class="box">
 
- <div class="logo">ARROW <span>TRADE</span></div>
+  <div class="logo">ARROW <span>TRADE</span></div>
+  <div class="logo-line"></div>
 
- <h2>Create Account</h2>
- <p class="sub">Join Arrow Trade today</p>
+  <div class="tag">Welcome to Arrow Trade</div>
+  <h2>Create Your Account</h2>
+  <p class="sub">Begin your journey with Arrow Trade</p>
 
- <form id="signupForm">
+  <form id="signupForm">
 
-  <label>Full Name</label>
-  <input type="text" id="name" placeholder="Enter your full name" required>
+    <label for="name">Full Name</label>
+    <div class="field">
+      <input type="text" id="name" placeholder="Enter your full name" autocomplete="name" required>
+    </div>
 
-  <label>Email Address</label>
-  <input type="email" id="email" placeholder="Enter your email" required>
+    <label for="email">Email Address</label>
+    <div class="field">
+      <input type="email" id="email" placeholder="Enter your email" autocomplete="email" required>
+    </div>
 
-  <label>Password</label>
-  <input type="password" id="password" placeholder="Minimum 6 characters" minlength="6" required>
+    <label for="password">Password</label>
+    <div class="field">
+      <input type="password" id="password" placeholder="Minimum 6 characters" minlength="6" autocomplete="new-password" required>
+      <button class="password-toggle" type="button" data-target="password">SHOW</button>
+    </div>
 
-  <label>Confirm Password</label>
-  <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+    <label for="confirmPassword">Confirm Password</label>
+    <div class="field">
+      <input type="password" id="confirmPassword" placeholder="Confirm your password" autocomplete="new-password" required>
+      <button class="password-toggle" type="button" data-target="confirmPassword">SHOW</button>
+    </div>
 
-  <button type="submit" id="signupBtn">CREATE ACCOUNT</button>
+    <button type="submit" class="submit-btn" id="signupBtn">
+      CREATE ACCOUNT
+    </button>
 
- </form>
+  </form>
 
- <div id="message"></div>
+  <div id="message" role="status" aria-live="polite"></div>
 
- <div class="bottom">
-  Already have an account? <a href="login.html">Login</a>
-  <br><br>
-  <a href="index.html">Back to Home</a>
- </div>
+  <div class="bottom">
+    Already have an account?
+    <a href="login.html">Login</a>
+    <br>
+    <a class="back-home" href="index.html">← Back to Home</a>
+  </div>
+
+  <div class="security-note">
+    ARROW TRADE · ACCOUNT ACCESS
+  </div>
 
 </div>
 
@@ -82,65 +329,79 @@ const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* Password visibility */
+document.querySelectorAll(".password-toggle").forEach(button => {
+  button.addEventListener("click", () => {
+    const input = document.getElementById(button.dataset.target);
+    const visible = input.type === "text";
+    input.type = visible ? "password" : "text";
+    button.textContent = visible ? "SHOW" : "HIDE";
+  });
+});
+
 document.getElementById("signupForm").addEventListener("submit", async function(e){
 
- e.preventDefault();
+  e.preventDefault();
 
- const btn = document.getElementById("signupBtn");
- const message = document.getElementById("message");
+  const btn = document.getElementById("signupBtn");
+  const message = document.getElementById("message");
 
- const name = document.getElementById("name").value.trim();
- const email = document.getElementById("email").value.trim();
- const password = document.getElementById("password").value;
- const confirmPassword = document.getElementById("confirmPassword").value;
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
 
- if(password !== confirmPassword){
-  message.style.color = "red";
-  message.textContent = "Passwords do not match.";
-  return;
- }
-
- btn.disabled = true;
- btn.textContent = "CREATING ACCOUNT...";
- message.textContent = "";
-
- try{
-
-  const {data,error} = await db.auth.signUp({
-   email: email,
-   password: password,
-   options:{
-    data:{
-     full_name: name
-    }
-   }
-  });
-
-  if(error) throw error;
-
-  message.style.color = "green";
-
-  if(data.session){
-   message.textContent = "Account created successfully! Redirecting to login...";
-  }else{
-   message.textContent = "Account created! Please verify your email, then login.";
+  if(password !== confirmPassword){
+    message.style.color = "#d04444";
+    message.textContent = "Passwords do not match.";
+    return;
   }
 
-  document.getElementById("signupForm").reset();
+  btn.disabled = true;
+  btn.textContent = "CREATING ACCOUNT...";
+  message.textContent = "";
 
-  setTimeout(()=>{
-   window.location.href = "login.html";
-  },2500);
+  try{
 
- }catch(error){
+    const {data,error} = await db.auth.signUp({
+      email: email,
+      password: password,
+      options:{
+        data:{
+          full_name: name
+        }
+      }
+    });
 
-  message.style.color = "red";
-  message.textContent = error.message || "Signup failed.";
+    if(error) throw error;
 
-  btn.disabled = false;
-  btn.textContent = "CREATE ACCOUNT";
+    message.style.color = "#168b68";
 
- }
+    if(data.session){
+      message.textContent = "Account created successfully! Redirecting to login...";
+    }else{
+      message.textContent = "Account created! Please verify your email, then login.";
+    }
+
+    document.getElementById("signupForm").reset();
+
+    document.querySelectorAll(".password-toggle").forEach(button => {
+      button.textContent = "SHOW";
+    });
+
+    setTimeout(()=>{
+      window.location.href = "login.html";
+    },2500);
+
+  }catch(error){
+
+    message.style.color = "#d04444";
+    message.textContent = error.message || "Signup failed.";
+
+    btn.disabled = false;
+    btn.textContent = "CREATE ACCOUNT";
+
+  }
 
 });
 </script>
