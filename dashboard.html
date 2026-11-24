@@ -672,6 +672,9 @@ document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
 if(button)button.classList.add("active");
 
 document.getElementById("sidebar").classList.remove("open");
+ if (id === "positions") {
+  loadTradePositions();
+ }
 }
 
 function toggleSidebar(){
