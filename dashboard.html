@@ -1278,182 +1278,320 @@ td{
 </div>
 </div>
 </header>
- <section id="overview" class="section active">
+<section id="overview" class="section active">
 
-<div class="stats">
-<div class="stat">
-<label>Available Balance</label>
-<h2 id="balance" class="balance-loading">Loading...</h2>
-<small>Actual wallet balance</small>
-</div>
-
-<div class="stat">
-<label>Total Investment</label>
-<h2 id="investment">Loading...</h2>
-<small>Recorded investments</small>
-</div>
-
-<div class="stat">
-<label>Total Profit / Loss</label>
-<h2 id="totalPL" class="balance-loading">Loading...</h2>
-<small>Verified records only</small>
-</div>
-
-<div class="stat">
-<label>Live P&L</label>
-<h2 id="todayPL" class="balance-loading">Loading...</h2>
-<small>Verified daily records</small>
-</div>
-</div>
-
-<!-- INVEST YOUR MONEY -->
-<div class="panel">
-  <div class="panel-head">
-    <h3>Invest Your Money</h3>
-    <span>Wallet Investment</span>
+  <!-- DASHBOARD HERO -->
+  <div class="dashboard-hero">
+    <div class="dashboard-hero-copy">
+      <span class="hero-eyebrow">ARROW TRADE / TRADING ACCOUNT</span>
+      <h2>Your Trading<br><span>Dashboard</span></h2>
+      <p>Monitor your wallet, investments and account performance from one place.</p>
+      <button class="hero-cta" onclick="showSection('markets',document.querySelectorAll('.nav-btn')[1])">
+        Explore Markets →
+      </button>
+    </div>
+    <div class="hero-market-note">
+      <strong>TRADING TERMINAL</strong>
+      <p>Market prices are displayed when an authorized live feed is connected.</p>
+    </div>
   </div>
 
-  <p style="font-size:12px;color:#8993A1;margin-bottom:15px">
-    Available Balance:
-    <strong id="investAvailableBalance">Loading...</strong>
-  </p>
+  <!-- ACCOUNT SUMMARY -->
+  <div class="dashboard-market-strip">
 
-  <label class="form-label">Investment Amount (₹)</label>
-
-  <input type="number" id="investAmount"
-    class="field" min="0.01" step="0.01"
-    placeholder="Enter amount">
-
-  <button class="trade-btn buy-btn"
-    onclick="makeInvestment()">
-    Invest Now
-  </button>
-
-  <p id="investmentMessage"
-    style="font-size:12px;margin-top:12px"></p>
-</div>
-
-
-  <!-- BOOK YOUR PROFIT -->
-<div class="panel">
-  <div class="panel-head">
-    <h3>Book Your Profit</h3>
-    <span>Profit Withdrawal</span>
-  </div>
-
-  <p style="font-size:12px;color:#8993A1;margin-bottom:15px">
-    Eligible Profit:
-    <strong id="eligibleProfit">Loading...</strong>
-  </p>
-
-  <label class="form-label">Amount to Book (₹)</label>
-
-  <input type="number"
-    id="bookProfitAmount"
-    class="field"
-    min="0.01"
-    step="0.01"
-    placeholder="Enter profit amount">
-
-  <button class="trade-btn buy-btn"
-    onclick="bookProfit()">
-    Book Your Profit
-  </button>
-
-  <p id="bookProfitMessage"
-    style="font-size:12px;margin-top:12px"></p>
-</div>
-<div class="trading-grid">
-
-<div class="panel">
-<div class="panel-head">
-<h3>Market Overview</h3>
-<span id="marketConnection">Market feed not connected</span>
-</div>
-
-<div class="market-top">
-<div>
-<div class="market-name" id="selectedSymbol">Market data unavailable</div>
-<div class="market-price" id="marketPrice">—</div>
-<div class="market-change grey" id="marketChange">Waiting for authorized market feed</div>
-</div>
-
-<select id="marketSelect" onchange="selectMarket()">
-<option value="">Select Market</option>
-<option value="EURUSD">EUR/USD</option>
-<option value="GBPUSD">GBP/USD</option>
-<option value="USDJPY">USD/JPY</option>
-<option value="XAUUSD">GOLD</option>
-<option value="BTCUSD">BTC/USD</option>
-</select>
-</div>
-
-<div class="chart-area"
-     style="width:100%;height:500px;min-height:500px;position:relative;">
-
-  <div class="tradingview-widget-container"
-       style="width:100%;height:500px;">
-
-    <div class="tradingview-widget-container__widget"
-         style="width:100%;height:500px;">
+    <div class="market-chip">
+      <span class="market-chip-symbol">AVAILABLE BALANCE</span>
+      <strong id="balance" class="balance-loading">Loading...</strong>
+      <small>Actual wallet balance</small>
     </div>
 
-    <script
-      type="text/javascript"
-      src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
-      async>
-    {
-      "autosize": false,
-      "width": "100%",
-      "height": 500,
-      "symbol": "OANDA:EURUSD",
-      "interval": "15",
-      "timezone": "Asia/Kolkata",
-      "theme": "light",
-      "style": "1",
-      "locale": "en",
-      "allow_symbol_change": true,
-      "withdateranges": true,
-      "hide_side_toolbar": false,
-      "hide_volume": false,
-      "calendar": false,
-      "support_host": "https://www.tradingview.com"
-    }
-    </script>
+    <div class="market-chip">
+      <span class="market-chip-symbol">TOTAL INVESTMENT</span>
+      <strong id="investment">Loading...</strong>
+      <small>Recorded investments</small>
+    </div>
+
+    <div class="market-chip">
+      <span class="market-chip-symbol">TOTAL PROFIT / LOSS</span>
+      <strong id="totalPL" class="balance-loading">Loading...</strong>
+      <small>Verified records only</small>
+    </div>
+
+    <div class="market-chip">
+      <span class="market-chip-symbol">LIVE P&L</span>
+      <strong id="todayPL" class="balance-loading">Loading...</strong>
+      <small>Verified daily records</small>
+    </div>
 
   </div>
-</div>
-<div class="notice">
-Market prices will appear after connecting a genuine market-data provider. No simulated quotes are displayed.
-</div>
-</div>
 
-<div class="panel">
-<div class="panel-head">
-<h3>Market Watch</h3>
-<span>Live feed required</span>
-</div>
+  <!-- PORTFOLIO -->
+  <div class="portfolio-layout">
 
-<div class="watch-item"><div><strong>EUR/USD</strong><small>Forex</small></div><b class="grey">—</b></div>
-<div class="watch-item"><div><strong>GBP/USD</strong><small>Forex</small></div><b class="grey">—</b></div>
-<div class="watch-item"><div><strong>USD/JPY</strong><small>Forex</small></div><b class="grey">—</b></div>
-<div class="watch-item"><div><strong>GOLD</strong><small>Commodity</small></div><b class="grey">—</b></div>
-<div class="watch-item"><div><strong>BTC/USD</strong><small>Crypto</small></div><b class="grey">—</b></div>
-</div>
+    <div class="portfolio-main-card">
+      <div class="portfolio-card-heading">
+        <h3>My Portfolio</h3>
+        <span class="account-state">REAL ACCOUNT</span>
+      </div>
 
-</div>
+      <div class="portfolio-balance-label">Available Wallet Balance</div>
+      <div class="portfolio-balance" id="investAvailableBalance">Loading...</div>
 
-<div class="panel">
-<div class="panel-head"><h3>Recent Account Activity</h3></div>
-<div class="table-wrap">
-<table>
-<thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
-<tbody id="recentActivity"><tr><td colspan="4" class="empty">Loading records...</td></tr></tbody>
-</table>
-</div>
-</div>
+      <div class="portfolio-bottom-stats">
 
-</section>
+        <div class="portfolio-mini-stat">
+          <span>Total Investment</span>
+          <strong id="portfolioInvestment">Loading...</strong>
+          <small>Recorded investments</small>
+        </div>
+
+        <div class="portfolio-mini-stat">
+          <span>Total Profit / Loss</span>
+          <strong id="portfolioProfit">Loading...</strong>
+          <small>Verified records</small>
+        </div>
+
+        <div class="portfolio-mini-stat">
+          <span>Live P&L</span>
+          <strong id="portfolioToday">Loading...</strong>
+          <small>Daily records</small>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="portfolio-side-card">
+      <div class="side-card-heading">
+        <h3>Quick Actions</h3>
+      </div>
+
+      <a href="deposit.html" class="quick-action">
+        <span class="quick-action-icon">＋</span>
+        <span>
+          <strong>Deposit Funds</strong>
+          <small>Add money to your wallet</small>
+        </span>
+        <b>→</b>
+      </a>
+
+      <a href="withdraw.html" class="quick-action">
+        <span class="quick-action-icon">−</span>
+        <span>
+          <strong>Withdraw Funds</strong>
+          <small>Request a withdrawal</small>
+        </span>
+        <b>→</b>
+      </a>
+
+      <div class="wallet-available">
+        Wallet Balance
+        <strong id="quickWalletBalance">Loading...</strong>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INVESTMENT AND PROFIT ACTIONS -->
+  <div class="dashboard-action-grid">
+
+    <div class="dashboard-action-card">
+      <div class="action-card-top">
+        <span class="action-icon blue">↗</span>
+        <span class="section-kicker">WALLET INVESTMENT</span>
+      </div>
+
+      <h3>Invest Your Money</h3>
+      <p>Enter the amount you want to invest from your available wallet balance.</p>
+
+      <label class="form-label">Investment Amount (₹)</label>
+
+      <input type="number"
+        id="investAmount"
+        class="field"
+        min="0.01"
+        step="0.01"
+        placeholder="Enter amount">
+
+      <button class="trade-btn buy-btn"
+        onclick="makeInvestment()">
+        Invest Now
+      </button>
+
+      <p id="investmentMessage"
+        style="font-size:12px;margin-top:12px"></p>
+    </div>
+
+    <div class="dashboard-action-card">
+      <div class="action-card-top">
+        <span class="action-icon green">₹</span>
+        <span class="section-kicker">PROFIT WITHDRAWAL</span>
+      </div>
+
+      <h3>Book Your Profit</h3>
+      <p>Check your eligible profit and enter the amount you want to book.</p>
+
+      <div class="eligible-profit-line">
+        <span>Eligible Profit</span>
+        <strong id="eligibleProfit">Loading...</strong>
+      </div>
+
+      <label class="form-label">Amount to Book (₹)</label>
+
+      <input type="number"
+        id="bookProfitAmount"
+        class="field"
+        min="0.01"
+        step="0.01"
+        placeholder="Enter profit amount">
+
+      <button class="trade-btn buy-btn"
+        onclick="bookProfit()">
+        Book Your Profit
+      </button>
+
+      <p id="bookProfitMessage"
+        style="font-size:12px;margin-top:12px"></p>
+    </div>
+
+  </div>
+
+  <!-- MARKET OVERVIEW -->
+  <div class="trading-grid dashboard-market-grid">
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Market Overview</h3>
+        <span id="marketConnection">Market feed not connected</span>
+      </div>
+
+      <div class="market-top">
+        <div>
+          <div class="market-name" id="selectedSymbol">
+            Market data unavailable
+          </div>
+
+          <div class="market-price" id="marketPrice">—</div>
+
+          <div class="market-change grey" id="marketChange">
+            Waiting for authorized market feed
+          </div>
+        </div>
+
+        <select id="marketSelect" onchange="selectMarket()">
+          <option value="">Select Market</option>
+          <option value="EURUSD">EUR/USD</option>
+          <option value="GBPUSD">GBP/USD</option>
+          <option value="USDJPY">USD/JPY</option>
+          <option value="XAUUSD">GOLD</option>
+          <option value="BTCUSD">BTC/USD</option>
+        </select>
+      </div>
+
+      <div class="chart-area"
+        style="width:100%;height:340px;min-height:340px;position:relative;">
+
+        <div class="tradingview-widget-container"
+          style="width:100%;height:340px;">
+
+          <div class="tradingview-widget-container__widget"
+            style="width:100%;height:340px;">
+          </div>
+
+          <script
+            type="text/javascript"
+            src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+            async>
+          {
+            "autosize": false,
+            "width": "100%",
+            "height": 340,
+            "symbol": "OANDA:EURUSD",
+            "interval": "15",
+            "timezone": "Asia/Kolkata",
+            "theme": "light",
+            "style": "1",
+            "locale": "en",
+            "allow_symbol_change": true,
+            "withdateranges": true,
+            "hide_side_toolbar": false,
+            "hide_volume": false,
+            "calendar": false,
+            "support_host": "https://www.tradingview.com"
+          }
+          </script>
+
+        </div>
+      </div>
+
+      <div class="notice">
+        Market prices will appear after connecting a genuine market-data provider. No simulated quotes are displayed.
+      </div>
+    </div>
+
+    <!-- MARKET WATCH -->
+    <div class="panel market-watch-panel">
+      <div class="panel-head">
+        <h3>Market Watch</h3>
+        <span>Live feed required</span>
+      </div>
+
+      <div class="watch-item">
+        <div><strong>EUR/USD</strong><small>Forex</small></div>
+        <b class="grey">—</b>
+      </div>
+
+      <div class="watch-item">
+        <div><strong>GBP/USD</strong><small>Forex</small></div>
+        <b class="grey">—</b>
+      </div>
+
+      <div class="watch-item">
+        <div><strong>USD/JPY</strong><small>Forex</small></div>
+        <b class="grey">—</b>
+      </div>
+
+      <div class="watch-item">
+        <div><strong>GOLD</strong><small>Commodity</small></div>
+        <b class="grey">—</b>
+      </div>
+
+      <div class="watch-item">
+        <div><strong>BTC/USD</strong><small>Crypto</small></div>
+        <b class="grey">—</b>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RECENT ACTIVITY -->
+  <div class="panel recent-activity-panel">
+    <div class="panel-head">
+      <h3>Recent Account Activity</h3>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody id="recentActivity">
+          <tr>
+            <td colspan="4" class="empty">Loading records...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+ </section>
+
+
 
 <section id="markets" class="section">
 
