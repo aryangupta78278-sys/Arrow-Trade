@@ -2407,11 +2407,13 @@ async function loadMarketWatch() {
     "BTC/USD"
   ];
 
+  window.marketWatchHistory = window.marketWatchHistory || {};
+
   const items = panel.querySelectorAll(".watch-item");
 
   for (let i = 0; i < symbols.length && i < items.length; i++) {
-    const priceElement = items[i].querySelector(".watch-price");
-
+    const item = items[i];
+    const priceElement = item.querySelector(".watch-price");
     if (!priceElement) continue;
 
     try {
@@ -2422,7 +2424,7 @@ async function loadMarketWatch() {
       const data = await response.json();
 
       if (!response.ok || data.price == null) {
-        throw new Error(data.message || data.error || "Price unavailable");
+        throw new Error(data.message || "Price unavailable");
       }
 
       const price = Number(data.price);
@@ -2431,16 +2433,61 @@ async function loadMarketWatch() {
         throw new Error("Invalid market price");
       }
 
+      const history = window.marketWatchHistory[symbols[i]] || [];
+      const previous = history.length
+        ? history[history.length - 1]
+        : price;
+
+      history.push(price);
+      if (history.length > 20) history.shift();
+
+      window.marketWatchHistory[symbols[i]] = history;
+
+      const direction = price >= previous ? "up" : "down";
+      const color = direction === "up" ? "#16a36a" : "#e04455";
+
       priceElement.textContent = price.toFixed(5);
-      priceElement.classList.remove("grey");
-      priceElement.classList.add("green");
+      priceElement.style.color = color;
+
+      let chart = item.querySelector(".watch-mini-chart");
+
+      if (!chart) {
+        chart = document.createElement("span");
+        chart.className = "watch-mini-chart";
+        chart.style.cssText =
+          "display:inline-block;width:58px;height:24px;flex-shrink:0;margin-left:8px;";
+        priceElement.insertAdjacentElement("afterend", chart);
+      }
+
+      const min = Math.min(...history);
+      const max = Math.max(...history);
+      const range = max - min || 1;
+
+      const points = history.map((value, index) => {
+        const x = history.length > 1
+          ? index * 58 / (history.length - 1)
+          : 29;
+        const y = 22 - ((value - min) / range) * 20;
+        return `${x},${y}`;
+      }).join(" ");
+
+      chart.innerHTML = `
+        <svg viewBox="0 0 58 24" width="58" height="24">
+          <polyline
+            points="${points}"
+            fill="none"
+            stroke="${color}"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      `;
 
     } catch (error) {
       console.error("Market Watch Error:", symbols[i], error);
-
       priceElement.textContent = "Unavailable";
-      priceElement.classList.remove("green");
-      priceElement.classList.add("grey");
+      priceElement.style.color = "#8993a1";
     }
   }
 }
