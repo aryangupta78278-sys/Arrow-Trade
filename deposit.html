@@ -3,167 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arrow Trade | Deposit</title>
-
+<meta name="theme-color" content="#f5f7fc">
+<title>Arrow Trade | Deposit Funds</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
+:root{
+--blue:#155bb3;
+--blue2:#0d438b;
+--navy:#17243a;
+--ink:#202b3d;
+--muted:#718096;
+--bg:#f5f7fc;
+--line:#e6eaf1;
+--gold:#b69a63;
+--green:#168b68;
+--white:#fff;
+--shadow:0 15px 40px rgba(24,45,78,.07);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-
 body{
-  font-family:Arial,sans-serif;
-  background:#F7F8FA;
-  color:#14243B;
-  padding:20px;
+font-family:'DM Sans',sans-serif;
+color:var(--ink);
+background:linear-gradient(135deg,#f8faff,#edf3ff 58%,#fff);
+min-height:100vh;padding:22px 16px 45px;
 }
-
-.container{max-width:550px;margin:30px auto}
-
+.container{max-width:570px;margin:20px auto}
 .header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:25px;
+display:flex;align-items:center;justify-content:space-between;
+margin-bottom:25px;
 }
-
-.logo{font-size:23px;font-weight:bold}
+.logo{
+font-family:Manrope,sans-serif;font-size:21px;
+font-weight:800;letter-spacing:1.4px;color:var(--navy)
+}
+.logo span{color:var(--blue)}
 .back{
-  text-decoration:none;
-  color:#14243B;
-  font-weight:bold;
+text-decoration:none;color:var(--blue);font-size:12px;
+font-weight:800;background:white;border:1px solid var(--line);
+padding:10px 14px;border-radius:9px;
 }
-
 .card{
-  background:white;
-  border-radius:16px;
-  padding:22px;
-  margin-bottom:18px;
-  box-shadow:0 5px 25px rgba(0,0,0,.05);
+background:#fff;border:1px solid var(--line);
+border-radius:18px;padding:23px;margin-bottom:17px;
+box-shadow:var(--shadow);
 }
-
-h2{font-size:21px;margin-bottom:8px}
-.sub{color:#777;font-size:13px;margin-bottom:20px}
-
-label{
-  display:block;
-  font-size:13px;
-  font-weight:bold;
-  margin:15px 0 8px;
+.heading-tag{
+color:var(--blue);font-size:10px;font-weight:800;
+letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;
 }
-
-input{
-  width:100%;
-  padding:14px;
-  border:1px solid #ddd;
-  border-radius:9px;
-  font-size:15px;
+h2{
+font-family:Manrope,sans-serif;color:var(--navy);
+font-size:23px;line-height:1.3;margin-bottom:7px;
 }
-
-.qr{
-  width:210px;
-  height:210px;
-  border:1px dashed #B99A58;
-  border-radius:12px;
-  margin:20px auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  color:#888;
-  padding:15px;
-}
-
-button{
-  width:100%;
-  padding:15px;
-  background:#14243B;
-  color:white;
-  border:0;
-  border-radius:9px;
-  font-weight:bold;
-  margin-top:18px;
-  cursor:pointer;
-}
-
-button:disabled{opacity:.5}
-
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.7}
 .notice{
-  background:#fff8e9;
-  color:#805d19;
-  padding:12px;
-  border-radius:8px;
-  font-size:12px;
-  line-height:1.6;
+background:#f1f6ff;border:1px solid #dce8fa;
+border-left:3px solid var(--blue);color:#526783;
+padding:13px;border-radius:10px;font-size:12px;
+line-height:1.8;margin-bottom:19px;
 }
-
-.message{margin-top:12px;font-size:13px}
-table{width:100%;font-size:12px;border-collapse:collapse}
-td,th{padding:11px 5px;border-bottom:1px solid #eee;text-align:left}
-.status{font-weight:bold}
+label{
+display:block;font-size:12px;font-weight:800;
+color:var(--navy);margin:17px 0 8px;
+}
+input{
+width:100%;height:51px;padding:0 14px;
+border:1px solid var(--line);border-radius:10px;
+font-family:inherit;font-size:14px;color:var(--ink);
+background:#fbfcfe;outline:none;transition:.2s;
+}
+input:focus{
+border-color:var(--blue);background:#fff;
+box-shadow:0 0 0 4px rgba(21,91,179,.09);
+}
+input::placeholder{color:#9aa5b4}
+.qr-heading{
+font-family:Manrope,sans-serif;color:var(--navy);
+font-size:15px;font-weight:800;text-align:center;margin-top:27px;
+}
+.qr{
+width:100%;min-height:260px;
+border:1px dashed #c8d8ed;border-radius:15px;
+margin:15px auto 20px;
+display:flex;align-items:center;justify-content:center;
+flex-direction:column;text-align:center;
+background:#f8faff;color:var(--muted);padding:18px;
+}
+.qr img{
+width:210px;height:210px;max-width:100%;
+object-fit:contain;background:#fff;border-radius:10px;
+}
+#qrLoading{font-size:13px}
+#upiDisplay{
+margin-top:13px;font-size:13px;
+font-weight:800;color:var(--blue);overflow-wrap:anywhere;
+}
+.file-input{
+height:auto;padding:12px;background:#f8faff;
+font-size:12px;cursor:pointer;
+}
+button{
+width:100%;min-height:53px;margin-top:22px;
+border:0;border-radius:10px;background:var(--blue);
+color:white;font-family:inherit;font-size:13px;
+font-weight:800;letter-spacing:.5px;cursor:pointer;
+box-shadow:0 7px 18px rgba(21,91,179,.18);transition:.2s;
+}
+button:hover{background:var(--blue2);transform:translateY(-1px)}
+button:disabled{opacity:.55;cursor:wait;transform:none}
+.message{margin-top:13px;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.history-wrap{overflow-x:auto}
+table{width:100%;font-size:12px;border-collapse:collapse;min-width:300px}
+th{
+color:var(--muted);font-size:10px;text-transform:uppercase;
+letter-spacing:.7px;background:#f8faff;
+}
+td,th{padding:13px 9px;border-bottom:1px solid var(--line);text-align:left}
+td{color:var(--ink)}
+.status{font-weight:800;text-transform:capitalize;color:var(--blue)}
+@media(max-width:480px){
+body{padding:15px 12px 35px}
+.container{margin:10px auto}
+.logo{font-size:18px}
+.card{padding:19px;border-radius:15px}
+h2{font-size:21px}
+.qr{min-height:245px}
+.qr img{width:190px;height:190px}
+}
+@media(prefers-reduced-motion:reduce){
+*,*:before,*:after{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
 <div class="header">
-  <div class="logo">ARROW TRADE</div>
-  <a href="dashboard.html" class="back">← Dashboard</a>
+<div class="logo">ARROW <span>TRADE.</span></div>
+<a href="dashboard.html" class="back">← Dashboard</a>
 </div>
 
 <div class="card">
-  <h2>Deposit Funds</h2>
-  <p class="sub">Add funds to your Arrow Trade wallet.</p>
+<div class="heading-tag">Wallet management</div>
+<h2>Deposit Funds</h2>
+<p class="sub">Add funds to your Arrow Trade wallet using the payment details below.</p>
 
-  <div class="notice">
-    Minimum Deposit: ₹2500<br>
-    Your deposit will be credited only after payment verification.
-  </div>
-
-  <label>Deposit Amount (₹)</label>
-  <input type="number" id="amount" min="50" placeholder="Enter amount">
-
-  <h3 style="text-align:center;margin-top:25px">Scan UPI QR Code</h3>
-
-<div class="qr" id="qrContainer" style="width:100%;height:auto;min-height:230px;flex-direction:column;">
-  <p id="qrLoading">Loading payment QR...</p>
-  <img id="paymentQR" src="" alt="Payment QR Code"
-       style="display:none;width:210px;height:210px;object-fit:contain;">
-  <p id="upiDisplay" style="margin-top:12px;font-weight:bold;"></p>
+<div class="notice">
+<strong>Deposit information</strong><br>
+Minimum Deposit: ₹2500<br>
+Your deposit will be credited only after payment verification.
 </div>
 
-  <label>UPI Transaction ID / UTR</label>
-  <input type="text" id="utr" placeholder="Enter UTR number">
+<label for="amount">Deposit Amount (₹)</label>
+<input type="number" id="amount" min="50" placeholder="Enter deposit amount">
 
-  <label>Payment Screenshot</label>
-  <input type="file" id="proof" accept="image/*">
+<div class="qr-heading">Scan UPI QR Code</div>
 
-  <button id="submitBtn" onclick="submitDeposit()">
-    Submit Deposit Request
-  </button>
+<div class="qr" id="qrContainer">
+<p id="qrLoading">Loading payment QR...</p>
+<img id="paymentQR" src="" alt="Payment QR Code" style="display:none">
+<p id="upiDisplay"></p>
+</div>
 
-  <div class="message" id="message"></div>
+<label for="utr">UPI Transaction ID / UTR</label>
+<input type="text" id="utr" placeholder="Enter UTR number">
+
+<label for="proof">Payment Screenshot</label>
+<input class="file-input" type="file" id="proof" accept="image/*">
+
+<button id="submitBtn" onclick="submitDeposit()">SUBMIT DEPOSIT REQUEST</button>
+<div class="message" id="message"></div>
 </div>
 
 <div class="card">
-  <h2>Deposit History</h2>
-  <p class="sub">Your previous deposit requests</p>
-
-  <div style="overflow-x:auto">
-    <table>
-      <thead>
-        <tr>
-          <th>Amount</th>
-          <th>UTR</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="history">
-        <tr><td colspan="3">Loading...</td></tr>
-      </tbody>
-    </table>
-  </div>
+<div class="heading-tag">Transaction records</div>
+<h2>Deposit History</h2>
+<p class="sub">Review your previous deposit requests and their status.</p>
+<div class="history-wrap">
+<table>
+<thead><tr><th>Amount</th><th>UTR</th><th>Status</th></tr></thead>
+<tbody id="history"><tr><td colspan="3">Loading...</td></tr></tbody>
+</table>
+</div>
 </div>
 
 </div>
@@ -172,169 +198,133 @@ td,th{padding:11px 5px;border-bottom:1px solid #eee;text-align:left}
 const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let currentUser = null;
+let currentUser=null;
 
 async function init(){
+const {data,error}=await db.auth.getSession();
+if(error||!data.session){location.href="login.html";return;}
+currentUser=data.session.user;
+loadHistory();
+loadPaymentSettings();
+}
 
-  const {data,error} = await db.auth.getSession();
+async function loadPaymentSettings(){
+const {data,error}=await db.from("payment_settings")
+.select("qr_image_path, upi_id")
+.eq("is_enabled",true)
+.order("id",{ascending:false})
+.limit(1)
+.maybeSingle();
 
-  if(error || !data.session){
-    location.href = "login.html";
-    return;
-  }
+const loading=document.getElementById("qrLoading");
+const qr=document.getElementById("paymentQR");
+const upi=document.getElementById("upiDisplay");
 
-  currentUser = data.session.user;
-
-  loadHistory();
-  loadPaymentSettings();
-
-} 
-  async function loadPaymentSettings(){
-  const { data, error } = await db
-    .from("payment_settings")
-    .select("qr_image_path, upi_id")
-    .eq("is_enabled", true)
-    .order("id", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const loading = document.getElementById("qrLoading");
-  const qr = document.getElementById("paymentQR");
-  const upi = document.getElementById("upiDisplay");
-
-  if(error || !data || !data.qr_image_path){
-    loading.textContent = "Payment QR unavailable";
-    return;
-  }
-
-  qr.src = data.qr_image_path;
-  qr.style.display = "block";
-  loading.style.display = "none";
-  upi.textContent = data.upi_id || "";
+if(error||!data||!data.qr_image_path){
+loading.textContent="Payment QR unavailable";
+return;
+}
+qr.src=data.qr_image_path;
+qr.style.display="block";
+loading.style.display="none";
+upi.textContent=data.upi_id||"";
 }
 
 async function submitDeposit(){
+const amount=Number(document.getElementById("amount").value);
+const utr=document.getElementById("utr").value.trim();
+const file=document.getElementById("proof").files[0];
+const message=document.getElementById("message");
+const button=document.getElementById("submitBtn");
 
-  const amount = Number(document.getElementById("amount").value);
-  const utr = document.getElementById("utr").value.trim();
-  const file = document.getElementById("proof").files[0];
+if(!Number.isFinite(amount)||amount<50){
+message.textContent="Minimum deposit amount is ₹50.";
+return;
+}
+if(!utr||utr.length<6){
+message.textContent="Please enter a valid UTR number.";
+return;
+}
+if(!file){
+message.textContent="Please upload payment screenshot.";
+return;
+}
+if(!file.type.startsWith("image/")||file.size>5*1024*1024){
+message.textContent="Upload an image under 5 MB.";
+return;
+}
 
-  const message = document.getElementById("message");
-  const button = document.getElementById("submitBtn");
+button.disabled=true;
+message.textContent="Submitting request...";
 
-  if(!Number.isFinite(amount) || amount < 50){
-    message.textContent = "Minimum deposit amount is ₹50.";
-    return;
-  }
+try{
+const extension=file.name.split(".").pop().toLowerCase();
+const path=currentUser.id+"/"+crypto.randomUUID()+"."+extension;
 
-  if(!utr || utr.length < 6){
-    message.textContent = "Please enter a valid UTR number.";
-    return;
-  }
+const {error:uploadError}=await db.storage
+.from("payment-proofs")
+.upload(path,file,{upsert:false});
+if(uploadError)throw uploadError;
 
-  if(!file){
-    message.textContent = "Please upload payment screenshot.";
-    return;
-  }
+const {error:insertError}=await db.from("deposits").insert({
+user_id:currentUser.id,
+amount:amount,
+utr_reference:utr,
+status:"pending",
+payment_proof_path:path
+});
+if(insertError)throw insertError;
 
-  if(!file.type.startsWith("image/") || file.size > 5*1024*1024){
-    message.textContent = "Upload an image under 5 MB.";
-    return;
-  }
+message.textContent="Deposit request submitted. Awaiting verification.";
 
-  button.disabled = true;
-  message.textContent = "Submitting request...";
+document.getElementById("amount").value="";
+document.getElementById("utr").value="";
+document.getElementById("proof").value="";
 
-  try{
-
-    const extension = file.name.split(".").pop().toLowerCase();
-    const path = currentUser.id + "/" + crypto.randomUUID() + "." + extension;
-
-    const {error:uploadError} = await db.storage
-      .from("payment-proofs")
-      .upload(path,file,{upsert:false});
-
-    if(uploadError) throw uploadError;
-
-    const {error:insertError} = await db
-      .from("deposits")
-      .insert({
-        user_id:currentUser.id,
-        amount:amount,
-        utr_reference:utr,
-        status:"pending",
-        payment_proof_path:path
-      });
-
-    if(insertError) throw insertError;
-
-    message.textContent = "Deposit request submitted. Awaiting verification.";
-
-    document.getElementById("amount").value = "";
-    document.getElementById("utr").value = "";
-    document.getElementById("proof").value = "";
-
-    await loadHistory();
-
-  }catch(error){
-
-    console.error("Deposit Error:",error);
-    message.textContent = "Request failed: " + error.message;
-
-  }finally{
-
-    button.disabled = false;
-
-  }
+await loadHistory();
+}catch(error){
+console.error("Deposit Error:",error);
+message.textContent="Request failed: "+error.message;
+}finally{
+button.disabled=false;
+}
 }
 
 async function loadHistory(){
+const tbody=document.getElementById("history");
 
-  const tbody = document.getElementById("history");
+const {data,error}=await db.from("deposits")
+.select("amount,utr_reference,status,created_at")
+.eq("user_id",currentUser.id)
+.order("created_at",{ascending:false});
 
-  const {data,error} = await db
-    .from("deposits")
-    .select("amount,utr_reference,status,created_at")
-    .eq("user_id",currentUser.id)
-    .order("created_at",{ascending:false});
-
-  if(error){
-    console.error("History Error:",error);
-    tbody.innerHTML = "<tr><td colspan='3'>History unavailable</td></tr>";
-    return;
-  }
-
-  if(!data || data.length === 0){
-    tbody.innerHTML = "<tr><td colspan='3'>No deposits yet</td></tr>";
-    return;
-  }
-
-  tbody.innerHTML = data.map(item => `
-    <tr>
-      <td>₹${Number(item.amount).toLocaleString("en-IN")}</td>
-      <td>${escapeHTML(item.utr_reference || "")}</td>
-      <td class="status">${escapeHTML(item.status || "pending")}</td>
-    </tr>
-  `).join("");
+if(error){
+console.error("History Error:",error);
+tbody.innerHTML="<tr><td colspan='3'>History unavailable</td></tr>";
+return;
+}
+if(!data||data.length===0){
+tbody.innerHTML="<tr><td colspan='3'>No deposits yet</td></tr>";
+return;
+}
+tbody.innerHTML=data.map(item=>`
+<tr>
+<td>₹${Number(item.amount).toLocaleString("en-IN")}</td>
+<td>${escapeHTML(item.utr_reference||"")}</td>
+<td class="status">${escapeHTML(item.status||"pending")}</td>
+</tr>
+`).join("");
 }
 
 function escapeHTML(value){
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[char]));
+return String(value).replace(/[&<>"']/g,char=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[char]));
 }
 
 init();
 </script>
-
 </body>
 </html>
