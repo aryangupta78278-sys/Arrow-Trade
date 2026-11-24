@@ -3,448 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arrow Trade | Withdrawal</title>
+<meta name="theme-color" content="#f5f7fc">
+<title>Arrow Trade | Withdraw Funds</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
+:root{
+--blue:#155bb3;
+--blue2:#0d438b;
+--navy:#17243a;
+--ink:#202b3d;
+--muted:#718096;
+--bg:#f5f7fc;
+--line:#e6eaf1;
+--gold:#b69a63;
+--green:#168b68;
+--white:#fff;
+--shadow:0 15px 40px rgba(24,45,78,.07);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-
 body{
-  font-family:Arial,sans-serif;
-  background:#F7F8FA;
-  color:#14243B;
-  padding:20px;
+font-family:'DM Sans',sans-serif;
+color:var(--ink);
+background:linear-gradient(135deg,#f8faff,#edf3ff 58%,#fff);
+min-height:100vh;
+padding:22px 16px 45px;
 }
-
-.container{max-width:550px;margin:30px auto}
-
+.container{max-width:570px;margin:20px auto}
 .header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:25px;
+display:flex;align-items:center;justify-content:space-between;
+margin-bottom:25px;
 }
-
-.logo{font-size:23px;font-weight:bold}
-.back{text-decoration:none;color:#14243B;font-weight:bold}
-
+.logo{
+font-family:Manrope,sans-serif;font-size:21px;
+font-weight:800;letter-spacing:1.4px;color:var(--navy)
+}
+.logo span{color:var(--blue)}
+.back{
+text-decoration:none;color:var(--blue);font-size:12px;
+font-weight:800;background:white;border:1px solid var(--line);
+padding:10px 14px;border-radius:9px;
+}
 .card{
-  background:white;
-  border-radius:16px;
-  padding:22px;
-  margin-bottom:18px;
-  box-shadow:0 5px 25px rgba(0,0,0,.05);
+background:#fff;border:1px solid var(--line);
+border-radius:18px;padding:23px;margin-bottom:17px;
+box-shadow:var(--shadow);
 }
-
-h2{font-size:21px;margin-bottom:8px}
-.sub{color:#777;font-size:13px;margin-bottom:20px}
-
+.heading-tag{
+color:var(--blue);font-size:10px;font-weight:800;
+letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;
+}
+h2{
+font-family:Manrope,sans-serif;color:var(--navy);
+font-size:23px;line-height:1.3;margin-bottom:7px;
+}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.7}
 .balance{
-  background:#14243B;
-  color:white;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:20px;
+position:relative;overflow:hidden;
+background:linear-gradient(120deg,#10213a,#155bb3);
+color:white;padding:22px;border-radius:15px;margin-bottom:19px;
+box-shadow:0 12px 27px rgba(21,91,179,.17);
 }
-
-.balance small{opacity:.75}
-.balance h2{font-size:27px;margin-top:8px}
-
-label{
-  display:block;
-  font-size:13px;
-  font-weight:bold;
-  margin:15px 0 8px;
+.balance:after{
+content:"";position:absolute;width:170px;height:170px;
+border:1px solid rgba(255,255,255,.13);border-radius:50%;
+right:-60px;top:-90px;
 }
-
-input,select{
-  width:100%;
-  padding:14px;
-  border:1px solid #ddd;
-  border-radius:9px;
-  font-size:15px;
-  background:white;
-  color:#14243B;
+.balance small{
+font-size:11px;color:#d5e2f4;letter-spacing:.7px;
+position:relative;z-index:1;
 }
-
-button{
-  width:100%;
-  padding:15px;
-  background:#14243B;
-  color:white;
-  border:0;
-  border-radius:9px;
-  font-weight:bold;
-  margin-top:18px;
-  cursor:pointer;
+.balance h2{
+font-size:29px;color:#fff;margin-top:8px;
+font-family:Manrope,sans-serif;position:relative;z-index:1;
 }
-
-button:disabled{opacity:.5}
-
 .notice{
-  background:#fff8e9;
-  color:#805d19;
-  padding:12px;
-  border-radius:8px;
-  font-size:12px;
-  line-height:1.6;
+background:#f1f6ff;border:1px solid #dce8fa;
+border-left:3px solid var(--blue);color:#526783;
+padding:13px;border-radius:10px;font-size:12px;line-height:1.7;
+margin-bottom:20px;
 }
-
-.message{margin-top:12px;font-size:13px;line-height:1.5}
-
+label{
+display:block;font-size:12px;font-weight:800;
+color:var(--navy);margin:16px 0 8px;
+}
+input,select{
+width:100%;height:51px;padding:0 14px;
+border:1px solid var(--line);border-radius:10px;
+font-family:inherit;font-size:14px;color:var(--ink);
+background:#fbfcfe;outline:none;transition:.2s;
+}
+input:focus,select:focus{
+border-color:var(--blue);background:#fff;
+box-shadow:0 0 0 4px rgba(21,91,179,.09);
+}
+input::placeholder{color:#9aa5b4}
+.method-label{margin-top:20px}
 .paymentFields{display:none}
-.paymentFields.active{display:block}
-
-table{width:100%;font-size:12px;border-collapse:collapse}
-td,th{padding:11px 5px;border-bottom:1px solid #eee;text-align:left}
-.status{font-weight:bold}
+.paymentFields.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+button{
+width:100%;min-height:52px;margin-top:23px;
+border:0;border-radius:10px;
+background:var(--blue);color:#fff;
+font-family:inherit;font-size:13px;font-weight:800;
+letter-spacing:.5px;cursor:pointer;
+box-shadow:0 7px 18px rgba(21,91,179,.18);
+transition:.2s;
+}
+button:hover{background:var(--blue2);transform:translateY(-1px)}
+button:disabled{opacity:.55;cursor:wait;transform:none}
+.message{margin-top:13px;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.history-wrap{overflow-x:auto}
+table{width:100%;font-size:12px;border-collapse:collapse;min-width:300px}
+th{
+color:var(--muted);font-size:10px;text-transform:uppercase;
+letter-spacing:.7px;background:#f8faff;
+}
+td,th{padding:13px 9px;border-bottom:1px solid var(--line);text-align:left}
+td{color:var(--ink)}
+.status{font-weight:800;text-transform:capitalize}
+.status:where(:not(:empty)){color:var(--blue)}
+@media(max-width:480px){
+body{padding:15px 12px 35px}
+.container{margin:10px auto}
+.logo{font-size:18px}
+.card{padding:19px;border-radius:15px}
+h2{font-size:21px}
+.balance{padding:20px}
+.balance h2{font-size:27px}
+}
+@media(prefers-reduced-motion:reduce){
+*,*:before,*:after{animation:none!important;transition:none!important}
+}
 </style>
 </head>
-
 <body>
-
 <div class="container">
 
 <div class="header">
-  <div class="logo">ARROW TRADE</div>
-  <a href="dashboard.html" class="back">← Dashboard</a>
+<div class="logo">ARROW <span>TRADE.</span></div>
+<a href="dashboard.html" class="back">← Dashboard</a>
 </div>
 
 <div class="card">
-
+<div class="heading-tag">Wallet management</div>
 <h2>Withdraw Funds</h2>
-<p class="sub">Request a withdrawal from your wallet.</p>
+<p class="sub">Request a withdrawal securely from your Arrow Trade wallet.</p>
 
 <div class="balance">
-  <small>Available Wallet Balance</small>
-  <h2 id="availableBalance">Loading...</h2>
+<small>AVAILABLE WALLET BALANCE</small>
+<h2 id="availableBalance">Loading...</h2>
 </div>
 
 <div class="notice">
-  Withdrawal requests are subject to balance verification and admin approval.
+<strong>Withdrawal information</strong><br>
+Withdrawal requests are subject to balance verification and admin approval.
 </div>
 
-<label>Withdrawal Amount (₹)</label>
-<input type="number" id="amount" min="0.01" step="0.01" placeholder="Enter amount">
+<label for="amount">Withdrawal Amount (₹)</label>
+<input type="number" id="amount" min="0.01" step="0.01" placeholder="Enter withdrawal amount">
 
-<label>Payment Method</label>
+<label for="paymentMethod" class="method-label">Payment Method</label>
 <select id="paymentMethod" onchange="changePaymentMethod()">
-  <option value="UPI">UPI</option>
-  <option value="Bank Transfer">Bank Transfer</option>
+<option value="UPI">UPI</option>
+<option value="Bank Transfer">Bank Transfer</option>
 </select>
 
-<!-- UPI FIELDS -->
-
 <div id="upiFields" class="paymentFields active">
+<label for="upiHolder">Account Holder Name</label>
+<input type="text" id="upiHolder" placeholder="Enter account holder name">
 
-  <label>Account Holder Name</label>
-  <input type="text" id="upiHolder" placeholder="Enter account holder name">
-
-  <label>UPI ID</label>
-  <input type="text" id="upiId" placeholder="example@upi">
-
+<label for="upiId">UPI ID</label>
+<input type="text" id="upiId" placeholder="example@upi">
 </div>
-
-<!-- BANK FIELDS -->
 
 <div id="bankFields" class="paymentFields">
+<label for="bankHolder">Account Holder Name</label>
+<input type="text" id="bankHolder" placeholder="Enter account holder name">
 
-  <label>Account Holder Name</label>
-  <input type="text" id="bankHolder" placeholder="Enter account holder name">
+<label for="bankName">Bank Name</label>
+<input type="text" id="bankName" placeholder="Enter bank name">
 
-  <label>Bank Name</label>
-  <input type="text" id="bankName" placeholder="Enter bank name">
+<label for="accountNumber">Account Number</label>
+<input type="text" id="accountNumber" inputmode="numeric" placeholder="Enter account number">
 
-  <label>Account Number</label>
-  <input type="text" id="accountNumber" inputmode="numeric" placeholder="Enter account number">
+<label for="confirmAccountNumber">Confirm Account Number</label>
+<input type="text" id="confirmAccountNumber" inputmode="numeric" placeholder="Re-enter account number">
 
-  <label>Confirm Account Number</label>
-  <input type="text" id="confirmAccountNumber" inputmode="numeric" placeholder="Re-enter account number">
-
-  <label>IFSC Code</label>
-  <input type="text" id="ifsc" placeholder="Example: SBIN0001234">
-
+<label for="ifsc">IFSC Code</label>
+<input type="text" id="ifsc" placeholder="Example: SBIN0001234">
 </div>
 
-<button id="submitBtn" onclick="submitWithdrawal()">
-  Submit Withdrawal Request
-</button>
-
+<button id="submitBtn" onclick="submitWithdrawal()">SUBMIT WITHDRAWAL REQUEST</button>
 <div class="message" id="message"></div>
-
 </div>
 
 <div class="card">
-
+<div class="heading-tag">Transaction records</div>
 <h2>Withdrawal History</h2>
-<p class="sub">Track your withdrawal requests.</p>
-
-<div style="overflow-x:auto">
+<p class="sub">Track your previous withdrawal requests and their status.</p>
+<div class="history-wrap">
 <table>
-<thead>
-<tr>
-<th>Amount</th>
-<th>Method</th>
-<th>Status</th>
-</tr>
-</thead>
-
-<tbody id="history">
-<tr><td colspan="3">Loading...</td></tr>
-</tbody>
-
+<thead><tr><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+<tbody id="history"><tr><td colspan="3">Loading...</td></tr></tbody>
 </table>
 </div>
-
 </div>
+
 </div>
 
 <script>
-
 const SUPABASE_URL = "https://sofargknzehbqkdlyywx.supabase.co";
 const SUPABASE_KEY = "sb_publishable_7In44w5vW2bEXL6f1PDNOw_vwva-09m";
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let currentUser = null;
 let walletBalance = 0;
 
 function changePaymentMethod(){
-
-  const method = document.getElementById("paymentMethod").value;
-
-  document.getElementById("upiFields").classList.toggle("active",method==="UPI");
-
-  document.getElementById("bankFields").classList.toggle("active",method==="Bank Transfer");
-
+const method=document.getElementById("paymentMethod").value;
+document.getElementById("upiFields").classList.toggle("active",method==="UPI");
+document.getElementById("bankFields").classList.toggle("active",method==="Bank Transfer");
 }
 
 async function init(){
-
-  const {data,error} = await db.auth.getSession();
-
-  if(error || !data.session){
-    location.href="login.html";
-    return;
-  }
-
-  currentUser=data.session.user;
-
-  await loadBalance();
-  await loadHistory();
-
+const {data,error}=await db.auth.getSession();
+if(error || !data.session){location.href="login.html";return;}
+currentUser=data.session.user;
+await loadBalance();
+await loadHistory();
 }
 
 async function loadBalance(){
+const balanceEl=document.getElementById("availableBalance");
+const {data,error}=await db.from("wallets")
+.select("available_balance")
+.eq("user_id",currentUser.id)
+.maybeSingle();
 
-  const balanceEl=document.getElementById("availableBalance");
-
-  const {data,error}=await db
-    .from("wallets")
-    .select("available_balance")
-    .eq("user_id",currentUser.id)
-    .maybeSingle();
-
-  if(error){
-    console.error("Wallet Error:",error);
-    balanceEl.textContent="Unavailable";
-    return;
-  }
-
-  walletBalance=Number(data?.available_balance ?? 0);
-
-  if(!Number.isFinite(walletBalance)){
-    walletBalance=0;
-  }
-
-  balanceEl.textContent="₹"+walletBalance.toLocaleString("en-IN",{
-    minimumFractionDigits:2,
-    maximumFractionDigits:2
-  });
-
+if(error){console.error("Wallet Error:",error);balanceEl.textContent="Unavailable";return;}
+walletBalance=Number(data?.available_balance ?? 0);
+if(!Number.isFinite(walletBalance))walletBalance=0;
+balanceEl.textContent="₹"+walletBalance.toLocaleString("en-IN",{
+minimumFractionDigits:2,maximumFractionDigits:2
+});
 }
 
 async function submitWithdrawal(){
+const amount=Number(document.getElementById("amount").value);
+const method=document.getElementById("paymentMethod").value;
+const message=document.getElementById("message");
+const button=document.getElementById("submitBtn");
+let payoutDetails="";
 
-  const amount=Number(document.getElementById("amount").value);
-  const method=document.getElementById("paymentMethod").value;
+if(!Number.isFinite(amount)||amount<=0){
+message.textContent="Enter a valid withdrawal amount.";return;
+}
+if(amount>walletBalance){
+message.textContent="Insufficient wallet balance.";return;
+}
 
-  const message=document.getElementById("message");
-  const button=document.getElementById("submitBtn");
+if(method==="UPI"){
+const holder=document.getElementById("upiHolder").value.trim();
+const upi=document.getElementById("upiId").value.trim();
+if(!holder||!upi){message.textContent="Please complete all UPI details.";return;}
+if(!/^[A-Za-z0-9._-]{2,256}@[A-Za-z0-9.-]{2,64}$/.test(upi)){
+message.textContent="Please enter a valid UPI ID.";return;
+}
+payoutDetails=JSON.stringify({method:"UPI",holder_name:holder,upi_id:upi});
+}else{
+const holder=document.getElementById("bankHolder").value.trim();
+const bank=document.getElementById("bankName").value.trim();
+const account=document.getElementById("accountNumber").value.trim();
+const confirm=document.getElementById("confirmAccountNumber").value.trim();
+const ifsc=document.getElementById("ifsc").value.trim().toUpperCase();
 
-  let payoutDetails="";
+if(!holder||!bank||!account||!confirm||!ifsc){
+message.textContent="Please complete all bank details.";return;
+}
+if(!/^[0-9]{6,20}$/.test(account)){
+message.textContent="Enter a valid account number.";return;
+}
+if(account!==confirm){
+message.textContent="Account numbers do not match.";return;
+}
+if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)){
+message.textContent="Enter a valid IFSC code.";return;
+}
+payoutDetails=JSON.stringify({
+method:"Bank Transfer",holder_name:holder,bank_name:bank,
+account_number:account,ifsc_code:ifsc
+});
+}
 
-  if(!Number.isFinite(amount) || amount<=0){
-    message.textContent="Enter a valid withdrawal amount.";
-    return;
-  }
+button.disabled=true;
+message.textContent="Submitting request...";
 
-  if(amount>walletBalance){
-    message.textContent="Insufficient wallet balance.";
-    return;
-  }
+try{
+const {error}=await db.from("withdrawals").insert({
+user_id:currentUser.id,amount:amount,
+payout_details:payoutDetails,status:"pending"
+});
+if(error)throw error;
 
-  if(method==="UPI"){
+message.textContent="Withdrawal request submitted successfully. Awaiting admin approval.";
 
-    const holder=document.getElementById("upiHolder").value.trim();
-    const upi=document.getElementById("upiId").value.trim();
+["amount","upiHolder","upiId","bankHolder","bankName","accountNumber","confirmAccountNumber","ifsc"]
+.forEach(id=>document.getElementById(id).value="");
 
-    if(!holder || !upi){
-      message.textContent="Please complete all UPI details.";
-      return;
-    }
-
-    if(!/^[A-Za-z0-9._-]{2,256}@[A-Za-z0-9.-]{2,64}$/.test(upi)){
-      message.textContent="Please enter a valid UPI ID.";
-      return;
-    }
-
-    payoutDetails=JSON.stringify({
-      method:"UPI",
-      holder_name:holder,
-      upi_id:upi
-    });
-
-  }else{
-
-    const holder=document.getElementById("bankHolder").value.trim();
-    const bank=document.getElementById("bankName").value.trim();
-    const account=document.getElementById("accountNumber").value.trim();
-    const confirm=document.getElementById("confirmAccountNumber").value.trim();
-    const ifsc=document.getElementById("ifsc").value.trim().toUpperCase();
-
-    if(!holder || !bank || !account || !confirm || !ifsc){
-      message.textContent="Please complete all bank details.";
-      return;
-    }
-
-    if(!/^[0-9]{6,20}$/.test(account)){
-      message.textContent="Enter a valid account number.";
-      return;
-    }
-
-    if(account!==confirm){
-      message.textContent="Account numbers do not match.";
-      return;
-    }
-
-    if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)){
-      message.textContent="Enter a valid IFSC code.";
-      return;
-    }
-
-    payoutDetails=JSON.stringify({
-      method:"Bank Transfer",
-      holder_name:holder,
-      bank_name:bank,
-      account_number:account,
-      ifsc_code:ifsc
-    });
-
-  }
-
-  button.disabled=true;
-  message.textContent="Submitting request...";
-
-  try{
-
-    const {error}=await db
-      .from("withdrawals")
-      .insert({
-        user_id:currentUser.id,
-        amount:amount,
-        payout_details:payoutDetails,
-        status:"pending"
-      });
-
-    if(error) throw error;
-
-    message.textContent="Withdrawal request submitted successfully. Awaiting admin approval.";
-
-    document.getElementById("amount").value="";
-    document.getElementById("upiHolder").value="";
-    document.getElementById("upiId").value="";
-    document.getElementById("bankHolder").value="";
-    document.getElementById("bankName").value="";
-    document.getElementById("accountNumber").value="";
-    document.getElementById("confirmAccountNumber").value="";
-    document.getElementById("ifsc").value="";
-
-    await loadHistory();
-
-  }catch(error){
-
-    console.error("Withdrawal Error:",error);
-    message.textContent="Request failed: "+error.message;
-
-  }finally{
-
-    button.disabled=false;
-
-  }
-
+await loadHistory();
+}catch(error){
+console.error("Withdrawal Error:",error);
+message.textContent="Request failed: "+error.message;
+}finally{
+button.disabled=false;
+}
 }
 
 async function loadHistory(){
+const tbody=document.getElementById("history");
+const {data,error}=await db.from("withdrawals")
+.select("amount,payout_details,status,created_at")
+.eq("user_id",currentUser.id)
+.order("created_at",{ascending:false});
 
-  const tbody=document.getElementById("history");
-
-  const {data,error}=await db
-    .from("withdrawals")
-    .select("amount,payout_details,status,created_at")
-    .eq("user_id",currentUser.id)
-    .order("created_at",{ascending:false});
-
-  if(error){
-    console.error("History Error:",error);
-    tbody.innerHTML="<tr><td colspan='3'>History unavailable</td></tr>";
-    return;
-  }
-
-  if(!data || data.length===0){
-    tbody.innerHTML="<tr><td colspan='3'>No withdrawal requests yet</td></tr>";
-    return;
-  }
-
-  tbody.innerHTML=data.map(item=>{
-
-    let method="Unknown";
-
-    try{
-      const details=JSON.parse(item.payout_details);
-      method=details.method || "Unknown";
-    }catch(e){
-      method="Unknown";
-    }
-
-    return `
-      <tr>
-        <td>₹${Number(item.amount).toLocaleString("en-IN")}</td>
-        <td>${escapeHTML(method)}</td>
-        <td class="status">${escapeHTML(item.status || "pending")}</td>
-      </tr>
-    `;
-
-  }).join("");
-
+if(error){
+console.error("History Error:",error);
+tbody.innerHTML="<tr><td colspan='3'>History unavailable</td></tr>";
+return;
+}
+if(!data||data.length===0){
+tbody.innerHTML="<tr><td colspan='3'>No withdrawal requests yet</td></tr>";
+return;
+}
+tbody.innerHTML=data.map(item=>{
+let method="Unknown";
+try{const details=JSON.parse(item.payout_details);method=details.method||"Unknown";}
+catch(e){method="Unknown";}
+return `<tr>
+<td>₹${Number(item.amount).toLocaleString("en-IN")}</td>
+<td>${escapeHTML(method)}</td>
+<td class="status">${escapeHTML(item.status||"pending")}</td>
+</tr>`;
+}).join("");
 }
 
 function escapeHTML(value){
-  return String(value).replace(/[&<>"']/g,char=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[char]));
+return String(value).replace(/[&<>"']/g,char=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[char]));
 }
 
 init();
-
 </script>
-
 </body>
 </html>
