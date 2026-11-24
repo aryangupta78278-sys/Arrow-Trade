@@ -1076,12 +1076,13 @@ function getCalculatedValue(item) {
   const invested = Number(item.invested_amount || 0);
   const created = new Date(item.created_at).getTime();
 
-  if (!invested || !created) return invested;
+  if (!invested || !Number.isFinite(created)) return invested;
 
-  const elapsedMinutes = Math.max(0, (Date.now() - created) / 60000);
-  const progress = Math.min(elapsedMinutes / 60, 1);
+  const elapsed = Math.max(0, Date.now() - created);
+  const progress = Math.min(elapsed / (60 * 60 * 1000), 1);
 
-  return invested * (1 + 1.5 * progress);
+  // Real only: profit gradually reaches 5x in one hour
+  return invested * (1 + 5 * progress);
 }
 async function loadInvestments(){
 
@@ -1111,8 +1112,12 @@ async function loadInvestments(){
     currentValue += Number(item.current_value || 0);
   });
 
-  const totalProfit = currentValue - totalInvestment;
-setPL("totalPL", totalProfit);
+  const realProfit = rows.reduce((sum, item) => {
+  const invested = Number(item.invested_amount || 0);
+  return sum + Math.max(0, getCalculatedValue(item) - invested);
+}, 0);
+
+setPL("totalPL", realProfit);
 
   document.getElementById("investment").textContent=
     money(totalInvestment);
