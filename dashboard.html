@@ -689,7 +689,11 @@ location.href="login.html";
 
 function setSide(value){
 side=value;
+document.getElementById("placeOrder").textContent =
+  value === "buy" ? "BUY NOW" : "SELL NOW";
 
+document.getElementById("placeOrder").className =
+  "trade-btn " + (value === "buy" ? "buy-btn" : "sell-btn");
 document.getElementById("buyTab").className=
 value==="buy"?"buy-active":"";
 
@@ -729,6 +733,7 @@ await loadProfile();
 await loadWallet();
 await loadInvestments();
 await loadDeposits();
+await startTradeEngine();
 }
 
 async function loadProfile(){
@@ -1165,6 +1170,272 @@ init();
   } finally {
     if (button) button.disabled = false;
   }
+ }
+ let tradePriceCache = {};
+let tradeRows = [];
+let tradeRefreshRunning = false;
+
+function tradeMoney(value) {
+  return "₹" + Number(value || 0).toFixed(2);
+}
+
+function showTradingBalance(value) {
+  let el = document.getElementById("tradingBalance");
+
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "tradingBalance";
+    el.className = "panel";
+    const market = document.getElementById("markets");
+    market.prepend(el);
+  }
+
+  el.innerHTML = `
+    <div style="font-size:12px;color:#8993A1">Trading Balance</div>
+    <h2 style="margin-top:8px">${tradeMoney(value)}</h2>
+    <small>Separate virtual trading funds</small>
+  `;
+}
+
+async function loadTradingBalance() {
+  if (!currentUser) return;
+
+  const { data, error } = await db
+    .from("trading_wallets")
+    .select("balance")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Trading balance:", error);
+    return;
+  }
+
+  showTradingBalance(data ? data.balance : 10000);
+}
+
+async function refreshTradeQuote() {
+  if (tradeRefreshRunning) return;
+  tradeRefreshRunning = true;
+
+  const symbols = ["EUR/USD", "GBP/USD", "XAU/USD"];
+
+  try {
+    await Promise.all(symbols.map(async symbol => {
+      const response = await fetch(
+        "/api/market?symbol=" + encodeURIComponent(symbol)
+      );
+
+      const data = await response.json();
+
+      if (response.ok && Number(data.price) > 0) {
+        tradePriceCache[symbol] = Number(data.price);
+      }
+    }));
+
+    const selected = document.getElementById("tradeSymbol").value;
+    const price = tradePriceCache[selected];
+
+    if (price) {
+      document.getElementById("tradeLivePrice").textContent =
+        price.toFixed(5);
+
+      document.getElementById("tradePriceStatus").textContent =
+        "Market connected";
+
+      document.getElementById("tradePriceStatus").className = "green";
+
+      document.getElementById("tradePriceTime").textContent =
+        "Updated: " + new Date().toLocaleTimeString("en-IN");
+    } else {
+      document.getElementById("tradeLivePrice").textContent =
+        "Unavailable";
+
+      document.getElementById("tradePriceStatus").textContent =
+        "Market unavailable";
+    }
+
+    renderTradeTables();
+
+  } catch (error) {
+    console.error("Market error:", error);
+  } finally {
+    tradeRefreshRunning = false;
+  }
+}
+
+function calculateTradePL(trade, price) {
+  const entry = Number(trade.entry_price);
+  const amount = Number(trade.amount_inr);
+  const direction = trade.side === "BUY" ? 1 : -1;
+
+  return amount * ((price - entry) / entry) * direction;
+}
+
+async function placeMarketTrade() {
+  const message = document.getElementById("tradeMessage");
+  const button = document.getElementById("placeOrder");
+
+  const amount = Number(document.getElementById("tradeAmount").value);
+  const symbol = document.getElementById("tradeSymbol").value;
+  const price = tradePriceCache[symbol];
+
+  if (!currentUser) {
+    message.textContent = "Please login first.";
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    message.textContent = "Enter a valid amount.";
+    return;
+  }
+
+  if (!price || price <= 0) {
+    message.textContent = "Market price unavailable.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Opening trade...";
+
+  try {
+    const { data, error } = await db.rpc("open_market_trade", {
+      p_symbol: symbol,
+      p_side: side.toUpperCase(),
+      p_amount: amount,
+      p_price: price
+    });
+
+    if (error) throw error;
+    if (!data || data.success !== true) {
+      throw new Error("Trade not confirmed.");
+    }
+
+    message.textContent = "Trade opened successfully!";
+    document.getElementById("tradeAmount").value = "";
+
+    await loadTradingBalance();
+    await loadTradePositions();
+
+  } catch (error) {
+    console.error(error);
+    message.textContent = "Trade failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function loadTradePositions() {
+  if (!currentUser) return;
+
+  const { data, error } = await db
+    .from("market_trades")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("opened_at", { ascending: false });
+
+  if (error) {
+    console.error("Positions error:", error);
+    return;
+  }
+
+  tradeRows = data || [];
+  renderTradeTables();
+}
+
+function renderTradeTables() {
+  const positions = document.getElementById("positionsTable");
+  const history = document.getElementById("ordersTable");
+
+  if (!positions || !history) return;
+
+  const open = tradeRows.filter(t => t.status === "OPEN");
+  const closed = tradeRows.filter(t => t.status === "CLOSED");
+
+  positions.innerHTML = open.length ? open.map(t => {
+    const price = tradePriceCache[t.symbol] || Number(t.current_price);
+    const pnl = calculateTradePL(t, price);
+
+    return `<tr>
+      <td>${safe(t.symbol)}</td>
+      <td>${safe(t.side)}</td>
+      <td>${tradeMoney(t.amount_inr)}</td>
+      <td>${Number(t.entry_price).toFixed(5)}</td>
+      <td>${Number(price).toFixed(5)}</td>
+      <td class="${pnl >= 0 ? "green" : "red"}">
+        ${pnl >= 0 ? "+" : ""}${tradeMoney(pnl)}
+        <button onclick="closeMarketTrade('${t.id}')"
+          style="display:block;margin-top:7px;padding:7px 12px;border:0;border-radius:6px;background:#DC4C55;color:white">
+          CLOSE
+        </button>
+      </td>
+    </tr>`;
+  }).join("") :
+  '<tr><td colspan="6" class="empty">No open positions</td></tr>';
+
+  history.innerHTML = closed.length ? closed.map(t => `
+    <tr>
+      <td>${safe(String(t.id).slice(0, 8))}</td>
+      <td>${safe(t.symbol)}</td>
+      <td>${safe(t.side)}</td>
+      <td>${tradeMoney(t.amount_inr)}</td>
+      <td>${tradeMoney(t.realized_pnl)}</td>
+      <td>${date(t.closed_at)}</td>
+    </tr>
+  `).join("") :
+  '<tr><td colspan="6" class="empty">No closed trades</td></tr>';
+}
+
+async function closeMarketTrade(id) {
+  const trade = tradeRows.find(t => t.id === id);
+
+  if (!trade || trade.status !== "OPEN") return;
+
+  const price = tradePriceCache[trade.symbol] ||
+    Number(trade.current_price);
+
+  if (!price || price <= 0) {
+    alert("Market price unavailable.");
+    return;
+  }
+
+  const estimatedPL = calculateTradePL(trade, price);
+
+  if (!confirm(
+    "Close trade? Estimated P&L: " + tradeMoney(estimatedPL)
+  )) return;
+
+  try {
+    const { data, error } = await db.rpc("close_market_trade", {
+      p_trade_id: id,
+      p_price: price
+    });
+
+    if (error) throw error;
+    if (!data || data.success !== true) {
+      throw new Error("Trade close not confirmed.");
+    }
+
+    await loadTradingBalance();
+    await loadTradePositions();
+
+    alert(
+      "Trade closed! Final P&L: " +
+      tradeMoney(data.profit_loss)
+    );
+
+  } catch (error) {
+    console.error(error);
+    alert("Close failed: " + error.message);
+  }
+}
+
+async function startTradeEngine() {
+  await loadTradingBalance();
+  await loadTradePositions();
+  await refreshTradeQuote();
+
+  setInterval(refreshTradeQuote, 30000);
  }
 </script>
 
