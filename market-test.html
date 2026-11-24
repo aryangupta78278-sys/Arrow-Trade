@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrow Trade - Market Feed</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<style>
+body{background:#101827;color:white;font-family:Arial;padding:20px}
+.card{background:#1d293b;padding:18px;margin:12px 0;border-radius:12px}
+.price{font-size:28px;font-weight:bold;margin:12px 0}
+small{color:#aab6c8}
+</style>
+</head>
+<body>
+<h2>Arrow Trade Market Feed</h2>
+<p id="status">Connecting...</p>
+
+<div id="markets"></div>
+
+<script>
+const symbols = ["EURUSD","GBPUSD","XAUUSD"];
+const prices = {};
+
+const container = document.getElementById("markets");
+
+symbols.forEach(symbol => {
+  container.innerHTML += `
+    <div class="card">
+      <h3>${symbol}</h3>
+      <div class="price" id="${symbol}">Loading...</div>
+      <small id="${symbol}_time">Waiting for price...</small>
+    </div>`;
+});
+
+const connection = new signalR.HubConnectionBuilder()
+  .withUrl("https://biquote.io/hubs/tick")
+  .withAutomaticReconnect()
+  .build();
+
+function showTick(tick) {
+  if (!symbols.includes(tick.symbol)) return;
+
+  const price = Number(tick.mid);
+  if (!Number.isFinite(price)) return;
+
+  prices[tick.symbol] = price;
+
+  document.getElementById(tick.symbol).textContent =
+    price.toFixed(tick.symbol === "XAUUSD" ? 2 : 5);
+
+  document.getElementById(tick.symbol + "_time").textContent =
+    "Last update: " + new Date().toLocaleTimeString();
+}
+
+async function start() {
+  try {
+    await connection.start();
+
+    document.getElementById("status").textContent =
+      "Connected to market feed";
+
+    for (const symbol of symbols) {
+      const tick = await connection.invoke("GetLatestTick", symbol);
+      showTick(tick);
+    }
+
+    await connection.invoke("Subscribe", symbols);
+
+  } catch (error) {
+    document.getElementById("status").textContent =
+      "Connection error: " + error.message;
+  }
+}
+
+connection.on("ReceiveTick", showTick);
+
+connection.onreconnecting(() => {
+  document.getElementById("status").textContent = "Reconnecting...";
+});
+
+connection.onreconnected(() => {
+  document.getElementById("status").textContent = "Reconnected";
+  connection.invoke("Subscribe", symbols);
+});
+
+start();
+</script>
+</body>
+</html>
