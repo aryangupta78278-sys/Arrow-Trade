@@ -2343,34 +2343,52 @@ async function selectMarket(){
     change.className = "market-change grey";
   }
 }
-async function loadMarketWatch(){
+async function loadMarketWatch() {
+  const panel = document.querySelector(".market-watch-new");
+  if (!panel) return;
 
-  const symbols = ["EUR/USD","GBP/USD","USD/JPY","XAU/USD","BTC/USD"];
+  const symbols = [
+    "EUR/USD",
+    "GBP/USD",
+    "USD/JPY",
+    "XAU/USD",
+    "BTC/USD"
+  ];
 
-  const items = document.querySelectorAll(".watch-item");
+  const items = panel.querySelectorAll(".watch-item");
 
-  for(let i=0;i<symbols.length;i++){
+  for (let i = 0; i < symbols.length && i < items.length; i++) {
+    const priceElement = items[i].querySelector(".watch-price");
 
-    const priceElement = items[i]?.querySelector("b");
-    if(!priceElement) continue;
+    if (!priceElement) continue;
 
-    try{
+    try {
       const response = await fetch(
         "/api/market?symbol=" + encodeURIComponent(symbols[i])
       );
 
       const data = await response.json();
 
-      if(!response.ok || !data.price){
+      if (!response.ok || data.price == null) {
         throw new Error(data.message || data.error || "Price unavailable");
       }
 
-      priceElement.textContent = Number(data.price).toFixed(5);
-      priceElement.className = "green";
+      const price = Number(data.price);
 
-    }catch(error){
-      console.error(symbols[i],error);
+      if (!Number.isFinite(price)) {
+        throw new Error("Invalid market price");
+      }
+
+      priceElement.textContent = price.toFixed(5);
+      priceElement.classList.remove("grey");
+      priceElement.classList.add("green");
+
+    } catch (error) {
+      console.error("Market Watch Error:", symbols[i], error);
+
       priceElement.textContent = "Unavailable";
+      priceElement.classList.remove("green");
+      priceElement.classList.add("grey");
     }
   }
 }
