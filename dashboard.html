@@ -1990,18 +1990,24 @@ function date(value){
 return value?new Date(value).toLocaleString("en-IN"):"—";
 }
 
-function showSection(id,button){
-document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
-document.getElementById(id).classList.add("active");
+function showSection(id, button) {
+    document.querySelectorAll(".section").forEach(x => x.classList.remove("active"));
 
-document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
+    const section = document.getElementById(id);
+    if (!section) return;
 
-if(button)button.classList.add("active");
+    section.classList.add("active");
+    localStorage.setItem("arrowTradeLastPage", id);
 
-document.getElementById("sidebar").classList.remove("open");
- if (id === "positions") {
-  loadTradePositions();
- }
+    document.querySelectorAll(".nav-btn").forEach(x => x.classList.remove("active"));
+
+    if (button) button.classList.add("active");
+
+    document.getElementById("sidebar").classList.remove("open");
+
+    if (id === "positions") {
+        loadTradePositions();
+    }
 }
 
 function toggleSidebar(){
@@ -2058,7 +2064,14 @@ return;
 }
 
 currentUser=data.session.user;
+const savedPage = localStorage.getItem("arrowTradeLastPage");
 
+if (savedPage && document.getElementById(savedPage)) {
+    const savedButton = Array.from(document.querySelectorAll(".nav-btn"))
+        .find(btn => (btn.getAttribute("onclick") || "").includes(savedPage));
+
+    showSection(savedPage, savedButton || null);
+}
 await loadProfile();
 await loadWallet();
 await loadInvestments();
