@@ -320,7 +320,7 @@ Withdrawal requests are subject to balance verification and admin approval.
 
     <div style="text-align:center;padding:15px;">
       <div style="font-weight:800;color:#155bb3;margin-bottom:12px;">
-        REAL QR — PAYABLE
+        DEMO QR — NOT PAYABLE
       </div>
 
       <div style="border:2px dashed #cbd5e1;padding:35px;border-radius:12px;">
@@ -330,7 +330,7 @@ Withdrawal requests are subject to balance verification and admin approval.
         </p>
       </div>
 
-      <h2 id="DepositAmount" style="margin-top:18px;">₹0.00</h2>
+      <h2 id="demoDepositAmount" style="margin-top:18px;">₹0.00</h2>
       <p style="font-size:11px;color:#718096;">Illustrative amount only</p>
     </div>
 
@@ -499,7 +499,7 @@ document.getElementById("reviewFee").textContent =
     formatINR(proposedFee);
 
 document.getElementById("reviewNet").textContent =
-    formatINR(amount - proposedFee);
+    formatINR(amount + proposedFee);
 
 document.getElementById("withdrawReviewPopup").classList.add("show");
 
