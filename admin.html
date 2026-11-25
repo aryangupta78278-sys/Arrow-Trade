@@ -627,7 +627,7 @@ async function loadCustomerInvestmentOptions() {
 
     const { data, error } = await db
         .from("portfolios")
-        .select("id, invested_amount, current_value, created_at")
+        .select("id, invested_amount, current_value, created_at, booked_profit")
         .eq("user_id", profile.id)
         .order("created_at", { ascending: false });
 
@@ -642,8 +642,9 @@ async function loadCustomerInvestmentOptions() {
         const option = document.createElement("option");
         option.value = item.id;
         option.textContent =
-            "Invested ₹" + item.invested_amount +
-            " | Current ₹" + item.current_value;
+  "Invested ₹" + item.invested_amount +
+  " | Current ₹" + item.current_value +
+  " | Profit ₹" + Math.max(0, Number(item.current_value || 0) - Number(item.invested_amount || 0) - Number(item.booked_profit || 0));
         select.appendChild(option);
     });
 }
