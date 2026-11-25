@@ -617,7 +617,7 @@ async function loadCustomerInvestmentOptions() {
     const { data: profile, error: profileError } = await db
         .from("profiles")
         .select("id")
-        .eq("id", accountId)
+        .eq("account_id", accountId)
         .maybeSingle();
 
     if (profileError || !profile) {
