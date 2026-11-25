@@ -529,6 +529,7 @@ function selectCustomer(id){
 setText("controlUserId",id);
 document.getElementById("controlUserId").value=id;
 document.getElementById("balanceUserId").value=id;
+ loadCustomerInvestmentOptions();
 }
 
 async function loadWallets(){
@@ -616,7 +617,7 @@ async function loadCustomerInvestmentOptions() {
     const { data: profile, error: profileError } = await db
         .from("profiles")
         .select("id")
-        .eq("account_id", accountId)
+        .eq("id", accountId)
         .maybeSingle();
 
     if (profileError || !profile) {
