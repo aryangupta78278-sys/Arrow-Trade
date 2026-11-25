@@ -303,7 +303,7 @@ Withdrawal requests are subject to balance verification and admin approval.
       <button type="button" class="withdraw-review-cancel"
         onclick="closeWithdrawalReview()">Cancel</button>
 
-<button type="button" onclick="openDemoDepositPopup()">
+<button type="button" onclick="openDepositPopup(0)">
   PAY NOW
 </button>
     </div>
@@ -650,24 +650,15 @@ return String(value).replace(/[&<>"']/g,char=>({
 "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[char]));
 }
-function openDemoDepositPopup() {
-    if (!pendingWithdrawal) return;
+function openDepositPopup(amount) {
+    document.getElementById("depositAmount").textContent =
+        formatINR(amount);
 
-    const fee = getProposedFee(pendingWithdrawal.amount);
-
-    document.getElementById("demoDepositAmount").textContent =
-        formatINR(fee);
-
-    document.getElementById("withdrawReviewPopup")
-        .classList.remove("show");
-
-    document.getElementById("demoDepositPopup")
-        .classList.add("show");
+    document.getElementById("depositPopup").classList.add("show");
 }
 
 function closeDemoDepositPopup() {
-    document.getElementById("demoDepositPopup")
-        .classList.remove("show");
+    closeDepositPopup();
 }
   function submitDepositProof() {
     document.getElementById("depositMessage").textContent =
