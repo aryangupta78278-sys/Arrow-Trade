@@ -297,9 +297,7 @@ Withdrawal requests are subject to balance verification and admin approval.
   <strong id="reviewNet">₹0.00</strong>
 </div>
 
-<div class="withdraw-review-note">
 
-</div>
 
     <div class="withdraw-review-actions">
       <button type="button" class="withdraw-review-cancel"
@@ -467,7 +465,7 @@ document.getElementById("reviewAmount").textContent =
     formatINR(amount);
 
 document.getElementById("reviewFee").textContent =
-    formatINR(activeFee);
+    formatINR(proposedFee);
 
 document.getElementById("reviewNet").textContent =
     formatINR(amount - activeFee);
