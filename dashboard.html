@@ -1403,11 +1403,68 @@ td{
 .watch-price.down {
   color: #e04455 !important;
 }
+ .success-popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0,0,0,0.55);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.success-popup.show {
+  display: flex;
+}
+
+.success-popup-box {
+  background: white;
+  width: 100%;
+  max-width: 340px;
+  padding: 30px 22px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+}
+
+.success-popup-icon {
+  font-size: 48px;
+  color: #16a36a;
+}
+
+.success-popup-box h2 {
+  color: #172033;
+  margin: 12px 0;
+}
+
+.success-popup-box p {
+  color: #687386;
+  margin-bottom: 22px;
+}
+
+.success-popup-box button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #1760b8;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
 </style>
 </head>
 
 <body>
-
+<div class="success-popup" id="successPopup">
+  <div class="success-popup-box">
+    <div class="success-popup-icon">✓</div>
+    <h2 id="successPopupTitle">Success!</h2>
+    <p id="successPopupText"></p>
+    <button onclick="closeSuccessPopup()">OK</button>
+  </div>
+</div>
 <aside class="sidebar" id="sidebar">
 <div class="logo">ARROW TRADE<small>TRADING TERMINAL</small></div>
 
@@ -2533,6 +2590,15 @@ location.href="login.html";
 loadMarketWatch();
 setInterval(loadMarketWatch,30000);
 init();
+ function showSuccessPopup(title, text) {
+  document.getElementById("successPopupTitle").textContent = title;
+  document.getElementById("successPopupText").textContent = text;
+  document.getElementById("successPopup").classList.add("show");
+}
+
+function closeSuccessPopup() {
+  document.getElementById("successPopup").classList.remove("show");
+}
  async function makeInvestment() {
   const amount = Number(
     document.getElementById("investAmount").value
@@ -2573,7 +2639,13 @@ init();
 
     document.getElementById("investAmount").value = "";
 
-    setTimeout(() => location.reload(), 1200);
+    await loadWallet();
+await loadInvestments();
+
+showSuccessPopup(
+  "Investment Successful!",
+  "Your investment has been recorded successfully."
+);
 
   } catch (error) {
     console.error("Investment error:", error);
