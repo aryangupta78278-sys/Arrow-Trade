@@ -340,11 +340,31 @@ document.getElementById("bankFields").classList.toggle("active",method==="Bank T
 }
 
 async function init(){
-const {data,error}=await db.auth.getSession();
-if(error || !data.session){location.href="login.html";return;}
-currentUser=data.session.user;
-await loadBalance();
-await loadHistory();
+    const balanceEl = document.getElementById("availableBalance");
+
+    try {
+        balanceEl.textContent = "Checking login...";
+
+        const {data, error} = await db.auth.getSession();
+
+        if(error) throw error;
+
+        if(!data.session){
+            location.href = "login.html";
+            return;
+        }
+
+        currentUser = data.session.user;
+
+        balanceEl.textContent = "Checking wallet...";
+
+        await loadBalance();
+        await loadHistory();
+
+    } catch(error) {
+        console.error("Init Error:", error);
+        balanceEl.textContent = "Login/Walet Error";
+    }
 }
 
 async function loadBalance(){
