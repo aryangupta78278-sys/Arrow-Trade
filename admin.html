@@ -448,7 +448,8 @@ return;
 
 customerCache=data||[];
 customerWalletMap = {};
-
+window.customerInvestmentMap = {};
+window.customerProfitMap = {};
 const { data: walletRows, error: walletError } = await db
   .from("wallets")
   .select("user_id, available_balance");
