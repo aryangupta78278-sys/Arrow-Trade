@@ -2200,7 +2200,12 @@ function getCalculatedValue(item) {
 
   setPL("totalPL", realProfit);
   setPL("todayPL", realProfit);
-}
+
+  const eligibleEl = document.getElementById("eligibleProfit");
+  if (eligibleEl) {
+    eligibleEl.textContent = money(realProfit);
+  }
+ }
 
 setInterval(updateRealProfitTimer, 1000);
 async function loadInvestments(){
@@ -2240,7 +2245,7 @@ setPL("totalPL", realProfit);
 
   document.getElementById("investment").textContent=
     money(totalInvestment);
-const eligibleProfit = Math.max(0, totalProfit);
+const eligibleProfit = Math.max(0, realProfit);
 
 document.getElementById("eligibleProfit").textContent =
   money(eligibleProfit);
