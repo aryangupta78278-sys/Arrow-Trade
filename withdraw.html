@@ -348,18 +348,41 @@ await loadHistory();
 }
 
 async function loadBalance(){
-const balanceEl=document.getElementById("availableBalance");
-const {data,error}=await db.from("wallets")
-.select("available_balance")
-.eq("user_id",currentUser.id)
-.maybeSingle();
+    const balanceEl = document.getElementById("availableBalance");
 
-if(error){console.error("Wallet Error:",error);balanceEl.textContent="Unavailable";return;}
-walletBalance=Number(data?.available_balance ?? 0);
-if(!Number.isFinite(walletBalance))walletBalance=0;
-balanceEl.textContent="₹"+walletBalance.toLocaleString("en-IN",{
-minimumFractionDigits:2,maximumFractionDigits:2
-});
+    balanceEl.textContent = "Loading...";
+
+    try {
+        const walletRequest = db
+            .from("wallets")
+            .select("available_balance")
+            .eq("user_id", currentUser.id)
+            .maybeSingle();
+
+        const timeout = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error("Wallet request timed out")), 10000);
+        });
+
+        const {data, error} = await Promise.race([
+            walletRequest,
+            timeout
+        ]);
+
+        if(error) throw error;
+
+        walletBalance = Number(data?.available_balance ?? 0);
+
+        if(!Number.isFinite(walletBalance)) walletBalance = 0;
+
+        balanceEl.textContent = "₹" + walletBalance.toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+    } catch(error) {
+        console.error("Wallet Loading Error:", error);
+        balanceEl.textContent = "Wallet unavailable";
+    }
 }
 
 async function submitWithdrawal(){
