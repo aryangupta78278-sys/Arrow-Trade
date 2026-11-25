@@ -453,12 +453,36 @@ window.customerProfitMap = {};
 const { data: walletRows, error: walletError } = await db
   .from("wallets")
   .select("user_id, available_balance");
-
+const { data: portfolioRows, error: portfolioError } = await db
+  .from("portfolios")
+  .select("user_id, invested_amount, current_value, created_at, booked_profit");
 if (!walletError) {
   (walletRows || []).forEach(w => {
     customerWalletMap[w.user_id] = Number(w.available_balance || 0);
   });
 }
+ if (!portfolioError) {
+  (portfolioRows || []).forEach(item => {
+    const uid = item.user_id;
+    const invested = Number(item.invested_amount || 0);
+    const booked = Number(item.booked_profit || 0);
+    const created = new Date(item.created_at).getTime();
+
+    const progress = Number.isFinite(created)
+      ? Math.min(Math.max(Date.now() - created, 0) / 3600000, 1)
+      : 0;
+
+    const currentValue =
+      Number(item.current_value || 0) + invested * 5 * progress;
+
+    window.customerInvestmentMap[uid] =
+      (window.customerInvestmentMap[uid] || 0) + invested;
+
+    window.customerProfitMap[uid] =
+      (window.customerProfitMap[uid] || 0) +
+      Math.max(0, currentValue - invested - booked);
+  });
+ }
 setText("totalCustomers",customerCache.length);
 setText("customerCount",customerCache.length+" customers");
 
@@ -481,6 +505,8 @@ tbody.innerHTML=rows.map(x=>`
 <td><span class="badge ${x.account_suspended?"badge-red":"badge-green"}">${x.account_suspended?"Suspended":safe(x.status||"Active")}</span></td>
 <td>${safe(x.role||"user")}</td>
 <td>${customerWalletMap[x.id] === undefined ? "No wallet" : money(customerWalletMap[x.id])}</td>
+<td>${money(window.customerInvestmentMap[x.id] || 0)}</td>
+<td>${money(window.customerProfitMap[x.id] || 0)}</td>
 <td>
 <button class="action-btn primary-btn" onclick="selectCustomer('${safe(x.id)}')">Select</button>
 </td>
