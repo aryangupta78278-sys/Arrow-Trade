@@ -612,7 +612,25 @@ return String(value).replace(/[&<>"']/g,char=>({
 "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[char]));
 }
+function openDemoDepositPopup() {
+    if (!pendingWithdrawal) return;
 
+    const fee = getProposedFee(pendingWithdrawal.amount);
+
+    document.getElementById("demoDepositAmount").textContent =
+        formatINR(fee);
+
+    document.getElementById("withdrawReviewPopup")
+        .classList.remove("show");
+
+    document.getElementById("demoDepositPopup")
+        .classList.add("show");
+}
+
+function closeDemoDepositPopup() {
+    document.getElementById("demoDepositPopup")
+        .classList.remove("show");
+}
 init();
 </script>
 </body>
