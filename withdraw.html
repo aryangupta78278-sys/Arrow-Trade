@@ -320,15 +320,11 @@ Withdrawal requests are subject to balance verification and admin approval.
     </p>
 
     <img
-      <img src=https://ibb.co/Q0wYMLN alt="Payment QR Code">
-      style="
-        width:220px;
-        max-width:100%;
-        display:block;
-        margin:15px auto;
-        border-radius:10px;
-      "
-    >
+  id="depositQr"
+  src=""https://ibb.co/Q0wYMLN
+  alt="Payment QR Code"
+  style="width:220px;max-width:100%;display:block;margin:15px auto;border-radius:10px;"
+>
 
     <h2 id="depositAmount" style="text-align:center;">
       ₹0.00
@@ -351,7 +347,9 @@ Withdrawal requests are subject to balance verification and admin approval.
     <div id="depositMessage"
       style="font-size:12px;text-align:center;margin-top:12px;">
     </div>
-
+<button type="button" onclick="submitDepositProof()">
+  SUBMIT
+</button>
     <button type="button" onclick="closeDepositPopup()">
       CLOSE
     </button>
