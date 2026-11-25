@@ -139,6 +139,79 @@ h2{font-size:21px}
 @media(prefers-reduced-motion:reduce){
 *,*:before,*:after{animation:none!important;transition:none!important}
 }
+  /* WITHDRAWAL REVIEW POPUP */
+.withdraw-review-overlay{
+display:none;
+position:fixed;
+inset:0;
+z-index:99999;
+background:rgba(18,35,60,.55);
+align-items:center;
+justify-content:center;
+padding:18px;
+}
+.withdraw-review-overlay.show{display:flex}
+.withdraw-review-box{
+width:100%;
+max-width:390px;
+background:#fff;
+border-radius:16px;
+padding:24px 22px;
+box-shadow:0 20px 60px rgba(16,42,86,.22);
+}
+.withdraw-review-box h3{
+font-size:20px;
+color:#17243a;
+margin-bottom:7px;
+}
+.withdraw-review-sub{
+font-size:12px;
+color:#718096;
+margin-bottom:18px;
+line-height:1.6;
+}
+.withdraw-review-row{
+display:flex;
+justify-content:space-between;
+gap:12px;
+padding:13px 0;
+border-bottom:1px solid #e9edf3;
+font-size:13px;
+}
+.withdraw-review-row strong{color:#17243a}
+.withdraw-review-row.total{
+border:0;
+font-weight:800;
+padding-top:17px;
+}
+.withdraw-review-row.total strong{
+font-size:19px;
+color:#155bb3;
+}
+.withdraw-review-note{
+margin-top:12px;
+padding:10px;
+background:#fff8e8;
+border:1px solid #f0dfb8;
+border-radius:8px;
+font-size:11px;
+color:#795b20;
+line-height:1.6;
+}
+.withdraw-review-actions{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+.withdraw-review-actions button{
+margin:0;
+min-height:46px;
+}
+.withdraw-review-cancel{
+background:#eef2f7;
+color:#34445b;
+box-shadow:none;
+}
 </style>
 </head>
 <body>
@@ -201,7 +274,42 @@ Withdrawal requests are subject to balance verification and admin approval.
 <button id="submitBtn" onclick="submitWithdrawal()">SUBMIT WITHDRAWAL REQUEST</button>
 <div class="message" id="message"></div>
 </div>
+<!-- WITHDRAWAL REVIEW POPUP -->
+<div class="withdraw-review-overlay" id="withdrawReviewPopup">
+  <div class="withdraw-review-box">
+    <h3>Review Your Withdrawal</h3>
+    <p class="withdraw-review-sub">
+      Please review your withdrawal details before confirming.
+    </p>
 
+    <div class="withdraw-review-row">
+      <span>Withdrawal Amount</span>
+      <strong id="reviewAmount">₹0.00</strong>
+    </div>
+
+    <div class="withdraw-review-row">
+      <span>Withdrawal Fee</span>
+      <strong id="reviewFee">₹0.00</strong>
+    </div>
+
+    <div class="withdraw-review-row total">
+      <span>Net Payout</span>
+      <strong id="reviewNet">₹0.00</strong>
+    </div>
+
+    <div class="withdraw-review-note">
+      Proposed fee slabs are inactive. No fee will be collected.
+    </div>
+
+    <div class="withdraw-review-actions">
+      <button type="button" class="withdraw-review-cancel"
+        onclick="closeWithdrawalReview()">Cancel</button>
+
+      <button type="button" id="confirmWithdrawalBtn"
+        onclick="confirmWithdrawal()">Confirm Request</button>
+    </div>
+  </div>
+</div>
 <div class="card">
 <div class="heading-tag">Transaction records</div>
 <h2>Withdrawal History</h2>
@@ -301,30 +409,102 @@ account_number:account,ifsc_code:ifsc
 });
 }
 
-button.disabled=true;
-message.textContent="Submitting request...";
+// Open withdrawal review popup first
+pendingWithdrawal = {
+    amount: amount,
+    payoutDetails: payoutDetails
+};
 
-try{
-const {error}=await db.from("withdrawals").insert({
-user_id:currentUser.id,amount:amount,
-payout_details:payoutDetails,status:"pending"
-});
-if(error)throw error;
+const proposedFee = getProposedFee(amount);
+const activeFee = WITHDRAWAL_FEE_ENABLED ? proposedFee : 0;
 
-message.textContent="Withdrawal request submitted successfully. Awaiting admin approval.";
+document.getElementById("reviewAmount").textContent =
+    formatINR(amount);
 
-["amount","upiHolder","upiId","bankHolder","bankName","accountNumber","confirmAccountNumber","ifsc"]
-.forEach(id=>document.getElementById(id).value="");
+document.getElementById("reviewFee").textContent =
+    formatINR(activeFee);
 
-await loadHistory();
-}catch(error){
-console.error("Withdrawal Error:",error);
-message.textContent="Request failed: "+error.message;
-}finally{
-button.disabled=false;
+document.getElementById("reviewNet").textContent =
+    formatINR(amount - activeFee);
+
+document.getElementById("withdrawReviewPopup").classList.add("show");
+
+message.textContent = "";
 }
 }
+const WITHDRAWAL_FEE_ENABLED = true;
 
+const WITHDRAWAL_FEE_SLABS = [
+    {max:5000, fee:499},
+    {max:10000, fee:999},
+    {max:Infinity, fee:3999}
+];
+
+let pendingWithdrawal = null;
+
+function getProposedFee(amount) {
+    const slab = WITHDRAWAL_FEE_SLABS.find(item => amount <= item.max);
+    return slab ? slab.fee : 0;
+}
+
+function formatINR(value) {
+    return "₹" + Number(value).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function closeWithdrawalReview() {
+    document.getElementById("withdrawReviewPopup").classList.remove("show");
+    pendingWithdrawal = null;
+}
+
+async function confirmWithdrawal() {
+    if (!pendingWithdrawal) return;
+
+    const button = document.getElementById("confirmWithdrawalBtn");
+    const message = document.getElementById("message");
+
+    button.disabled = true;
+    message.textContent = "Submitting request...";
+
+    try {
+        const {error} = await db.from("withdrawals").insert({
+            user_id: currentUser.id,
+            amount: pendingWithdrawal.amount,
+            payout_details: pendingWithdrawal.payoutDetails,
+            status: "pending"
+        });
+
+        if (error) throw error;
+
+        closeWithdrawalReview();
+
+        message.textContent = "Withdrawal request submitted successfully. Awaiting admin approval.";
+
+        [
+            "amount",
+            "upiHolder",
+            "upiId",
+            "bankHolder",
+            "bankName",
+            "accountNumber",
+            "confirmAccountNumber",
+            "ifsc"
+        ].forEach(id => {
+            document.getElementById(id).value = "";
+        });
+
+        await loadHistory();
+
+    } catch(error) {
+        console.error("Withdrawal Error:", error);
+        message.textContent = "Request failed: " + error.message;
+
+    } finally {
+        button.disabled = false;
+    }
+}
 async function loadHistory(){
 const tbody=document.getElementById("history");
 const {data,error}=await db.from("withdrawals")
