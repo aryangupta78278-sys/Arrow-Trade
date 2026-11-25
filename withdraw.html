@@ -303,9 +303,40 @@ Withdrawal requests are subject to balance verification and admin approval.
       <button type="button" class="withdraw-review-cancel"
         onclick="closeWithdrawalReview()">Cancel</button>
 
-      <button type="button"
-  onclick="window.location.href='https://www.arrowtrade.in/deposit.html'">
+<button type="button" onclick="openDepositPopup()">
   PAY NOW
+</button>
+    </div>
+  </div>
+</div>
+  <!-- DEMO DEPOSIT POPUP -->
+<div class="withdraw-review-overlay" id="demoDepositPopup">
+  <div class="withdraw-review-box">
+    <h3>Deposit Preview</h3>
+
+    <p class="withdraw-review-sub">
+      Illustrative demo only. No payment is accepted.
+    </p>
+
+    <div style="text-align:center;padding:15px;">
+      <div style="font-weight:800;color:#155bb3;margin-bottom:12px;">
+        REAL QR — PAYABLE
+      </div>
+
+      <div style="border:2px dashed #cbd5e1;padding:35px;border-radius:12px;">
+        <strong>REAL QR</strong>
+        <p style="font-size:11px;color:#718096;margin-top:8px;">
+          Non-functional placeholder
+        </p>
+      </div>
+
+      <h2 id="DepositAmount" style="margin-top:18px;">₹0.00</h2>
+      <p style="font-size:11px;color:#718096;">Illustrative amount only</p>
+    </div>
+
+    <div class="withdraw-review-actions">
+      <button type="button" onclick="closeDemoDepositPopup()">
+        CLOSE
       </button>
     </div>
   </div>
