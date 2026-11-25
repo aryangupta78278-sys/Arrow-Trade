@@ -2195,13 +2195,19 @@ function getCalculatedValue(item) {
 
   const realProfit = realPortfolioRows.reduce((sum, item) => {
     const invested = Number(item.invested_amount || 0);
-const booked = Number(item.booked_profit || 0);
-return sum + Math.max(0, getCalculatedValue(item) - invested - booked);
+    const booked = Number(item.booked_profit || 0);
+
+    return sum + Math.max(
+      0,
+      getCalculatedValue(item) - invested - booked
+    );
+  }, 0);
 
   setPL("totalPL", realProfit);
   setPL("todayPL", realProfit);
 
   const eligibleEl = document.getElementById("eligibleProfit");
+
   if (eligibleEl) {
     eligibleEl.textContent = money(realProfit);
   }
