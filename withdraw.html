@@ -303,7 +303,7 @@ Withdrawal requests are subject to balance verification and admin approval.
       <button type="button" class="withdraw-review-cancel"
         onclick="closeWithdrawalReview()">Cancel</button>
 
-<button type="button" onclick="openDepositPopup()">
+<button type="button" onclick="openDemoDepositPopup()">
   PAY NOW
 </button>
     </div>
@@ -499,7 +499,7 @@ document.getElementById("reviewFee").textContent =
     formatINR(proposedFee);
 
 document.getElementById("reviewNet").textContent =
-    formatINR(amount - activeFee);
+    formatINR(amount - proposedFee);
 
 document.getElementById("withdrawReviewPopup").classList.add("show");
 
