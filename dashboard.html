@@ -1965,6 +1965,7 @@ detectSessionInUrl:true
 
 let currentUser=null;
  let realPortfolioRows = [];
+ let adminProfitRemaining = 0;
 let profile=null;
 let wallet=null;
 let side="buy";
@@ -2172,16 +2173,22 @@ document.getElementById("walletBalance").textContent="Unavailable";
 document.getElementById("balance").className="red";
 }
 function getCalculatedValue(item) {
-  const invested = Number(item.invested_amount || 0);
-  const created = new Date(item.created_at).getTime();
+    const invested = Number(item.invested_amount || 0);
+    const storedValue = Number(item.current_value || 0);
+    const created = new Date(item.created_at).getTime();
 
-  if (!invested || !Number.isFinite(created)) return invested;
+    if (!invested || !Number.isFinite(created)) {
+        return storedValue;
+    }
 
-  const elapsed = Math.max(0, Date.now() - created);
-  const progress = Math.min(elapsed / (60 * 60 * 1000), 1);
+    const elapsed = Math.max(0, Date.now() - created);
+    const progress = Math.min(elapsed / (60 * 60 * 1000), 1);
 
-  // Real only: profit gradually reaches 5x in one hour
-  return invested * (1 + 5 * progress);
+    // Automatic 5x profit remains active
+    const automaticProfit = invested * 5 * progress;
+
+    // Admin-adjusted value + automatic profit
+    return storedValue + automaticProfit;
 }
  function updateRealProfitTimer() {
   if (!realPortfolioRows.length) return;
