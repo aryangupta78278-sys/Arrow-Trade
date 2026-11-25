@@ -2195,8 +2195,8 @@ function getCalculatedValue(item) {
 
   const realProfit = realPortfolioRows.reduce((sum, item) => {
     const invested = Number(item.invested_amount || 0);
-    return sum + Math.max(0, getCalculatedValue(item) - invested);
-  }, 0);
+const booked = Number(item.booked_profit || 0);
+return sum + Math.max(0, getCalculatedValue(item) - invested - booked);
 
   setPL("totalPL", realProfit);
   setPL("todayPL", realProfit);
@@ -2212,7 +2212,7 @@ async function loadInvestments(){
 
   const {data,error}=await db
     .from("portfolios")
-    .select("id,invested_amount,current_value,created_at")
+    .select("id,invested_amount,current_value,created_at,booked_profit")
     .eq("user_id",currentUser.id);
 
   if(error){
@@ -2238,7 +2238,8 @@ realPortfolioRows = rows;
 const totalProfit = currentValue - totalInvestment;
   const realProfit = rows.reduce((sum, item) => {
   const invested = Number(item.invested_amount || 0);
-  return sum + Math.max(0, getCalculatedValue(item) - invested);
+  const booked = Number(item.booked_profit || 0);
+  return sum + Math.max(0, getCalculatedValue(item) - invested - booked);
 }, 0);
 
 setPL("totalPL", realProfit);
