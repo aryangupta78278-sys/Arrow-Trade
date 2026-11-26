@@ -431,70 +431,136 @@ document.querySelectorAll(".password-toggle").forEach(button => {
   });
 });
 
-document.getElementById("signupForm").addEventListener("submit", async function(e){
+let otpSentForEmail = "";
 
+const sendOtpBtn = document.getElementById("sendOtpBtn");
+
+sendOtpBtn.addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const message = document.getElementById("message");
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    message.style.color = "#d04444";
+    message.textContent = "Please enter a valid email address.";
+    return;
+  }
+
+  sendOtpBtn.disabled = true;
+  sendOtpBtn.textContent = "SENDING OTP...";
+  message.textContent = "";
+
+  try {
+    const randomBytes = new Uint8Array(32);
+    crypto.getRandomValues(randomBytes);
+
+    const temporaryPassword = Array.from(randomBytes)
+      .map(byte => byte.toString(16).padStart(2, "0"))
+      .join("");
+
+    const { error } = await db.auth.signUp({
+      email: email,
+      password: temporaryPassword
+    });
+
+    if (error) throw error;
+
+    otpSentForEmail = email;
+
+    message.style.color = "#168b68";
+    message.textContent = "OTP sent successfully! Check your Gmail.";
+
+    sendOtpBtn.textContent = "RESEND OTP";
+    sendOtpBtn.disabled = false;
+
+  } catch (error) {
+    message.style.color = "#d04444";
+    message.textContent = error.message || "OTP sending failed.";
+
+    sendOtpBtn.textContent = "GET OTP";
+    sendOtpBtn.disabled = false;
+  }
+});
+
+
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const btn = document.getElementById("signupBtn");
   const message = document.getElementById("message");
 
   const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const otp = document.getElementById("emailOtp").value.trim();
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirmPassword").value;
 
-  if(password !== confirmPassword){
+  if (otpSentForEmail !== email) {
+    message.style.color = "#d04444";
+    message.textContent = "Please get OTP for this email first.";
+    return;
+  }
+
+  if (!/^\d{6}$/.test(otp)) {
+    message.style.color = "#d04444";
+    message.textContent = "Please enter the 6-digit OTP.";
+    return;
+  }
+
+  if (password.length < 6) {
+    message.style.color = "#d04444";
+    message.textContent = "Password must be at least 6 characters.";
+    return;
+  }
+
+  if (password !== confirmPassword) {
     message.style.color = "#d04444";
     message.textContent = "Passwords do not match.";
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = "CREATING ACCOUNT...";
+  btn.textContent = "VERIFYING OTP...";
   message.textContent = "";
 
-  try{
-
-    const {data,error} = await db.auth.signUp({
+  try {
+    const { error: verifyError } = await db.auth.verifyOtp({
       email: email,
+      token: otp,
+      type: "signup"
+    });
+
+    if (verifyError) throw verifyError;
+
+    const { error: updateError } = await db.auth.updateUser({
       password: password,
-      options:{
-        data:{
-          full_name: name
-        }
+      data: {
+        full_name: name
       }
     });
 
-    if(error) throw error;
+    if (updateError) throw updateError;
 
     message.style.color = "#168b68";
-
-    if(data.session){
-      message.textContent = "Account created successfully! Redirecting to login...";
-    }else{
-      message.textContent = "Account created! Please verify your email, then login.";
-    }
+    message.textContent = "Email verified! Account created successfully.";
 
     document.getElementById("signupForm").reset();
+    otpSentForEmail = "";
 
     document.querySelectorAll(".password-toggle").forEach(button => {
       button.textContent = "SHOW";
     });
 
-    setTimeout(()=>{
+    setTimeout(() => {
       window.location.href = "login.html";
-    },2500);
+    }, 2500);
 
-  }catch(error){
-
+  } catch (error) {
     message.style.color = "#d04444";
-    message.textContent = error.message || "Signup failed.";
+    message.textContent = error.message || "Verification failed.";
 
     btn.disabled = false;
     btn.textContent = "CREATE ACCOUNT";
-
   }
-
 });
 </script>
 
