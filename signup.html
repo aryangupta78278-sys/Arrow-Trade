@@ -390,13 +390,21 @@ a:hover {
       <button class="password-toggle" type="button" data-target="confirmPassword">SHOW</button>
     </div>
 
-    <button type="submit" class="submit-btn" id="signupBtn">
-      <div class="field">
+    <div class="field">
   <label for="emailOtp">Email OTP</label>
-  <input type="text" id="emailOtp" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric">
-      </div>
-      CREATE ACCOUNT
-    </button>
+  <input
+    type="text"
+    id="emailOtp"
+    placeholder="Enter 6-digit OTP"
+    maxlength="6"
+    inputmode="numeric"
+    autocomplete="one-time-code"
+  >
+</div>
+
+<button type="submit" class="submit-btn" id="signupBtn">
+  CREATE ACCOUNT
+</button>
 
   </form>
 
@@ -432,8 +440,31 @@ document.querySelectorAll(".password-toggle").forEach(button => {
 });
 
 let otpSentForEmail = "";
+let resendTimer = null;
+let resendSeconds = 60;
 
 const sendOtpBtn = document.getElementById("sendOtpBtn");
+
+function startResendTimer() {
+  clearInterval(resendTimer);
+
+  resendSeconds = 60;
+  sendOtpBtn.disabled = true;
+
+  sendOtpBtn.textContent = "RESEND IN 60s";
+
+  resendTimer = setInterval(() => {
+    resendSeconds--;
+
+    if (resendSeconds > 0) {
+      sendOtpBtn.textContent = `RESEND IN ${resendSeconds}s`;
+    } else {
+      clearInterval(resendTimer);
+      sendOtpBtn.disabled = false;
+      sendOtpBtn.textContent = "RESEND OTP";
+    }
+  }, 1000);
+}
 
 sendOtpBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim().toLowerCase();
@@ -450,34 +481,44 @@ sendOtpBtn.addEventListener("click", async () => {
   message.textContent = "";
 
   try {
-    const randomBytes = new Uint8Array(32);
-    crypto.getRandomValues(randomBytes);
+    if (otpSentForEmail === email) {
+      const { error } = await db.auth.resend({
+        type: "signup",
+        email: email
+      });
 
-    const temporaryPassword = Array.from(randomBytes)
-      .map(byte => byte.toString(16).padStart(2, "0"))
-      .join("");
+      if (error) throw error;
+    } else {
+      const randomBytes = new Uint8Array(32);
+      crypto.getRandomValues(randomBytes);
 
-    const { error } = await db.auth.signUp({
-      email: email,
-      password: temporaryPassword
-    });
+      const temporaryPassword = Array.from(randomBytes)
+        .map(byte => byte.toString(16).padStart(2, "0"))
+        .join("");
 
-    if (error) throw error;
+      const { error } = await db.auth.signUp({
+        email: email,
+        password: temporaryPassword
+      });
 
-    otpSentForEmail = email;
+      if (error) throw error;
+
+      otpSentForEmail = email;
+    }
 
     message.style.color = "#168b68";
-    message.textContent = "OTP sent successfully! Check your Gmail.";
+    message.textContent = "OTP sent successfully! Check your email.";
 
-    sendOtpBtn.textContent = "RESEND OTP";
-    sendOtpBtn.disabled = false;
+    startResendTimer();
 
   } catch (error) {
     message.style.color = "#d04444";
     message.textContent = error.message || "OTP sending failed.";
 
-    sendOtpBtn.textContent = "GET OTP";
     sendOtpBtn.disabled = false;
+    sendOtpBtn.textContent = otpSentForEmail === email
+      ? "RESEND OTP"
+      : "GET OTP";
   }
 });
 
