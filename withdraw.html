@@ -767,6 +767,10 @@ function openDepositPopup(amount) {
 function closeDemoDepositPopup() {
     closeDepositPopup();
 }
+  function closeSuccessPopup() {
+    document.getElementById("successPopup").classList.remove("show");
+    closeDepositPopup();
+  }
   async function submitDepositProof() {
     const message = document.getElementById("depositMessage");
     const utr = document.getElementById("depositUTR").value.trim();
