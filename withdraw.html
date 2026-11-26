@@ -702,9 +702,88 @@ function openDepositPopup(amount) {
 function closeDemoDepositPopup() {
     closeDepositPopup();
 }
-  function submitDepositProof() {
-    document.getElementById("depositMessage").textContent =
-        "Payment details have not been submitted. Verification system is not connected yet.";
+  async function submitDepositProof() {
+    const message = document.getElementById("depositMessage");
+    const utr = document.getElementById("depositUTR").value.trim();
+    const proofInput = document.getElementById("depositProof");
+    const file = proofInput.files[0];
+
+    const button = document.querySelector(
+        '#depositPopup button[onclick="submitDepositProof()"]'
+    );
+
+    try {
+        if (!currentUser) {
+            message.textContent = "Please login first.";
+            return;
+        }
+
+        if (!utr) {
+            message.textContent = "Please enter transaction ID.";
+            return;
+        }
+
+        if (!file || !file.type.startsWith("image/")) {
+            message.textContent = "Please upload a valid image.";
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            message.textContent = "Image must be below 5 MB.";
+            return;
+        }
+
+        const amount = Number(
+            document.getElementById("depositAmount")
+                .textContent.replace(/[^\d.]/g, "")
+        );
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            message.textContent = "Invalid amount.";
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "SUBMITTING...";
+
+        const filePath =
+            `deposit-proofs/${currentUser.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+
+        const { error: uploadError } = await db.storage
+            .from("payment-assets")
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = db.storage
+            .from("payment-assets")
+            .getPublicUrl(filePath);
+
+        const { error } = await db
+            .from("deposits")
+            .insert({
+                user_id: currentUser.id,
+                amount: amount,
+                utr_reference: utr,
+                proof_url: urlData.publicUrl,
+                status: "pending"
+            });
+
+        if (error) throw error;
+
+        message.textContent = "Request submitted successfully!";
+        document.getElementById("depositUTR").value = "";
+        proofInput.value = "";
+
+        alert("Request Submitted Successfully!");
+
+    } catch (error) {
+        console.error("Submission Error:", error);
+        message.textContent = "Error: " + error.message;
+    } finally {
+        button.disabled = false;
+        button.textContent = "SUBMIT";
+    }
   }
 init();
 </script>
