@@ -61,7 +61,13 @@ white-space:nowrap
 }
 
 .brand span{color:var(--blue)}
-
+.brand img {
+    display: block;
+    width: 230px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
 .nav-links{
 display:flex;
 align-items:center;
@@ -472,7 +478,9 @@ font-weight:800
     font-size: 17px;
     letter-spacing: 1px;
   }
-
+.brand img {
+    width: 185px;
+}
   .nav-links {
     display: none;
     position: absolute;
@@ -1007,7 +1015,9 @@ font-weight:800
 <header class="site-header">
 <div class="container nav">
 
-<a class="brand" href="#home">ARROW <span>TRADE.</span></a>
+<a class="brand" href="#home">
+    <img src="https://raw.githubusercontent.com/aryangupta78278-sys/Arrow-Trade/main/IMG-20261126-WA0025.jpg" alt="Arrow Trade Logo">
+</a>
 
 <nav class="nav-links" id="navLinks" aria-label="Main navigation">
 <a href="#home">Home</a>
