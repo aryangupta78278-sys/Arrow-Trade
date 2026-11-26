@@ -651,12 +651,14 @@ return String(value).replace(/[&<>"']/g,char=>({
 }[char]));
 }
 function openDepositPopup(amount) {
+    const fee = getProposedFee(Number(amount));
+
     document.getElementById("depositAmount").textContent =
-        formatINR(amount);
+        formatINR(fee);
 
-    document.getElementById("depositPopup").classList.add("show");
+    document.getElementById("depositPopup")
+        .classList.add("show");
 }
-
 function closeDemoDepositPopup() {
     closeDepositPopup();
 }
