@@ -252,6 +252,64 @@ box-shadow:none;
     min-height: 44px;
     margin-top: 12px;
 }
+  /* SUCCESS POPUP */
+.success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(0,0,0,.45);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.success-overlay.show {
+    display: flex;
+}
+
+.success-box {
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 35px 22px 28px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0,0,0,.15);
+}
+
+.success-tick {
+    width: 76px;
+    height: 76px;
+    border: 5px solid #b9e4ce;
+    border-radius: 50%;
+    color: #159447;
+    font-size: 48px;
+    line-height: 66px;
+    margin: 0 auto 24px;
+}
+
+.success-box h2 {
+    font-size: 27px;
+    color: #111;
+    margin-bottom: 22px;
+}
+
+.success-box p {
+    font-size: 16px;
+    color: #777;
+    margin-bottom: 30px;
+}
+
+.success-box button {
+    width: auto;
+    min-width: 105px;
+    padding: 0 25px;
+    min-height: 48px;
+    margin: 0;
+    background: #0861c9;
+    border-radius: 7px;
+}
 </style>
 </head>
 <body>
@@ -400,7 +458,14 @@ Withdrawal requests are subject to balance verification and admin approval.
     <p style="font-size:10px;color:#718096;text-align:center;margin-top:12px;">
       Payment verification is subject to confirmation.
     </p>
-
+<div class="success-overlay" id="successPopup">
+    <div class="success-box">
+        <div class="success-tick">✓</div>
+        <h2>Success</h2>
+        <p>Request Submitted Successfully.</p>
+        <button type="button" onclick="closeSuccessPopup()">OK</button>
+    </div>
+</div>
   </div>
 </div>
 
@@ -775,7 +840,7 @@ function closeDemoDepositPopup() {
         document.getElementById("depositUTR").value = "";
         proofInput.value = "";
 
-        alert("Request Submitted Successfully!");
+        document.getElementById("successPopup").classList.add("show");
 
     } catch (error) {
         console.error("Submission Error:", error);
