@@ -300,12 +300,15 @@ Withdrawal requests are subject to balance verification and admin approval.
 
 
     <div class="withdraw-review-actions">
-      <button type="button" class="withdraw-review-cancel"
+      
+    <button type="button" class="withdraw-review-cancel"
         onclick="closeWithdrawalReview()">Cancel</button>
 
-onclick="openDepositPopup(document.getElementById('withdrawAmount').value)"
-  PAY NOW
-</button>
+    <button type="button" class="withdraw-review-confirm"
+        onclick="openDepositPopup(document.getElementById('amount').value)">
+        PAY NOW
+    </button>
+      </div>
     </div>
   </div>
 </div>
